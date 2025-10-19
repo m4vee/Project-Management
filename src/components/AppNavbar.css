@@ -1,0 +1,182 @@
+.app-navbar {
+  background: linear-gradient(90deg, #7a0000 0%, #4b0000 100%);
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 80px;
+  padding: 0 25px;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
+
+/* ===== LEFT SIDE ===== */
+.app-navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 90px;
+}
+
+/* Logo + App Name */
+.app-logo {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.app-logo img {
+  width: 55px;
+  height: 55px;
+  object-fit: contain;
+  border-radius: 50%;
+}
+
+.app-logo h2 {
+  font-size: 1.9rem;
+  margin: 0;
+}
+
+/* Search bar */
+.search-bar {
+  position: relative;
+}
+
+.search-bar input {
+  padding: 8px 35px 8px 15px;
+  border: none;
+  border-radius: 25px;
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+  outline: none;
+  font-size: 0.95rem;
+  width: 300px;
+  transition: all 0.3s ease;
+}
+
+.search-bar input::placeholder {
+  color: #ddd;
+}
+
+.search-bar input:focus {
+  background: rgba(255,255,255,0.3);
+  width: 350px;
+}
+
+.search-bar i {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #fff;
+}
+
+/* ===== RIGHT SIDE ===== */
+.app-navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  font-size: 1.3rem;
+}
+
+.app-navbar-right i {
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.app-navbar-right i:hover {
+  color: #fff704;
+}
+
+/* Profile icon */
+.profile-icon img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid #fff;
+}
+
+/* ===== Responsive Design ===== */
+/* ===== Responsive Design ===== */
+@media (max-width: 960px) {
+  .app-navbar {
+    flex-direction: column;
+    align-items: stretch;
+    height: auto;
+    padding: 12px 18px;
+    gap: 10px;
+  }
+
+  .app-navbar-left {
+    width: 100%;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  /* Search bar centered and fits screen */
+  .search-bar {
+    width: 50%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .search-bar input {
+    width: 90%;
+    max-width: 350px;
+    border-radius: 25px;
+    background: rgba(255,255,255,0.25);
+    font-size: 0.95rem;
+    color: #fff;
+    text-align: left;
+    transition:none;
+  }
+
+  .search-bar input::placeholder {
+    color: #f2f2f2;
+  }
+
+  .app-navbar-right {
+    width: 100%;
+    justify-content: space-evenly;
+    font-size: 1.2rem;
+    margin-top: 5px;
+  }
+}
+
+/* ===== Smaller screens ===== */
+@media (max-width: 600px) {
+  .app-logo img {
+    width: 20px;
+    height: 20px;
+  }
+
+  .app-logo i {
+  font-size: 1rem; /* smaller icon */
+  margin-left: 5px;  /* a little space from text */
+  color: #fff;       /* ensure it matches your navbar */
+  vertical-align: middle;
+}
+
+
+  .app-logo h2 {
+    font-size: 1.3rem;
+  }
+
+  .search-bar input {
+    width: 100%;
+    max-width: 280px;
+    font-size: 0.9rem;
+  }
+
+  .app-navbar-right {
+    font-size: 1.1rem;
+    gap: 25px;
+  }
+
+  .profile-icon img {
+    width: 35px;
+    height: 35px;
+  }
+}

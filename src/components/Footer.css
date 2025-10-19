@@ -1,0 +1,85 @@
+.footer-container {
+  background-color: #242424;
+  color: white;
+  padding: 3rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.footer-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  max-width: 800px; /* keeps it centered with padding on sides */
+  width: 100%;
+  gap: 19rem;
+}
+
+.footer-subscription,
+.footer-contact {
+  flex: 1;
+}
+
+.footer-subscription-heading,
+.footer-contact h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.footer-subscription-text {
+  margin-bottom: 1rem;
+}
+
+.input-areas form {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.footer-input {
+  padding: 0.5rem;
+  border: none;
+  border-radius: 4px;
+  outline: none;
+}
+
+.footer-contact ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-contact li {
+  margin: 5px 0;
+}
+
+.footer-contact a {
+  color: white;
+  text-decoration: none;
+}
+
+.footer-contact a:hover {
+  text-decoration: underline;
+}
+
+.footer-rights {
+  text-align: center;
+  margin-top: 2rem;
+  font-size: 0.9rem;
+  color: #ccc;
+}
+
+@media (max-width: 768px) {
+  .footer-inner {
+    flex-direction: column;
+    align-items: center; /* center both sections vertically */
+    text-align: center;
+    gap: 2rem; /* reduce vertical space */
+  }
+
+  .input-areas form {
+    flex-direction: column;
+  }
+}
+

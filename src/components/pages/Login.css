@@ -1,0 +1,166 @@
+/* 🌆 Background setup */
+.login-page {
+  height: 100vh;
+  background: url('/images/login2.jpg') no-repeat center center/cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Wrapper to center content */
+.wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+/* 💎 Glassmorphism login box */
+.form-box-login {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 40px 50px;
+  box-shadow: 0 32px 32px rgba(0, 0, 0, 0.37);
+  width: 350px;
+  text-align: center;
+  color: white;
+  
+}
+
+/* Title */
+.form-box-login h1 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: #ffffff;
+}
+
+/* Input fields */
+.input-box {
+  position: relative;
+  margin: 20px 0;
+}
+
+.input-box input {
+  width: 100%;
+  padding: 12px 40px 12px 15px;
+  border: none;
+  border-radius: 25px;
+  outline: none;
+  background: rgba(255, 255, 255, 0.25);
+  color: #fff;
+  font-size: 1rem;
+}
+
+.input-box input::placeholder {
+  color: #eee;
+}
+
+/* Icons */
+.input-box i {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #fff;
+}
+
+/* Remember + Forgot */
+.remember-forgot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  margin: 10px 0 20px;
+  flex-wrap: wrap;
+}
+
+.remember-forgot a {
+  color: #00c3ff;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.remember-forgot a:hover {
+  color: #00ffff;
+}
+
+/* Login Button */
+.login-btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 25px;
+  background: linear-gradient(135deg, #00c3ff, #0062ff);
+  color: white;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.login-btn:hover {
+  background: linear-gradient(135deg, #0062ff, #00c3ff);
+}
+
+/* Register link */
+.register-link {
+  margin-top: 20px;
+  font-size: 0.9rem;
+}
+
+.register-link a {
+  color: #00c3ff;
+  text-decoration: none;
+}
+
+/* 🌈 Fade-in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 📱 Responsive design */
+@media (max-width: 768px) {
+  .form-box-login {
+    width: 90%;
+    padding: 30px 25px;
+  }
+
+  .form-box-login h1 {
+    font-size: 1.8rem;
+  }
+
+  .input-box input {
+    font-size: 0.95rem;
+  }
+
+  .remember-forgot {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .login-btn {
+    padding: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .form-box-login {
+    width: 85%;
+    padding: 25px 20px;
+  }
+
+  .form-box-login h1 {
+    font-size: 1.6rem;
+  }
+}
