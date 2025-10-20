@@ -138,7 +138,7 @@
 /* ===== Service Navbar ===== */
 .service-navbar {
   display: flex;
-  justify-content: center;
+  justify-content: space-between; /* Default: buttons on left, post button on right */
   align-items: center;
   gap: 30px;
   padding: 12px 0;
@@ -146,12 +146,45 @@
   box-shadow: 0 0 0 rgba(0,0,0,0.2);
   margin: 0 20px 10px 290px;
   position: sticky;
-  top: 70px; /* adjust if your AppNavbar is taller */
+  top: 80px; 
   z-index: 10;
   transition: all 0.3s ease;
-  top: 80px;
+}
+.service-navbar.centered-nav {
+  justify-content: center; /* Override to center the buttons */
 }
 
+
+.service-navbar > div {
+  display: flex;
+  gap: 30px;
+}
+
+.service-navbar > div {
+  display: flex;
+  gap: 30px; /* This keeps your original 30px gap */
+}
+
+.post-item-btn {
+  background-color: #800000;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 20px; /* Matched your .service-btn style */
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 15px;
+  transition: background-color 0.3s ease;
+  white-space: nowrap; /* Prevents button from wrapping */
+}
+
+.post-item-btn:hover {
+  background-color: #600000;
+}
+
+.post-item-btn i {
+  margin-left: 8px;
+}
 .service-navbar.scrolled {
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   background: #ffffff;
