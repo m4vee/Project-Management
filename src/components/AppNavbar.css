@@ -98,6 +98,10 @@
   border: 2px solid #fff;
 }
 
+.notification-container {
+  position: relative;
+}
+
 /* ===== Responsive Design ===== */
 /* ===== Responsive Design ===== */
 @media (max-width: 960px) {

@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import "./AppNavbar.css";
+import Notification from "./Notification"; // ✅ correct place for the import
 
 export default function AppNavbar() {
+
   return (
     <nav className="app-navbar">
       <div className="app-navbar-left">
@@ -9,7 +11,7 @@ export default function AppNavbar() {
           <img src="/images/logo.jpg" alt="TUPulse" />
           <h2>TUPulse <i className='fab fa-typo3'></i></h2>
         </div>
-        
+
         <div className="search-bar">
           <input type="text" placeholder="Search" />
           <i className="fa-solid fa-magnifying-glass"></i>
@@ -17,7 +19,7 @@ export default function AppNavbar() {
       </div>
 
       <div className="app-navbar-right">
-        <i className="fa-solid fa-bell"></i>
+       <Notification />
         <i className="fa-solid fa-comment"></i>
         <i className="fa-solid fa-cart-shopping"></i>
         <div className="profile-icon">

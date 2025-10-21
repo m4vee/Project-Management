@@ -81,8 +81,8 @@ export default function HomePage() {
 
       <div className={`service-navbar ${isSticky ? "scrolled" : ""}`}>
         <div>
-            <button className={`service-btn ${filter === "all" ? "active" : ""}`} onClick={() => setFilter("all")}>All Posts</button>
-            <button className={`service-btn ${filter === "buy/sell" ? "active" : ""}`} onClick={() => setFilter("buy/sell")}>Buy/Sell</button>
+            <button className={`service-btn ${filter === "all" ? "active" : ""}`} onClick={() => setFilter("all")}>All</button>
+            <button className={`service-btn ${filter === "buy/sell" ? "active" : ""}`} onClick={() => setFilter("buy/sell")}>Buy</button>
             <button className={`service-btn ${filter === "rent" ? "active" : ""}`} onClick={() => setFilter("rent")}>Rent</button>
             <button className={`service-btn ${filter === "swap" ? "active" : ""}`} onClick={() => setFilter("swap")}>Swap</button>
         </div>
