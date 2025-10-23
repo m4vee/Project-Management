@@ -1,9 +1,3 @@
-/* Profile.css
-    Facebook-style layout (non-overlapping)
-    Color scheme: dark red header, cream buttons, gold accents
-    Uses CSS variables for dark mode switching.
-*/
-
 :root {
   --brand-red: #8a0f0f;
   --brand-red-dark: #5a0a0a;
@@ -30,6 +24,7 @@
 * {
   box-sizing: border-box;
 }
+
 body {
   background: var(--bg-color);
   color: var(--text-color);
@@ -213,32 +208,35 @@ body {
   font-size: 13px;
 }
 
-/* Avatar overlapping cover */
+
+/* Avatar styling to make it circular and large */
 .profile-avatar-column {
   position: absolute;
-  bottom: -75px; /* Keeps the avatar slightly overlapping the cover */
-  left: 20px;  /* Adjust this for the horizontal position */
+  bottom: -75px; 
+  left: 20px; 
   z-index: 2;
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;
+  width: 180px; 
+  height: 180px; 
+  border-radius: 50%; 
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   background: white;
 }
 
 .avatar-wrapper {
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;  /* Circular avatar */
+  width: 180px; 
+  height: 180px;
+  border-radius: 50%; 
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   background: white;
+  overflow: hidden; 
 }
 
 .avatar-img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: cover; 
 }
+
 
 /* Header info card below cover */
 .profile-header {
@@ -258,8 +256,8 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  align-items: flex-start;
+  gap: 12px;
+  align-items: flex;
 }
 
 .profile-info h1 {
@@ -319,19 +317,6 @@ body {
   cursor: pointer;
   margin-left: 10px; /* Space between the button and the three dots */
   align-self: center;  /* Align the dots vertically with the button */
-}
-.edit-profile-btn {
-  background-color: var(--brand-red);
-  color: white;
-  padding: 8px 16px;
-  border-radius: 6px;
-  text-decoration: none;
-  margin-top: 12px;
-  display: inline-block;
-}
-
-.edit-profile-btn:hover {
-  background-color: #5a0a0a;
 }
 
 

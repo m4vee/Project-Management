@@ -1,0 +1,157 @@
+/* Account Settings Container */
+.account-settings-container {
+  padding: 20px;
+  max-width: 800px;
+  margin: 40px auto;
+  font-family: Arial, sans-serif;
+  border: 2px solid #b22222; /* Red border */
+  border-radius: 10px;
+  background-color: white;
+  box-sizing: border-box;
+}
+
+h1 {
+  font-size: 32px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.settings-section {
+  margin-bottom: 30px;
+  padding: 15px;
+  border-bottom: 1px solid #f2f2f2;
+}
+
+.settings-section h2 {
+  font-size: 24px;
+  margin-bottom: 15px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* For form elements */
+.setting-item {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column; /* Stack input fields */
+  align-items: flex-start;
+}
+
+.setting-item label {
+  font-size: 16px;
+  color: #555;
+  margin-bottom: 8px; /* Spacing between label and input */
+}
+
+.setting-item input {
+  padding: 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 100%; /* Make inputs take full width */
+  box-sizing: border-box;
+  margin-bottom: 10px; /* Space between inputs */
+}
+
+/* Button Styles */
+.setting-item button {
+  padding: 12px 20px;
+  font-size: 14px;
+  border-radius: 5px;
+  background-color: #f2b331; /* Yellow button */
+  color: white;
+  border: none;
+  cursor: pointer;
+  width: 100%; /* Make button the same width as input */
+  box-sizing: border-box;
+}
+
+.setting-item button:hover {
+  background-color: #f0a420; /* Darker yellow for hover effect */
+}
+
+/* Save Button Styling */
+.save-button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.save-button {
+  background-color: #b22222; /* Red background for save button */
+  color: white;
+  font-size: 16px;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%; /* Match width with inputs */
+}
+
+.save-button:hover {
+  background-color: #8b0000; /* Darker red for hover */
+}
+
+/* Back Button */
+.back-button {
+  background-color: #b22222;
+  color: white;
+  font-size: 16px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  width: 150px;
+  display: inline-block;
+}
+
+.back-button:hover {
+  background-color: #8b0000;
+}
+
+/* Switch and Toggle Styles */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 34px;
+  height: 20px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 50px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 12px;
+  width: 12px;
+  border-radius: 50%;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.4s;
+}
+
+input:checked + .slider {
+  background-color: #f2b331;
+}
+
+input:checked + .slider:before {
+  transform: translateX(14px);
+}
