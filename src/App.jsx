@@ -1,28 +1,45 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
 import "./index.css";
 import Navbar from "./components/Navbar.jsx";
 import Home from "./components/pages/Home.jsx";
 import Services from "./components/pages/Services.jsx";
 import Login from "./components/pages/Login.jsx";
 import SignUp from "./components/pages/SignUp.jsx";
-import HomePage from "./components/pages/HomePage.jsx"; // This is your inside app
+import HomePage from "./components/pages/HomePage.jsx"; // Inside app page
+import AppNavbar from "./components/AppNavbar.jsx"; // AppNavbar for logged-in state
+import Profile from "./components/pages/Profile.jsx"; // Profile Component
+import ProfileEdit from "./components/pages/ProfileEdit.jsx"; // ProfileEdit Component
 
 function AppContent() {
   const location = useLocation();
 
-  // Hide Navbar inside the logged-in app
-  const hideNavbarRoutes = ["/inside-app"];
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const loggedIn = localStorage.getItem("isLoggedIn") === "true";
+    setIsLoggedIn(loggedIn);
+  }, []);
+
+  const hideNavbarRoutes = ["/profile", "/inside-app", "/app-navbar"];
 
   return (
     <>
-      {!hideNavbarRoutes.includes(location.pathname) && <Navbar />}
+      {/* Conditionally render Navbar or AppNavbar based on login status */}
+      {isLoggedIn && !hideNavbarRoutes.includes(location.pathname) ? (
+        <AppNavbar />
+      ) : (
+        !hideNavbarRoutes.includes(location.pathname) && <Navbar />
+      )}
 
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/services" element={<Services />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/inside-app" element={<HomePage />} /> {/* Changed here */}
+        <Route path="/inside-app" element={<HomePage />} />
+        <Route path="/profile" element={<Profile />} /> {/* Profile Page */}
+        <Route path="/profile/edit" element={<ProfileEdit />} /> {/* Profile Edit Page */}
       </Routes>
     </>
   );

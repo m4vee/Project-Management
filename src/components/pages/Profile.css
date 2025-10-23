@@ -1,0 +1,556 @@
+/* Profile.css
+    Facebook-style layout (non-overlapping)
+    Color scheme: dark red header, cream buttons, gold accents
+    Uses CSS variables for dark mode switching.
+*/
+
+:root {
+  --brand-red: #8a0f0f;
+  --brand-red-dark: #5a0a0a;
+  --accent-gold: #e8c37a;
+  --cream: #f6e9e6;
+  --muted: #777;
+  --bg-color: #ffffff;
+  --card-bg: #ffffff;
+  --text-color: #111;
+  --glass: rgba(255, 255, 255, 0.9);
+  --shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="dark"] {
+  --bg-color: #0f0f10;
+  --card-bg: #161616;
+  --text-color: #eee;
+  --glass: rgba(255, 255, 255, 0.03);
+  --shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+  --brand-red: #5a0a0a;
+  --cream: #1f1f1f;
+}
+
+* {
+  box-sizing: border-box;
+}
+body {
+  background: var(--bg-color);
+  color: var(--text-color);
+  font-family: "Inter", system-ui, Arial;
+  margin: 0;
+}
+
+/* TOPBAR */
+.profile-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 24px;
+  background: linear-gradient(90deg, var(--brand-red), var(--brand-red-dark));
+  color: var(--cream);
+  position: sticky;
+  top: 0;
+  z-index: 25;
+  box-shadow: var(--shadow);
+}
+.profile-topbar .logo {
+  background: #ffd27a;
+  color: var(--brand-red-dark);
+  padding: 10px 14px;
+  border-radius: 24px;
+  font-weight: 700;
+  margin-right: 16px;
+}
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.top-search input {
+  width: 360px;
+  max-width: 45vw;
+  padding: 10px 14px;
+  border-radius: 24px;
+  border: none;
+  outline: none;
+}
+
+/* topbar right */
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.icon-btn {
+  background: transparent;
+  border: none;
+  color: var(--cream);
+  margin-right: 8px;
+  cursor: pointer;
+  font-size: 18px;
+  text-decoration: none;
+}
+.avatar-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  width: 44px;
+  height: 44px;
+}
+.avatar-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%; /* Circular Avatar */
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+/* DROPDOWN */
+.profile-dropdown {
+  position: absolute;
+  right: 20px;
+  top: 68px;
+  background: var(--card-bg);
+  color: var(--text-color);
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  min-width: 200px;
+  z-index: 40;
+}
+.profile-dropdown .dd-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 10px;
+  align-items: center;
+  cursor: pointer;
+  border-radius: 6px;
+  text-decoration: none;
+  color: inherit;
+}
+.profile-dropdown .dd-item:hover {
+  background: var(--glass);
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: space-between;
+}
+.switch {
+  position: relative;
+  width: 44px;
+  height: 24px;
+}
+.switch input {
+  display: none;
+}
+.switch .slider {
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  background: #ddd;
+}
+.switch input:checked + .slider {
+  background: var(--brand-red);
+}
+.switch .slider::after {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  top: 3px;
+  left: 3px;
+  background: white;
+  transition: 0.2s;
+}
+.switch input:checked + .slider::after {
+  transform: translateX(20px);
+}
+
+/* MAIN LAYOUT GRID */
+.profile-main {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 24px;
+  padding: 18px 28px;
+  align-items: start;
+}
+
+/* ========================================
+   FACEBOOK-STYLE PROFILE HEADER & AVATAR
+   ======================================== */
+
+/* Cover */
+.cover-avatar-container {
+  position: relative;
+  width: 100%;
+  height: 220px; /* Set a fixed height for the cover */
+}
+
+.cover {
+  position: relative;
+  width: 96vw; /* Ensures the cover image spans the entire viewport width */
+  height: 220px; /* Set height */
+  background-size: cover;
+  background-position: center;
+  z-index: 1;
+}
+
+/* Change cover button */
+.cover .cover-overlay {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+}
+.cover-actions {
+  background: rgba(0, 0, 0, 0.45);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+}
+
+/* Avatar overlapping cover */
+.profile-avatar-column {
+  position: absolute;
+  bottom: -75px; /* Keeps the avatar slightly overlapping the cover */
+  left: 20px;  /* Adjust this for the horizontal position */
+  z-index: 2;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  background: white;
+}
+
+.avatar-wrapper {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;  /* Circular avatar */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  background: white;
+}
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Header info card below cover */
+.profile-header {
+  grid-column: 1 / -1;  /* Align to the full width of the screen */
+  grid-row: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: #fff;
+  padding: 20px 28px;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  margin-top: 50px;
+}
+
+.profile-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-start;
+}
+
+.profile-info h1 {
+  margin: 0;
+  font-size: 2rem; /* Facebook-style font size */
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Arial', sans-serif; /* Change font family to match Facebook */
+}
+
+.verified {
+  color: var(--accent-gold);
+  font-size: 1.1rem;
+}
+.subtitle {
+  margin: 4px 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+/* Profile actions section */
+.profile-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-end;  /* Aligns button to the right */
+  width: 100%;  /* Ensure it takes full width to align the elements properly */
+}
+
+/* Button Styles */
+.btn {
+  background: var(--cream);
+  color: var(--brand-red);
+  border: none;
+  padding: 8px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+}
+
+.btn.primary {
+  background: var(--brand-red);
+  color: white;
+  border-radius: 20px;
+  padding: 8px 18px;
+  font-weight: 600;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+  margin-left: auto;  /* Pushes the button to the right side within the flex container */
+}
+
+.more-dots {
+  font-size: 1.8rem;
+  color: var(--muted);
+  cursor: pointer;
+  margin-left: 10px; /* Space between the button and the three dots */
+  align-self: center;  /* Align the dots vertically with the button */
+}
+.edit-profile-btn {
+  background-color: var(--brand-red);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  text-decoration: none;
+  margin-top: 12px;
+  display: inline-block;
+}
+
+.edit-profile-btn:hover {
+  background-color: #5a0a0a;
+}
+
+
+/* Divider line */
+.profile-header::after {
+  content: "";
+  display: block;
+  height: 1px;
+  background: #ddd;
+  margin-top: 20px;
+}
+
+/* Left column */
+.left-column {
+  grid-column: 1 / 2;
+  grid-row: 3;
+  padding-left: 40px;
+}
+.content-column {
+  grid-column: 2 / 3;
+  grid-row: 3;
+}
+
+/* Photos grid */
+.photos-grid img {
+  width: 100%;
+  border-radius: 14px;
+  object-fit: cover;
+  box-shadow: var(--shadow);
+}
+
+/* Rating box */
+.rating-box {
+  margin-top: 18px;
+  background: #fffbeb;
+  padding: 12px;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  border: 1px solid #fde68a;
+}
+.big-rating {
+  font-size: 28px;
+  font-weight: 700;
+  margin-right: 8px;
+  color: #d97706;
+}
+.rating-stars .star-string {
+  color: var(--accent-gold);
+}
+
+/* Filters */
+.filters-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.filter-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.filter-btn {
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: var(--cream);
+  cursor: pointer;
+}
+.filter-btn.active {
+  background: var(--brand-red);
+  color: white;
+}
+.filters-row .search-row input {
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: var(--cream);
+  color: var(--text-color);
+  outline: none;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+/* Posts grid */
+.posts-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+.post-card {
+  background: var(--card-bg);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+}
+.post-thumb img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  display: block;
+}
+.post-body {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.post-title {
+  font-weight: 700;
+}
+.post-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.price {
+  background: var(--accent-gold);
+  padding: 6px 10px;
+  border-radius: 999px;
+  color: var(--brand-red-dark);
+  font-weight: 700;
+}
+.category {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* Modal */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 60;
+}
+.modal-card {
+  width: 520px;
+  max-width: 92%;
+  background: var(--card-bg);
+  padding: 18px;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+}
+
+/* Helpers */
+.hidden-file {
+  display: none;
+}
+.small {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.no-posts {
+  padding: 40px;
+  text-align: center;
+  color: var(--muted);
+}
+
+/* Responsive */
+@media (max-width: 980px) {
+  .profile-main {
+    grid-template-columns: 1fr;
+    padding: 12px;
+  }
+
+  .profile-avatar-column {
+    justify-content: center;
+    padding-left: 0;
+    margin-top: -60px;
+  }
+  .profile-header {
+    grid-column: 1 / -1;
+    align-items: center;
+    text-align: center;
+    margin-top: 0;
+  }
+  .left-column {
+    grid-column: 1 / -1;
+    padding-left: 0;
+  }
+  .content-column {
+    grid-column: 1 / -1;
+  }
+  .avatar-wrapper {
+    width: 120px;
+    height: 120px;
+  }
+  .posts-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .top-search input {
+    width: 200px;
+  }
+  .profile-dropdown {
+    right: 10px;
+    top: 64px;
+  }
+}
+
+@media (max-width: 560px) {
+  .posts-grid {
+    grid-template-columns: 1fr;
+  }
+  .top-search input {
+    display: none;
+  }
+  .filter-btn {
+    padding: 6px 10px;
+    font-size: 14px;
+  }
+  .filters-row .search-row input {
+    width: 100%;
+  }
+}

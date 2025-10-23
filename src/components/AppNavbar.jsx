@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "./AppNavbar.css";
 import Notification from "./Notification"; // ✅ correct place for the import
+import { Link } from "react-router-dom";
 
 export default function AppNavbar() {
 
@@ -23,7 +24,10 @@ export default function AppNavbar() {
         <i className="fa-solid fa-comment"></i>
         <i className="fa-solid fa-cart-shopping"></i>
         <div className="profile-icon">
-          <img src="/images/mikha.webp" alt="User" />
+          <Link to="/profile">
+  <img src="/images/mikha.webp" alt="User" />
+</Link>
+
         </div>
       </div>
     </nav>
