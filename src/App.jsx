@@ -1,45 +1,82 @@
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
-import { useState, useEffect } from "react";
 import "./index.css";
+
+// Components
 import Navbar from "./components/Navbar.jsx";
+import AppNavbar from "./components/AppNavbar.jsx";
+
+// Pages
 import Home from "./components/pages/Home.jsx";
 import Services from "./components/pages/Services.jsx";
 import Login from "./components/pages/Login.jsx";
 import SignUp from "./components/pages/SignUp.jsx";
-import HomePage from "./components/pages/HomePage.jsx"; // Inside app page
-import AppNavbar from "./components/AppNavbar.jsx"; // AppNavbar for logged-in state
-import Profile from "./components/pages/Profile.jsx"; // Profile Component
-import ProfileEdit from "./components/pages/ProfileEdit.jsx"; // ProfileEdit Component
+import HomePage from "./components/pages/HomePage.jsx";
+import Profile from "./components/pages/Profile.jsx";
+import ProfileEdit from "./components/pages/ProfileEdit.jsx";
+
+// Inside-app sections
+import Cart from "./components/Cart.jsx";
+import Checkout from "./components/Checkout.jsx";
+import Receipt from "./components/pages/Receipt.jsx";
+import Chat from "./components/pages/Chat.jsx"; // ✅ updated import path to match your Chat.jsx file
+
+// Cart Context
+import { CartProvider } from "./context/CartContext.jsx";
 
 function AppContent() {
   const location = useLocation();
-
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  // Check login state from localStorage
   useEffect(() => {
     const loggedIn = localStorage.getItem("isLoggedIn") === "true";
     setIsLoggedIn(loggedIn);
   }, []);
 
-  const hideNavbarRoutes = ["/profile", "/inside-app", "/app-navbar"];
+  // ✅ Updated routes inside app layout
+  const insideAppRoutes = [
+    "/profile",
+    "/profile/edit",
+    "/inside-app",
+    "/app-navbar",
+    "/cart",
+    "/checkout",
+    "/receipt",
+    "/chat"
+  ];
+
+  const isInsideApp = insideAppRoutes.includes(location.pathname);
 
   return (
     <>
-      {/* Conditionally render Navbar or AppNavbar based on login status */}
-      {isLoggedIn && !hideNavbarRoutes.includes(location.pathname) ? (
+      {/* ✅ Correct Navbar logic remains unchanged */}
+      {isLoggedIn && isInsideApp ? (
         <AppNavbar />
       ) : (
-        !hideNavbarRoutes.includes(location.pathname) && <Navbar />
+        !isInsideApp && <Navbar />
       )}
 
+      {/* ✅ All Routes kept intact */}
       <Routes>
+        {/* Public Pages */}
         <Route path="/" element={<Home />} />
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/services" element={<Services />} />
         <Route path="/login" element={<Login />} />
+
+        {/* Inside App Pages */}
         <Route path="/inside-app" element={<HomePage />} />
-        <Route path="/profile" element={<Profile />} /> {/* Profile Page */}
-        <Route path="/profile/edit" element={<ProfileEdit />} /> {/* Profile Edit Page */}
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/profile/edit" element={<ProfileEdit />} />
+
+        {/* E-Commerce Routes */}
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/receipt" element={<Receipt />} />
+
+        {/* ✅ Chat Route — now fully integrated */}
+        <Route path="/chat" element={<Chat />} />
       </Routes>
     </>
   );
@@ -48,7 +85,9 @@ function AppContent() {
 export default function App() {
   return (
     <Router>
-      <AppContent />
+      <CartProvider>
+        <AppContent />
+      </CartProvider>
     </Router>
   );
 }

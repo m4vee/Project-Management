@@ -172,25 +172,25 @@ export default function Profile() {
           </button>
 
           {dropdownOpen && (
-            <div className="profile-dropdown" onClick={(e) => e.stopPropagation()}>
+            < div className="profile-dropdown" onClick={(e) => e.stopPropagation()}>
               <Link to="/profile" className="dd-item">View Profile</Link>
-              <Link to="/orders" className="dd-item">View Orders</Link>
+              <Link to="/cart" className="dd-item">🛒 My Cart</Link>
 
-              <div className="dd-item toggle-row">
-                <span>Dark Mode</span>
-                <label className="switch">
+                <div className="dd-item toggle-row">
+      <         span>Dark Mode</span>
+                  <label className="switch">
                   <input
                     type="checkbox"
                     checked={theme === "dark"}
                     onChange={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
-                  />
-                  <span className="slider" />
-                </label>
-              </div>
+                    />
+                    <span className="slider" />
+                  </label>
+                </div>
 
-              <button className="dd-item logout" onClick={handleLogout}>Logout</button>
-            </div>
-          )}
+    <button className="dd-item logout" onClick={handleLogout}>Logout</button>
+  </div>
+)}
         </div>
       </header>
 
