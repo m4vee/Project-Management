@@ -1,0 +1,243 @@
+/* src/components/Receipt.css */
+
+/* CSS Variables for Consistency and Easy Theming */
+:root {
+  --primary-color: #2563eb; /* Professional blue */
+  --secondary-color: #64748b; /* Neutral gray */
+  --accent-color: #10b981; /* Green for success/confirmation */
+  --text-color: #1f2937; /* Dark gray for text */
+  --bg-color: #f8fafc; /* Light background */
+  --card-bg: #ffffff; /* White card background */
+  --border-color: #e5e7eb; /* Light border */
+  --shadow: 0 10px 25px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  --border-radius: 12px; /* Rounded corners */
+  --font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Modern font stack */
+}
+
+/* Container */
+.receipt-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  background: linear-gradient(135deg, var(--bg-color) 0%, #e2e8f0 100%); /* Subtle gradient background */
+  font-family: var(--font-family);
+}
+
+/* Card */
+.receipt-card {
+  background: var(--card-bg);
+  width: 100%;
+  max-width: 500px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  animation: fadeIn 0.5s ease-in-out; /* Smooth entrance animation */
+}
+
+/* Header */
+.receipt-header {
+  text-align: center;
+  padding: 30px 20px 20px;
+  background: linear-gradient(135deg, var(--primary-color), #1d4ed8); /* Gradient header */
+  color: white;
+}
+
+.receipt-icon {
+  font-size: 3rem;
+  margin-bottom: 10px;
+}
+
+.receipt-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 0 0 10px;
+}
+
+.receipt-subtitle {
+  font-size: 1rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+/* Content */
+.receipt-content {
+  padding: 20px;
+}
+
+/* Items Section */
+.receipt-items {
+  margin-bottom: 30px;
+}
+
+.section-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin-bottom: 15px;
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 5px;
+}
+
+.receipt-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+  border-bottom: 1px solid var(--border-color);
+  transition: background 0.2s ease;
+}
+
+.receipt-item:hover {
+  background: rgba(37, 99, 235, 0.05); /* Subtle hover effect */
+}
+
+.item-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.item-name {
+  font-weight: 600;
+  color: var(--text-color);
+  font-size: 1rem;
+}
+
+.item-quantity {
+  font-size: 0.9rem;
+  color: var(--secondary-color);
+  margin-top: 4px;
+}
+
+.item-price {
+  font-weight: 600;
+  color: var(--primary-color);
+  font-size: 1.1rem;
+}
+
+/* Summary Section */
+.receipt-summary {
+  background: var(--bg-color);
+  padding: 20px;
+  border-radius: var(--border-radius);
+  margin-bottom: 20px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 10px 0;
+  font-size: 1rem;
+  color: var(--text-color);
+}
+
+.summary-row.total {
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--accent-color);
+  border-top: 2px solid var(--border-color);
+  padding-top: 15px;
+  margin-top: 15px;
+}
+
+/* Empty State */
+.empty-receipt {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--secondary-color);
+  font-size: 1.1rem;
+}
+
+/* Footer */
+.receipt-footer {
+  display: flex;
+  gap: 15px;
+  padding: 20px;
+  background: var(--bg-color);
+  border-top: 1px solid var(--border-color);
+}
+
+.btn {
+  flex: 1;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.btn-primary {
+  background: var(--primary-color);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #1d4ed8;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
+}
+
+.btn-secondary {
+  background: var(--secondary-color);
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #475569;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(100, 116, 139, 0.3);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Print Styles (for Print Receipt button) */
+@media print {
+  .receipt-container {
+    background: white;
+  }
+  .receipt-footer {
+    display: none; /* Hide buttons when printing */
+  }
+  .receipt-card {
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .receipt-card {
+    margin: 10px;
+    max-width: none;
+  }
+  .receipt-header {
+    padding: 20px 15px 15px;
+  }
+  .receipt-title {
+    font-size: 1.5rem;
+  }
+  .receipt-content {
+    padding: 15px;
+  }
+  .receipt-footer {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .btn {
+    padding: 14px;
+  }
+}

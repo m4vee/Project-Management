@@ -1,0 +1,261 @@
+/* src/components/Checkout.css */
+
+/* CSS Variables (Matching Homepage Palette) */
+:root {
+  --primary-color: #800000; /* Homepage maroon */
+  --primary-hover: #a00000; /* Homepage darker maroon */
+  --secondary-bg: #eee; /* Homepage secondary bg */
+  --secondary-hover: #ddd; /* Homepage secondary hover */
+  --bg-color: #f5f5f5; /* Homepage light bg */
+  --card-bg: #ffffff; /* Homepage white cards */
+  --text-color: #333; /* Homepage text */
+  --shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Homepage shadow */
+  --border-radius: 12px; /* Homepage rounded corners */
+  --font-family: 'Poppins', sans-serif; /* Homepage font */
+  --transition: all 0.3s ease; /* Homepage transitions */
+}
+
+/* Page Background (Matching Homepage) */
+.checkout-page {
+  background-color: var(--bg-color);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  font-family: var(--font-family);
+}
+
+/* Container (Like Homepage Cards) */
+.checkout-container {
+  background: var(--card-bg);
+  padding: 30px; /* Extra padding */
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  max-width: 800px;
+  width: 100%;
+  animation: fadeIn 0.3s ease; /* Homepage fade-in */
+}
+
+/* Header */
+.checkout-header {
+  text-align: center;
+  margin-bottom: 30px; /* Extra padding */
+}
+
+.checkout-header h2 {
+  color: var(--primary-color);
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.checkout-header p {
+  color: #777;
+  font-size: 1rem;
+}
+
+/* Order Summary (Styled Like Homepage Post Cards) */
+.order-summary {
+  margin-bottom: 30px; /* Extra padding */
+}
+
+.order-summary h3 {
+  color: var(--primary-color);
+  font-size: 1.4rem;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.order-item {
+  display: flex;
+  align-items: center;
+  padding: 15px; /* Extra padding */
+  border-bottom: 1px solid #ccc;
+  transition: var(--transition);
+}
+
+.order-item:hover {
+  background: var(--secondary-bg);
+  transform: translateY(-2px); /* Homepage hover effect */
+}
+
+.order-item-img {
+  width: 60px;
+  height: 60px;
+  border-radius: var(--border-radius);
+  object-fit: cover;
+  margin-right: 15px;
+}
+
+.item-details {
+  flex: 1;
+}
+
+.item-details h4 {
+  color: var(--text-color);
+  font-size: 1.1rem;
+  margin-bottom: 5px;
+  font-weight: 600;
+}
+
+.item-details p {
+  color: #777;
+  font-size: 0.9rem;
+}
+
+.item-price {
+  font-weight: bold;
+  color: var(--primary-color);
+  font-size: 1rem;
+}
+
+/* Total Breakdown */
+.checkout-total {
+  background: var(--secondary-bg);
+  padding: 20px; /* Extra padding */
+  border-radius: var(--border-radius);
+  margin-top: 20px;
+  text-align: right;
+}
+
+.checkout-total p {
+  margin: 5px 0;
+  color: var(--text-color);
+}
+
+.checkout-total h4 {
+  color: var(--primary-color);
+  font-size: 1.3rem;
+  margin-top: 10px;
+}
+
+/* Payment Section (Like Homepage Forms) */
+.payment-section {
+  background: var(--card-bg);
+  padding: 25px; /* Extra padding */
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+}
+
+.payment-section h3 {
+  color: var(--primary-color);
+  font-size: 1.4rem;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.form-group {
+  margin-bottom: 20px; /* Extra padding */
+}
+
+.form-group label {
+  display: block;
+  font-weight: bold;
+  color: var(--text-color);
+  margin-bottom: 5px;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 12px; /* Extra padding */
+  border: 1px solid #ccc;
+  border-radius: 6px; /* Matched homepage */
+  font-size: 1rem;
+  background: var(--card-bg);
+  transition: var(--transition);
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  border-color: var(--primary-color);
+  outline: none;
+  box-shadow: 0 0 5px rgba(128, 0, 0, 0.2);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* Pay Now Button (Matching Homepage .price-btn) */
+.checkout-btn {
+  width: 100%;
+  padding: 15px; /* Extra padding */
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 20px; /* Matched homepage */
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: 0 4px 10px rgba(128, 0, 0, 0.3);
+}
+
+.checkout-btn:hover {
+  background: var(--primary-hover);
+  transform: translateY(-2px);
+}
+
+/* Animations (Matching Homepage) */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Responsive Design */
+/* Desktop View */
+@media (min-width: 761px) {
+  .checkout-container {
+    padding: 40px; /* More padding for desktop */
+  }
+  .order-item {
+    padding: 20px;
+  }
+}
+
+/* Mobile View */
+@media (max-width: 760px) {
+  .checkout-page {
+    padding: 10px;
+  }
+  .checkout-container {
+    padding: 20px;
+    margin: 10px;
+  }
+  .checkout-header h2 {
+    font-size: 1.6rem;
+  }
+  .order-item {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 15px;
+  }
+  .order-item-img {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 10px;
+  }
+  .checkout-total {
+    text-align: left;
+    padding: 15px;
+  }
+  .payment-section {
+    padding: 20px;
+  }
+  .checkout-btn {
+    padding: 12px;
+  }
+}
+
+/* Tablet View */
+@media (min-width: 761px) and (max-width: 1024px) {
+  .checkout-container {
+    max-width: 700px;
+    padding: 30px;
+  }
+}
