@@ -41,7 +41,7 @@ export default function AppNavbar() {
           style={{ cursor: "pointer" }}
         ></i>
 
-        {/* 🛒 Cart Icon */}
+        {/* Cart Icon */}
         <div
           className="cart-icon-wrapper"
           style={{ position: "relative", cursor: "pointer" }}
@@ -67,7 +67,7 @@ export default function AppNavbar() {
           )}
         </div>
 
-        {/* 👤 Profile */}
+        {/* Profile */}
         <div className="profile-icon">
           <Link to="/profile">
             <img src="/images/mikha.webp" alt="User" />

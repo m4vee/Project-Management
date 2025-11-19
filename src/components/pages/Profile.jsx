@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Profile.css"; // Ensure this file contains the updated CSS code
+import AppNavbar from "../AppNavbar";
 
 const DEFAULT_COVER =
   "https://images.unsplash.com/photo-1503264116251-35a269479413?q=80&w=1400&auto=format&fit=crop&crop=entropy";
 const DEFAULT_AVATAR =
   "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=800&auto=format&fit=crop&crop=faces";
+
 
 const samplePosts = [
   {
@@ -143,17 +145,14 @@ export default function Profile() {
       <header className="profile-topbar">
         <div className="topbar-left">
           <div className="logo">
-            <Link to="/inside-app" className="navbar-logo" onClick={() => setMobileMenuOpen(false)}>
-              TUPulse <i className="fab fa-typo3"></i>
-            </Link>
+            <img src="/images/logo.jpg" alt="TUPulse" />
+            <h2>
+            TUPulse <i className="fab fa-typo3"></i>
+            </h2>
           </div>
           <div className="top-search">
-            <input
-              type="text"
-              placeholder="Search"
-              value={globalQuery}
-              onChange={(e) => setGlobalQuery(e.target.value)}
-            />
+            <input type="text" placeholder="Search" value={globalQuery} onChange={(e) => setGlobalQuery(e.target.value)}/>
+            <i className="fa-solid fa-magnifying-glass"></i>
           </div>
         </div>
 
@@ -161,6 +160,13 @@ export default function Profile() {
           <button onClick={handleMobileMenuToggle} className="menu-icon">
             <i className={`fas ${mobileMenuOpen ? "fa-times" : "fa-bars"}`}></i>
           </button>
+
+          <button
+            className="home-btn"
+              onClick={() => navigate("/inside-app")}>
+                Home
+          </button>
+          
           <button
             className="avatar-btn"
             onClick={(e) => {
@@ -174,7 +180,9 @@ export default function Profile() {
           {dropdownOpen && (
             < div className="profile-dropdown" onClick={(e) => e.stopPropagation()}>
               <Link to="/profile" className="dd-item">View Profile</Link>
-              <Link to="/cart" className="dd-item">🛒 My Cart</Link>
+              <Link to="/cart" className="dd-item">My Cart</Link>
+              <Link to="/rentalrequests" className="dd-item">My Rentals</Link>
+              <Link to="/swaprequests" className="dd-item">My Swaps</Link>
 
                 <div className="dd-item toggle-row">
       <         span>Dark Mode</span>

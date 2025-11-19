@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../../index.css';
 import './SignUp.css';
 
 export default function SignUp() {
   const [otpSent, setOtpSent] = useState(false);
+  const navigate = useNavigate(); // ✅ hook for navigation
 
   const handleSendCode = (e) => {
     e.preventDefault();
@@ -12,7 +14,9 @@ export default function SignUp() {
 
   const handleCreateAccount = (e) => {
     e.preventDefault();
+    // Here you can also add your API call or form validation logic
     alert('Account created successfully!');
+    navigate('/inside-app'); // ✅ redirect to your app page
   };
 
   return (

@@ -3,6 +3,7 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext"; // Fixed: Use the context hook (adjust path if in pages/: ../../context/CartContext)
 import "./Cart.css";
+import AppNavbar from "./AppNavbar";
 
 export default function Cart() {
   const navigate = useNavigate();
@@ -44,6 +45,8 @@ export default function Cart() {
   };
 
   return (
+    <div className="cart-wrapper">
+    <AppNavbar />
     <div className="cart-page">
       <header className="cart-header">
         <h2>🛒 My Cart</h2>
@@ -106,6 +109,7 @@ export default function Cart() {
           )}
         </div>
       </div>
+    </div>
     </div>
   );
 }
