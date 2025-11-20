@@ -113,7 +113,15 @@ body {
   align-items: center;
   gap: 8px;
 }
-
+.lightbox-img {
+  width: auto;
+  height: auto;
+  max-width: 95vw;
+  max-height: 95vh;
+  object-fit: contain;
+  border-radius: 10px;
+}
+  
 .icon-btn {
   background: transparent;
   border: none;
@@ -134,7 +142,7 @@ body {
   width: 50px;
   height: 50px;
   margin-right: 0px;
-  border: 2px solid rgb(255, 255, 255);
+  border: 2px solid rgb(213, 10, 10);
 }
 
 .avatar-btn img {
@@ -238,6 +246,8 @@ body {
   gap: 24px;
   padding: 18px 28px;
   align-items: start;
+   overflow-x: auto;
+   
 }
 
 /* ========================================
@@ -248,13 +258,13 @@ body {
 .cover-avatar-container {
   position: relative;
   width: 100%;
-  height: 220px; /* Set a fixed height for the cover */
 }
+
 
 .cover {
   position: relative;
   width: 96vw; /* Ensures the cover image spans the entire viewport width */
-  height: 220px; /* Set height */
+  height: 230px; /* Set height */
   background-size: cover;
   background-position: center;
   z-index: 1;
@@ -278,14 +288,9 @@ body {
 /* Avatar styling to make it circular and large */
 .profile-avatar-column {
   position: absolute;
-  bottom: -75px; 
-  left: 20px; 
+  bottom: -75px;
+  left: 120px;
   z-index: 2;
-  width: 180px; 
-  height: 180px; 
-  border-radius: 50%; 
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  background: white;
 }
 
 .avatar-wrapper {
@@ -293,7 +298,7 @@ body {
   height: 180px;
   border-radius: 50%; 
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  background: white;
+  background: rgb(141, 36, 36);
   overflow: hidden; 
 }
 
@@ -308,7 +313,7 @@ body {
 .profile-header {
   grid-column: 1 / -1;  /* Align to the full width of the screen */
   grid-row: 2;
-  display: flex;
+  display: block !important;
   flex-direction: column;
   justify-content: center;
   background: #fff;
@@ -317,13 +322,34 @@ body {
   box-shadow: var(--shadow);
   margin-top: 50px;
 }
+.profile-header .profile-layout {
+  display: grid;
+  grid-template-columns: 1.5fr 1.5fr 2fr; /* Adjust this if you need more space for the right column */
+  gap: 100px; /* Add space betwe6en the columns */
+  width: 100%;
+  padding: 5px;
+}
+
+
+.profile-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  margin: 0 auto;    /* ← THIS FIXES THE CENTERING */
+  width: 100%;
+}
+
+
 
 .profile-info {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  align-items: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-top: 2;
 }
 
 .profile-info h1 {
@@ -348,13 +374,26 @@ body {
 
 /* Profile actions section */
 .profile-actions {
-  margin-top: 12px;
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  justify-content: flex-end;  /* Aligns button to the right */
-  width: 100%;  /* Ensure it takes full width to align the elements properly */
+  position: absolute;
+  right: 70px;
+  bottom: 40px;
 }
+
+
+
+/* Make the Create Post button compact */
+.create-post-btn {
+  width: auto !important;
+  padding: 8px 18px !important;
+  border-radius: 10px !important;
+}
+
+.create-post-wrapper {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 10px;
+}
+
 
 /* Button Styles */
 .btn {
@@ -373,9 +412,10 @@ body {
   border-radius: 20px;
   padding: 8px 18px;
   font-weight: 600;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-  margin-left: auto;  /* Pushes the button to the right side within the flex container */
+  box-shadow: 0 3px 6px rgba(135, 16, 16, 0.1);
+  margin-left: auto;
 }
+
 
 .more-dots {
   font-size: 1.8rem;
@@ -383,6 +423,44 @@ body {
   cursor: pointer;
   margin-left: 10px; /* Space between the button and the three dots */
   align-self: center;  /* Align the dots vertically with the button */
+}
+
+.search-create-wrapper {
+  display: flex;
+  justify-content: space-between; /* This will space the elements evenly */
+  align-items: center; /* Align the input and button vertically */
+  gap: 10px; /* Add space between the elements */
+}
+
+.search-create-wrapper input {
+  padding: 8px 16px;
+  border: 2px solid #8a0f0f; /* Same color as the button's border */
+  border-radius: 20px;
+  background-color: #fff;
+  color: #444;
+  outline: none;
+  font-size: 14px;
+  width: 300px; /* Adjust the width of the input */
+  transition: all 0.3s ease;
+}
+
+.search-create-wrapper input:focus {
+  border-color: #e8c37a; /* Change border color on focus */
+}
+
+.search-create-wrapper .btn.primary {
+  background-color: #8a0f0f; /* Same brand color for the button */
+  color: white;
+  border-radius: 20px;
+  padding: 8px 18px;
+  font-weight: 600;
+  box-shadow: 0 3px 6px rgba(135, 16, 16, 0.1);
+  cursor: pointer;
+  width: auto; /* Make button's width fit content */
+}
+
+.search-create-wrapper .btn.primary:hover {
+  background-color: #4b0000; /* Darken the button color on hover */
 }
 
 
@@ -402,8 +480,8 @@ body {
   padding-left: 40px;
 }
 .content-column {
-  grid-column: 2 / 3;
-  grid-row: 3;
+  grid-column: 1 / 3;
+  grid-row: 4;
 }
 
 /* Photos grid */
@@ -414,15 +492,20 @@ body {
   box-shadow: var(--shadow);
 }
 
-/* Rating box */
 .rating-box {
-  margin-top: 18px;
-  background: #fffbeb;
-  padding: 12px;
+  width: 100%;
+  max-width: 360px; /* Adjust this as needed */
+  margin: 12px auto; /* Centers it horizontally */
+  padding: 16px 18px;
+  background: #fffbe8;
+  border: 1px solid #f3d98b;
   border-radius: 12px;
-  box-shadow: var(--shadow);
-  border: 1px solid #fde68a;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
+
+
 .big-rating {
   font-size: 28px;
   font-weight: 700;
@@ -444,7 +527,7 @@ body {
 }
 .filter-buttons {
   display: flex;
-  gap: 10px;
+  gap: 20px;
   flex-wrap: wrap;
 }
 .filter-btn {
@@ -472,17 +555,38 @@ body {
 /* Posts grid */
 .posts-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 18px;
+  padding-left: 0px;
+  margin-left: 0px;
 }
 .post-card {
-  background: var(--card-bg);
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: var(--shadow);
-  display: flex;
-  flex-direction: column;
+  width: 100%;
+  max-width: 360px; /* Ensure cards don't stretch too wide */
+  margin: 0 auto;
 }
+
+.post-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+.preview-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.thumb-small {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+
 .post-thumb img {
   width: 100%;
   height: 160px;
@@ -500,10 +604,12 @@ body {
 }
 .post-meta {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
 }
+
 .price {
   background: var(--accent-gold);
   padding: 6px 10px;
@@ -512,8 +618,9 @@ body {
   font-weight: 700;
 }
 .category {
-  font-size: 12px;
-  color: var(--muted);
+  font-size: 1rem;
+  color: #444;
+  white-space: nowrap;
 }
 
 /* Modal */
@@ -548,60 +655,195 @@ body {
   text-align: center;
   color: var(--muted);
 }
-
+.menu-icon {
+  display: none; /* default: hidden on desktop */
+}
 /* Responsive */
 @media (max-width: 980px) {
-  .profile-main {
-    grid-template-columns: 1fr;
-    padding: 12px;
-  }
 
-  .profile-avatar-column {
-    justify-content: center;
-    padding-left: 0;
-    margin-top: -60px;
-  }
-  .profile-header {
-    grid-column: 1 / -1;
-    align-items: center;
-    text-align: center;
-    margin-top: 0;
-  }
-  .left-column {
-    grid-column: 1 / -1;
-    padding-left: 0;
-  }
-  .content-column {
-    grid-column: 1 / -1;
-  }
-  .avatar-wrapper {
-    width: 120px;
-    height: 120px;
-  }
-  .posts-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .top-search input {
-    width: 200px;
-  }
-  .profile-dropdown {
-    right: 10px;
-    top: 64px;
-  }
-}
-
-@media (max-width: 560px) {
-  .posts-grid {
-    grid-template-columns: 1fr;
-  }
-  .top-search input {
+  .top-search {
     display: none;
   }
-  .filter-btn {
-    padding: 6px 10px;
-    font-size: 14px;
+
+.profile-header {
+  display: flex;
+  justify-content: space-between; /* phes left + right content apart */
+  align-items: center;
+  position: relative
+}
+
+.profile-header-grid {
+  display: grid;
+  grid-template-columns: 260px 1fr 180px;
+  gap: 40px;
+  align-items: start;
+}
+.left-col {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+
+.center-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 100%; /* This ensures the content doesn't stretch too far on large screens */
+  margin: 0 auto; /* Centers the content */
+}
+
+.right-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* Align items vertically */
+  align-items: flex-start; /* Align to the left */
+  padding-left: 20px; /* Add space to the left */
+  max-width: 350px; /* Optional: limit the width of the right column */
+  gap: 20px; /* Add space between elements */
+}
+
+
+  .profile-info-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
   }
-  .filters-row .search-row input {
-    width: 100%;
+
+.cover {
+  min-width: 100%;
+  max-width: 100%;
+  aspect-ratio: 16 / 5;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  background-color: #000; /* fallback para di mag-white */
+}
+
+
+  .avatar-wrapper {
+    width: 130px;
+    height: 130px;
+    margin-top: -60px;
+  }
+
+.profile-actions {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+  .stats-row {
+    justify-content: center;
+    gap: 20px;
   }
 }
+
+/* Mobile */
+@media (max-width: 560px) {
+
+  .cover {
+    width: 100%;
+  }
+
+  .avatar-wrapper {
+    width: 115px;
+    height: 115px;
+    margin-top: -55px;
+  }
+
+  .username {
+    font-size: 24px;
+  }
+
+  .subtext {
+    font-size: 14px;
+  }
+
+  .stats-row {
+    gap: 14px;
+  }
+
+  .stat-number {
+    font-size: 18px;
+  }
+
+  .stat-label {
+    font-size: 12px;
+  }
+
+  .filter-btn {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .section-title {
+    font-size: 18px;
+  }
+
+  .grid-posts {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .profile-container {
+    width: 100%;
+    padding: 0 12px;
+  }
+}
+
+/* Small mobile (iPhone SE, 375px) */
+@media (max-width: 400px) {
+
+  .avatar-wrapper {
+    width: 100px;
+    height: 100px;
+    margin-top: -48px;
+  }
+
+  .username {
+    font-size: 22px;
+  }
+
+  .filter-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .grid-posts {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+@media (max-width: 768px) {
+  .rating-box {
+    max-width: 100%;
+    margin: 12px 0; /* Add margin to the top and bottom */
+  }
+
+  .profile-header {
+    flex-direction: column; /* Stack profile and rating on mobile */
+    align-items: center;
+  }
+}
+
+/* Ultra small (Galaxy Fold) */
+@media (max-width: 330px) {
+
+  .avatar-wrapper {
+    width: 90px;
+    height: 90px;
+  }
+
+  .username {
+    font-size: 20px;
+  }
+
+  .filter-btn {
+    padding: 5px 8px;
+    font-size: 11px;
+  }
+}
+

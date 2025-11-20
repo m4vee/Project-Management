@@ -1,0 +1,408 @@
+.reviews-container {
+  width: 90%;
+  max-width: 1100px;
+  margin: auto;
+  padding: 30px 10px;
+  animation: fadeIn 0.3s ease;
+}
+
+.back-btn {
+  background: #7a0000;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  font-size: 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  transition: 0.2s;
+}
+
+.back-btn:hover {
+  background: #a30000;
+}
+
+.title {
+  color: #7a0000;
+  margin-bottom: 20px;
+  font-size: 32px;
+  font-weight: bold;
+}
+
+/* Rating Breakdown */
+.rating-box {
+  margin-bottom: 40px;
+}
+
+.rating-row {
+  display: flex;
+  align-items: center;
+  margin: 6px 0;
+}
+
+.star-label {
+  width: 40px;
+  font-weight: bold;
+}
+
+.bar {
+  flex: 1;
+  background: #e6e6e6;
+  height: 10px;
+  border-radius: 10px;
+  margin: 0 10px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  background: #f7c000;
+}
+
+/* Review Cards */
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.review-card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border-left: 5px solid #7a0000;
+  animation: fadeUp 0.4s ease;
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+  color: #333;
+}
+
+.review-username {
+  font-size: 18px;
+  color: #7a0000;
+}
+
+.review-date {
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+.review-stars {
+  font-size: 20px;
+  color: #f7c000;
+  margin: 6px 0 8px;
+}
+
+.review-text {
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.reviews-container {
+  width: 90%;
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 10px;
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  background: #a30000;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-bottom: 20px;
+  transition: 0.2s ease;
+}
+
+.back-btn:hover {
+  background: #7a0000;
+}
+
+.rating-summary-section {
+  margin-bottom: 30px;
+}
+
+.rating-row {
+  display: flex;
+  align-items: center;
+  margin: 6px 0;
+  font-size: 14px;
+}
+
+.star-label {
+  width: 30px;
+  font-weight: bold;
+}
+
+.bar-background {
+  flex: 1;
+  height: 10px;
+  background: #e6e6e6;
+  border-radius: 20px;
+  margin: 0 10px;
+}
+
+.bar-fill {
+  height: 100%;
+  background: #f7c531; /* GOLD COLOR */
+  border-radius: 20px;
+}
+
+.rating-count {
+  width: 35px;
+  text-align: right;
+}
+
+.review-card {
+  background: #ffffff;
+  padding: 15px 20px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.stars {
+  color: #f7c531;
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+.add-review-btn {
+  background: #a60707;
+  padding: 10px 18px;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  margin-bottom: 20px;
+  transition: 0.2s;
+}
+
+.add-review-btn:hover {
+  background: #7b0606;
+}
+
+/* Modal background */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+/* Modal box */
+.modal-box {
+  background: #fff;
+  width: 380px;
+  padding: 22px;
+  border-radius: 14px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+  animation: pop 0.25s ease-out;
+}
+
+@keyframes pop {
+  from { transform: scale(0.85); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.modal-box h3 {
+  margin-top: 0;
+}
+
+.modal-box textarea {
+  width: 100%;
+  height: 90px;
+  border-radius: 8px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  resize: none;
+}
+
+.modal-box select {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 8px;
+  border-radius: 8px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.modal-actions .cancel {
+  background: #ccc;
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+.modal-actions .submit {
+  background: #a60707;
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.modal-actions .submit:hover {
+  background: #7b0606;
+}
+
+.star-selector span {
+  pointer-events: auto !important;
+}
+.modal-buttons button {
+  pointer-events: auto !important;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ------------------------------------------------------ */
+/* 📱 MOBILE RESPONSIVE FOR SELLER REVIEWS PAGE */
+/* ------------------------------------------------------ */
+
+@media (max-width: 768px) {
+
+  .reviews-container {
+    width: 95%;
+    padding: 10px;
+  }
+
+  .title {
+    font-size: 26px;
+    text-align: left;
+  }
+
+  .rating-row {
+    font-size: 13px;
+  }
+
+  .star-label {
+    width: 28px;
+  }
+
+  .bar-background {
+    height: 9px;
+  }
+
+  .review-card {
+    padding: 15px;
+    border-radius: 10px;
+  }
+
+  .review-header span {
+    font-size: 14px;
+  }
+
+  .stars {
+    font-size: 16px;
+  }
+
+  .review-text {
+    font-size: 14px;
+  }
+
+  .add-review-btn {
+    width: 100%;
+    font-size: 15px;
+    padding: 10px;
+  }
+}
+
+
+@media (max-width: 500px) {
+
+  .title {
+    font-size: 22px;
+  }
+
+  .star-label {
+    width: 24px;
+    font-size: 12px;
+  }
+
+  .rating-count {
+    width: 28px;
+    font-size: 12px;
+  }
+
+  .review-card {
+    padding: 12px;
+  }
+
+  .review-header {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .review-header span {
+    font-size: 13px;
+  }
+
+  .stars {
+    font-size: 15px;
+  }
+
+  .review-text {
+    font-size: 13px;
+  }
+}
+
+
+@media (max-width: 380px) {
+
+  .reviews-container {
+    padding: 5px;
+  }
+
+  .title {
+    font-size: 20px;
+  }
+
+  .review-card {
+    padding: 10px;
+  }
+
+  .review-text {
+    font-size: 12.5px;
+  }
+
+  .stars {
+    font-size: 14px;
+  }
+}

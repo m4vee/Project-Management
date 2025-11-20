@@ -1,0 +1,67 @@
+/* Container for photos */
+.photos-section {
+  width: 100%;
+  margin-top: 20px; /* Add some spacing from other content */
+}
+
+.photos-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+/* Grid layout for photos */
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* Ensures 3 columns */
+  gap: 10px; /* Space between the images */
+  padding: 0 10px;
+}
+
+/* Ensuring each photo is a square and well-positioned */
+.photo-item img {
+  width: 100%;
+  aspect-ratio: 1 / 1; /* Keeps all images as squares */
+  object-fit: cover;  /* Ensures the images fill the box and aren't stretched */
+  border-radius: 6px;
+}
+
+/* Lightbox styling for the image preview */
+.lightbox {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+}
+
+.lightbox-img {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 10px;
+}
+
+/* Mobile responsive design for smaller screens */
+@media (max-width: 768px) {
+  .photo-grid {
+    grid-template-columns: repeat(2, 1fr); /* 2 columns on tablets */
+    gap: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .photo-grid {
+    grid-template-columns: 1fr; /* 1 column on mobile */
+    gap: 6px;
+  }
+
+  .photo-item img {
+    height: 100%; /* Make sure the image fits well */
+    border-radius: 8px;
+  }
+}
