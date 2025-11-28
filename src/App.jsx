@@ -21,7 +21,7 @@ import Feedback from "./components/pages/Feedback.jsx";
 import MyProfile from "./components/pages/MyProfile.jsx";
 import RentalRequests from "./components/pages/RentalRequests";
 import SwapRequests from './components/pages/SwapRequests';
-import ReviewsPage from "./components/pages/ReviewsPage.jsx";
+
 // E-Commerce and Chat
 import Cart from "./components/Cart.jsx";
 import Checkout from "./components/Checkout.jsx";
@@ -45,38 +45,35 @@ function AppContent() {
 
   const hideNavbarRoutes = ["/profile", "/inside-app", "/app-navbar", "/account-settings", "/feedback", "/my-profile"];
 
-const insideAppRoutes = [
-  "/inside-app",
-  "/profile",
-  "/profile/edit",
-  "/my-profile",
-  "/account-settings",
-  "/feedback",
-  "/app-navbar",
-  "/cart",
-  "/checkout",
-  "/receipt",
-  "/chat",
-  "/rentalrequests",
-  "/swaprequests",
-  "/reviews"
-];
+  // ✅ Updated routes inside app layout
+  const insideAppRoutes = [
+    "/inside-app",
+    "/profile",
+    "/profile/edit",
+    "/my-profile",
+    "/account-settings",
+    "/feedback",
+    "/app-navbar",
+    "/cart",
+    "/checkout",
+    "/receipt",
+    "/chat",
+    "/rentalrequests",
+    "/swaprequests"
+  ];
 
-
-    const isInsideApp = insideAppRoutes.some(route =>
-      location.pathname.startsWith(route)
-    );
+  const isInsideApp = insideAppRoutes.includes(location.pathname);
 
   return (
     <>
-      {/*  Navbar logic */}
+      {/* ✅ Navbar logic */}
       {isLoggedIn && isInsideApp ? (
         <AppNavbar />
       ) : (
         !isInsideApp && <Navbar />
       )}
 
-      {/* Routes */}
+      {/* ✅ Routes */}
       <Routes>
         {/* Public Pages */}
         <Route path="/" element={<Home />} />
@@ -88,9 +85,6 @@ const insideAppRoutes = [
         <Route path="/inside-app" element={<HomePage />} />
         <Route path="/profile" element={<Profile />} /> {/* Profile Page */}
         <Route path="/my-profile" element={<MyProfile />} /> {/* My Profile Page */}
-        <Route path="/reviews" element={<ReviewsPage />} />
-        <Route path="/reviews/:sellerId" element={<ReviewsPage />} />
-        <Route path="/reviews/:sellerId" element={<ReviewsPage reviews={[]} />} />
         <Route path="/profile/edit" element={<ProfileEdit />} /> {/* Profile Edit Page */}
         <Route path="/account-settings" element={<AccountSettings />} /> {/* Account Settings Page */}
         <Route path="/feedback" element={<Feedback />} /> {/* Feedback Page */}
