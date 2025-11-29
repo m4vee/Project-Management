@@ -19,8 +19,6 @@ import ProfileEdit from "./components/pages/ProfileEdit.jsx";
 import AccountSettings from "./components/pages/AccountSettings.jsx";
 import Feedback from "./components/pages/Feedback.jsx";
 import MyProfile from "./components/pages/MyProfile.jsx";
-import RentalRequests from "./components/pages/RentalRequests";
-import SwapRequests from './components/pages/SwapRequests';
 
 // E-Commerce and Chat
 import Cart from "./components/Cart.jsx";
@@ -30,8 +28,6 @@ import Chat from "./components/pages/Chat.jsx";
 
 // Context
 import { CartProvider } from "./context/CartContext.jsx";
-import { RentalRequestProvider } from "./components/pages/RentalRequestContext.jsx";
-import { SwapRequestProvider } from './components/pages/SwapRequestContext';
 
 function AppContent() {
   const location = useLocation();
@@ -57,9 +53,7 @@ function AppContent() {
     "/cart",
     "/checkout",
     "/receipt",
-    "/chat",
-    "/rentalrequests",
-    "/swaprequests"
+    "/chat"
   ];
 
   const isInsideApp = insideAppRoutes.includes(location.pathname);
@@ -88,8 +82,6 @@ function AppContent() {
         <Route path="/profile/edit" element={<ProfileEdit />} /> {/* Profile Edit Page */}
         <Route path="/account-settings" element={<AccountSettings />} /> {/* Account Settings Page */}
         <Route path="/feedback" element={<Feedback />} /> {/* Feedback Page */}
-        <Route path="/rentalrequests" element={<RentalRequests />} /> {/* Rental Requests Page */}
-        <Route path="/swaprequests" element={<SwapRequests />} /> {/* Swap Requests Page */}
 
         {/* E-Commerce Routes */}
         <Route path="/cart" element={<Cart />} />
@@ -102,20 +94,12 @@ function AppContent() {
     </>
   );
 }
-
-    <SwapRequestProvider>
-      <AppContent />
-    </SwapRequestProvider>
   
 export default function App() {
   return (
     <Router>
       <CartProvider>
-        <RentalRequestProvider>
-          <SwapRequestProvider>
-              <AppContent />
-            </SwapRequestProvider>
-        </RentalRequestProvider>
+        <AppContent />
       </CartProvider>
     </Router>
   );
