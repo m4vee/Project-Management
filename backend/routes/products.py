@@ -172,3 +172,30 @@ def delete_product(product_id):
         return jsonify({'message': 'Product deleted successfully'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+@bp.route('/<int:product_id>/photos', methods=['POST'])
+def add_product_photo():
+    try:
+        data = request.get_json()
+        product_id = data.get('product_id')
+        photo_url = data.get('photo_url')
+        
+        if not product_id or not photo_url:
+            return jsonify({'error': 'Product ID and photo URL are required'}), 400
+        
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        cur.execute(
+            'INSERT INTO Photos (product_id, photo_url) VALUES (%s, %s) RETURNING *',
+            (product_id, photo_url)
+        )
+        
+        new_photo = cur.fetchone()
+        conn.commit()
+        cur.close()
+        conn.close()
+        
+        return jsonify(new_photo), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500

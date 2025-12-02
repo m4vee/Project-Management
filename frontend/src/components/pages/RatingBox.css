@@ -1,0 +1,90 @@
+.rating-wrapper {
+  min-height: 70px;   /* ensures box doesn’t shrink too small */
+  max-height: 160px; 
+}
+
+.rating-box-polished {
+  background: #fffaf0;
+  border: 1px solid #871020;
+  border-radius: 14px;
+  padding: 14px 18px; /* Reduced padding */
+  margin-top: 10px; /* Adjusted margin for positioning */
+  box-shadow: 0 3px 8px rgba(0,0,0,0.06);
+  width: 100%;
+  max-width: 360px; /* Ensure it’s not too wide */
+  margin-left: auto;
+  margin-right: auto;
+  min-height: 100px;
+}
+
+.rating-box-polished h4 {
+  margin-bottom: 6px; /* Reduced space below heading */
+  font-size: 15px; /* Smaller heading font */
+  font-weight: 600;
+}
+
+.rating-main {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Reduced gap between number and stars */
+}
+
+.rating-number {
+  font-size: 30px; /* Smaller font for the rating number */
+  color: #90172d;
+  font-weight: 700;
+}
+
+.rating-stars {
+  font-size: 15px; /* Reduced font size for stars */
+  color: #720d28;
+}
+
+.review-count {
+  margin-top: 2px; /* Smaller margin for reviews */
+  font-size: 14px; /* Slightly smaller font */
+  font-weight: 500;
+}
+
+.view-reviews-wrapper {
+  display: flex;
+  justify-content: flex-end; /* aligns content to the right */
+  margin-top: 10px; /* optional spacing */
+}
+
+.view-reviews-link {
+  display: inline-block;
+  margin-top: 10px; /* Adjusted margin */
+  font-size: 15px; /* Slightly smaller font size */
+  color: #b23400;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.view-reviews-link:hover {
+  text-decoration: underline;
+}
+
+.no-reviews {
+  font-size: 13px; /* Smaller font size for no reviews */
+  color: #666;
+}
+
+@media (max-width: 560px) {
+  .rating-box-polished {
+    padding: 12px 16px; /* Smaller padding on mobile */
+    max-width: 90%; /* Make the box responsive */
+  }
+
+  .rating-number {
+    font-size: 22px; /* Slightly smaller number on mobile */
+  }
+
+  .rating-stars {
+    font-size: 16px; /* Smaller stars on mobile */
+  }
+
+  .review-count, .view-reviews-link, .no-reviews {
+    font-size: 12px; /* Smaller font for mobile */
+  }
+}

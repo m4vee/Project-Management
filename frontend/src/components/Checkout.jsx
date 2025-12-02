@@ -1,20 +1,31 @@
 // src/components/Checkout.jsx
 import React, { useState } from "react";
 import { useCart } from "../context/CartContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "./Checkout.css";
 
 export default function Checkout() {
   const { cartItems, clearCart } = useCart();
-  const total = cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
   const navigate = useNavigate();
+  const { state } = useLocation();
+  const selectedItemIds = state?.selectedItems || [];
+
+  // Filter cart items to only include selected ones
+  const selectedCartItems = cartItems.filter((item) =>
+    selectedItemIds.includes(item.id)
+  );
+  const total = selectedCartItems.reduce(
+    (sum, i) => sum + i.price * i.quantity,
+    0
+  );
 
   // Added: State for payment form
   const [formData, setFormData] = useState({
     fullName: "",
-    address: "",
+    meetupLocation: "school-premises",
+    specificLocation: "",
     contact: "",
-    paymentMethod: "Cash on Delivery",
+    paymentMethod: "Cash",
   });
 
   // Added: State for validation errors
@@ -43,16 +54,22 @@ export default function Checkout() {
       newErrors.fullName = "Full name is required.";
     }
 
-    // Validate address
-    if (!formData.address.trim()) {
-      newErrors.address = "Delivery address is required.";
+    // Validate meet-up location
+    if (!formData.meetupLocation.trim()) {
+      newErrors.meetupLocation = "Please select a meet-up location.";
+    }
+
+    // Validate specific location details if needed
+    if (!formData.specificLocation.trim()) {
+      newErrors.specificLocation = "Please provide specific meet-up details.";
     }
 
     // Validate contact number
     if (!formData.contact.trim()) {
       newErrors.contact = "Contact number is required.";
     } else if (!validateContact(formData.contact)) {
-      newErrors.contact = "Please enter a valid Philippine number (e.g., +639123456789 or 09123456789).";
+      newErrors.contact =
+        "Please enter a valid Philippine number (e.g., +639123456789 or 09123456789).";
     }
 
     // If there are errors, set them and stop submission
@@ -67,24 +84,25 @@ export default function Checkout() {
   };
 
   const subtotal = total;
-  const shippingFee = 50;
-  const grandTotal = subtotal + shippingFee;
+  const grandTotal = subtotal;
 
   return (
     <div className="checkout-page">
       <div className="checkout-container">
         <header className="checkout-header">
-          <h2>🛒 Checkout</h2>
-          <p>Please review your order and enter payment details.</p>
+          <h2>Checkout</h2>
+          <p>
+            Please review your order and select your preferred meet-up location.
+          </p>
         </header>
 
         {/* Added: Order Summary Section */}
         <section className="order-summary">
           <h3>Order Summary</h3>
-          {cartItems.length === 0 ? (
+          {selectedCartItems.length === 0 ? (
             <p>Your cart is empty.</p>
           ) : (
-            cartItems.map((item) => (
+            selectedCartItems.map((item) => (
               <div key={item.id} className="order-item">
                 <img
                   src={item.img || "/placeholder.jpg"}
@@ -93,7 +111,9 @@ export default function Checkout() {
                 />
                 <div className="item-details">
                   <h4>{item.name}</h4>
-                  <p>₱{item.price.toLocaleString()} × {item.quantity}</p>
+                  <p>
+                    ₱{item.price.toLocaleString()} × {item.quantity}
+                  </p>
                 </div>
                 <span className="item-price">
                   ₱{(item.price * item.quantity).toLocaleString()}
@@ -103,7 +123,6 @@ export default function Checkout() {
           )}
           <div className="checkout-total">
             <p>Subtotal: ₱{subtotal.toLocaleString()}</p>
-            <p>Shipping Fee: ₱{shippingFee}</p>
             <h4>Total: ₱{grandTotal.toLocaleString()}</h4>
           </div>
         </section>
@@ -122,18 +141,37 @@ export default function Checkout() {
                 required
                 placeholder="Enter your full name"
               />
-              {errors.fullName && <span className="error">{errors.fullName}</span>}
+              {errors.fullName && (
+                <span className="error">{errors.fullName}</span>
+              )}
             </div>
             <div className="form-group">
-              <label>Delivery Address</label>
-              <textarea
-                name="address"
-                value={formData.address}
+              <label>Meet-up Location Preference</label>
+              <select
+                name="meetupLocation"
+                value={formData.meetupLocation}
                 onChange={handleChange}
                 required
-                placeholder="Enter your address"
+              >
+                <option value="school-premises">School Premises</option>
+                <option value="near-establishment">Near Establishment</option>
+              </select>
+              {errors.meetupLocation && (
+                <span className="error">{errors.meetupLocation}</span>
+              )}
+            </div>
+            <div className="form-group">
+              <label>Specific Meet-up Location / Details</label>
+              <textarea
+                name="specificLocation"
+                value={formData.specificLocation}
+                onChange={handleChange}
+                required
+                placeholder="e.g., Building A lobby, Near main gate, Specific establishment name, etc."
               />
-              {errors.address && <span className="error">{errors.address}</span>}
+              {errors.specificLocation && (
+                <span className="error">{errors.specificLocation}</span>
+              )}
             </div>
             <div className="form-group">
               <label>Contact Number</label>
@@ -145,7 +183,9 @@ export default function Checkout() {
                 required
                 placeholder="e.g., +639123456789 or 09123456789"
               />
-              {errors.contact && <span className="error">{errors.contact}</span>}
+              {errors.contact && (
+                <span className="error">{errors.contact}</span>
+              )}
             </div>
             <div className="form-group">
               <label>Payment Method</label>
@@ -154,13 +194,13 @@ export default function Checkout() {
                 value={formData.paymentMethod}
                 onChange={handleChange}
               >
-                <option value="Cash on Delivery">Cash on Delivery</option>
+                <option value="Cash">Cash</option>
                 <option value="GCash">GCash</option>
                 <option value="PayMaya">PayMaya</option>
               </select>
             </div>
             <button type="submit" className="checkout-btn">
-              Pay Now
+              Confirm Order
             </button>
           </form>
         </section>

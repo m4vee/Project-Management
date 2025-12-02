@@ -15,8 +15,7 @@ export default function Receipt() {
     (sum, item) => sum + item.price * (item.quantity || 1),
     0
   );
-  const shippingFee = subtotal > 0 ? 50 : 0;
-  const grandTotal = subtotal + shippingFee;
+  const grandTotal = subtotal;
 
   const handleDone = () => {
     clearCart(); // Clear cart when leaving receipt
@@ -33,7 +32,9 @@ export default function Receipt() {
         <header className="receipt-header">
           <div className="receipt-icon">🧾</div>
           <h1 className="receipt-title">Order Receipt</h1>
-          <p className="receipt-subtitle">Thank you for your purchase! Your order has been confirmed.</p>
+          <p className="receipt-subtitle">
+            Thank you for your purchase! Your order has been confirmed.
+          </p>
         </header>
 
         <div className="receipt-content">
@@ -42,10 +43,26 @@ export default function Receipt() {
               {/* Customer Info */}
               <section className="customer-info">
                 <h2 className="section-title">Customer Details</h2>
-                <p><strong>Name:</strong> {formData.fullName || "N/A"}</p>
-                <p><strong>Address:</strong> {formData.address || "N/A"}</p>
-                <p><strong>Contact:</strong> {formData.contact || "N/A"}</p>
-                <p><strong>Payment Method:</strong> {formData.paymentMethod || "N/A"}</p>
+                <p>
+                  <strong>Name:</strong> {formData.fullName || "N/A"}
+                </p>
+                <p>
+                  <strong>Meet-up Location:</strong>{" "}
+                  {formData.meetupLocation === "school-premises"
+                    ? "School Premises"
+                    : "Near Establishment"}
+                </p>
+                <p>
+                  <strong>Specific Location:</strong>{" "}
+                  {formData.specificLocation || "N/A"}
+                </p>
+                <p>
+                  <strong>Contact:</strong> {formData.contact || "N/A"}
+                </p>
+                <p>
+                  <strong>Payment Method:</strong>{" "}
+                  {formData.paymentMethod || "N/A"}
+                </p>
               </section>
 
               {/* Order Items */}
@@ -55,9 +72,13 @@ export default function Receipt() {
                   <div key={item.id} className="receipt-item">
                     <div className="item-details">
                       <span className="item-name">{item.name}</span>
-                      <span className="item-quantity">Qty: {item.quantity || 1}</span>
+                      <span className="item-quantity">
+                        Qty: {item.quantity || 1}
+                      </span>
                     </div>
-                    <span className="item-price">₱{(item.price * (item.quantity || 1)).toFixed(2)}</span>
+                    <span className="item-price">
+                      ₱{(item.price * (item.quantity || 1)).toFixed(2)}
+                    </span>
                   </div>
                 ))}
               </section>
@@ -67,10 +88,6 @@ export default function Receipt() {
                 <div className="summary-row">
                   <span>Subtotal</span>
                   <span>₱{subtotal.toFixed(2)}</span>
-                </div>
-                <div className="summary-row">
-                  <span>Shipping Fee</span>
-                  <span>₱{shippingFee.toFixed(2)}</span>
                 </div>
                 <div className="summary-row total">
                   <span>Total Amount</span>

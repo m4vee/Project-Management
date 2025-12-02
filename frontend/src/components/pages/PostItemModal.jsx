@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { createProduct } from "../../services/api";
+import { createProduct, addProductPhoto } from "../../services/api";
 import "./PostItemModal.css";
+import { uploadProductImage } from "../../services/imageUpload";
 
 const PostItemModal = ({ isOpen, onClose, activeFilter }) => {
   const [itemName, setItemName] = useState("");
@@ -130,8 +131,14 @@ const PostItemModal = ({ isOpen, onClose, activeFilter }) => {
 
       console.log("Product created successfully:", newProduct);
 
-      if (image && newProduct.product_id) {
-        await uploadProductImage(newProduct.product_id, image);
+      if (image) {
+        console.log("Uploading image...");
+        const imageUrl = await uploadProductImage(image);
+        console.log("Image uploaded:", imageUrl);
+
+        // Save image URL to database
+        await addProductPhoto(newProduct.product_id, imageUrl);
+        console.log("Image URL saved to database");
       }
 
       // TODO: Save availability if you have availability endpoint

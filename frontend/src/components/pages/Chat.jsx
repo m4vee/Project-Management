@@ -2,21 +2,80 @@ import React, { useEffect, useRef, useState } from "react";
 import "./Chat.css";
 
 const CONTACTS = [
-  { id: "m", name: "Bini Mikha", avatar: "/images/mikha.webp", status: "online" },
+  {
+    id: "m",
+    name: "Bini Mikha",
+    avatar: "/images/mikha.webp",
+    status: "online",
+  },
   { id: "a", name: "Bini Aiah", avatar: "/images/aiah.webp", status: "online" },
-  { id: "l", name: "Bini Maloi", avatar: "/images/maloi.webp", status: "offline" },
-  { id: "c", name: "Bini Colet", avatar: "/images/colet.webp", status: "online" },
-  { id: "j", name: "Bini Jhoanna", avatar: "/images/jhoanna.webp", status: "online" },
-  { id: "g", name: "Bini Gwen", avatar: "/images/gwen.webp", status: "offline" },
-  { id: "s", name: "Bini Stacey", avatar: "/images/stacey.webp", status: "online" },
-  { id: "h", name: "Bini Sheena", avatar: "/images/sheena.webp", status: "offline" },
+  {
+    id: "l",
+    name: "Bini Maloi",
+    avatar: "/images/maloi.webp",
+    status: "offline",
+  },
+  {
+    id: "c",
+    name: "Bini Colet",
+    avatar: "/images/colet.webp",
+    status: "online",
+  },
+  {
+    id: "j",
+    name: "Bini Jhoanna",
+    avatar: "/images/jhoanna.webp",
+    status: "online",
+  },
+  {
+    id: "g",
+    name: "Bini Gwen",
+    avatar: "/images/gwen.webp",
+    status: "offline",
+  },
+  {
+    id: "s",
+    name: "Bini Stacey",
+    avatar: "/images/stacey.webp",
+    status: "online",
+  },
+  {
+    id: "h",
+    name: "Bini Sheena",
+    avatar: "/images/sheena.webp",
+    status: "offline",
+  },
 ];
 
 const PRODUCT_CATALOG = [
-  { id: "p1", title: "Laptop Bag", price: 600, img: "/images/bag.jpg", type: "Sell" },
-  { id: "p2", title: "Muji Notebook", price: 100, img: "/images/notebook.jpg", type: "Sell" },
-  { id: "p3", title: "Scientific Calculator", price: 600, img: "/images/calculator.jpg", type: "Sell" },
-  { id: "p4", title: "Pen Set", price: 120, img: "/images/pens.jpg", type: "Sell" },
+  {
+    id: "p1",
+    title: "Laptop Bag",
+    price: 600,
+    img: "/images/bag.jpg",
+    type: "Sell",
+  },
+  {
+    id: "p2",
+    title: "Muji Notebook",
+    price: 100,
+    img: "/images/notebook.jpg",
+    type: "Sell",
+  },
+  {
+    id: "p3",
+    title: "Scientific Calculator",
+    price: 600,
+    img: "/images/calculator.jpg",
+    type: "Sell",
+  },
+  {
+    id: "p4",
+    title: "Pen Set",
+    price: 120,
+    img: "/images/pens.jpg",
+    type: "Sell",
+  },
 ];
 
 const STORAGE_KEY = "tup_chats_v1";
@@ -28,7 +87,8 @@ function timeNow() {
 
 export default function ChatPage() {
   const [chats, setChats] = useState({});
-  const [activeContact, setActiveContact] = useState(CONTACTS[0].id);
+  // Start with no active conversation so user lands on a selection screen
+  const [activeContact, setActiveContact] = useState(null);
   const [search, setSearch] = useState("");
   const [composer, setComposer] = useState("");
   const [showCatalog, setShowCatalog] = useState(false);
@@ -41,9 +101,7 @@ export default function ChatPage() {
       try {
         const parsed = JSON.parse(raw);
         setChats(parsed);
-        if (!parsed[activeContact]) {
-          setActiveContact(Object.keys(parsed)[0] || CONTACTS[0].id);
-        }
+        // Do NOT auto-open a conversation: keep landing view and let user select
         return;
       } catch (e) {
         console.error("Failed parse chat storage", e);
@@ -58,9 +116,13 @@ export default function ChatPage() {
           {
             id: `${c.id}-1`,
             from: c.name,
-            text: `Hi, I'm ${c.name}. Ask me about ${PRODUCT_CATALOG[idx % PRODUCT_CATALOG.length].title}.`,
+            text: `Hi, I'm ${c.name}. Ask me about ${
+              PRODUCT_CATALOG[idx % PRODUCT_CATALOG.length].title
+            }.`,
             time: timeNow(),
-            meta: { productId: PRODUCT_CATALOG[idx % PRODUCT_CATALOG.length].id },
+            meta: {
+              productId: PRODUCT_CATALOG[idx % PRODUCT_CATALOG.length].id,
+            },
           },
         ],
       };
@@ -78,7 +140,10 @@ export default function ChatPage() {
   }, [chats]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    messagesEndRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "end",
+    });
   }, [activeContact, chats]);
 
   const contactObj = (id) => CONTACTS.find((c) => c.id === id) || {};
@@ -101,7 +166,10 @@ export default function ChatPage() {
       return copy;
     });
     setComposer("");
-    setTimeout(() => simulateReply(activeContact, text), 800 + Math.random() * 1200);
+    setTimeout(
+      () => simulateReply(activeContact, text),
+      800 + Math.random() * 1200
+    );
   };
 
   const simulateReply = (contactId, userText) => {
@@ -166,7 +234,9 @@ export default function ChatPage() {
   );
 
   const insertProductInComposer = (product) => {
-    setComposer((prev) => `${prev}${prev ? " " : ""}${product.title} ₱${product.price}`);
+    setComposer(
+      (prev) => `${prev}${prev ? " " : ""}${product.title} ₱${product.price}`
+    );
     setShowCatalog(false);
   };
 
@@ -182,7 +252,9 @@ export default function ChatPage() {
           <div className="sidebar-header">
             <h3>Chats</h3>
             <div className="sidebar-actions">
-              <button title="New message" className="icon-btn">✚</button>
+              <button title="New message" className="icon-btn">
+                <i className="fa-solid fa-plus" aria-hidden="true"></i>
+              </button>
             </div>
           </div>
 
@@ -199,11 +271,17 @@ export default function ChatPage() {
           {filteredContacts.map((c) => {
             const chat = chats[c.id] || { messages: [], unread: 0 };
             const last = chat.messages[chat.messages.length - 1];
-            const preview = last ? (last.from === "You" ? `You: ${last.text}` : last.text) : "No messages";
+            const preview = last
+              ? last.from === "You"
+                ? `You: ${last.text}`
+                : last.text
+              : "No messages";
             return (
               <div
                 key={c.id}
-                className={`contact-item ${activeContact === c.id ? "active" : ""}`}
+                className={`contact-item ${
+                  activeContact === c.id ? "active" : ""
+                }`}
                 onClick={() => openChat(c.id)}
                 title={`${c.name} — ${preview}`}
               >
@@ -215,7 +293,9 @@ export default function ChatPage() {
                   </div>
                 </div>
                 <div className="contact-right">
-                  {chat.unread > 0 && <div className="unread-dot">{chat.unread}</div>}
+                  {chat.unread > 0 && (
+                    <div className="unread-dot">{chat.unread}</div>
+                  )}
                   <div className={`status ${c.status}`}></div>
                 </div>
               </div>
@@ -228,131 +308,203 @@ export default function ChatPage() {
         </div>
       </aside>
 
-      {/* MAIN CHAT PANEL */}
+      {/* MAIN CHAT PANEL: show landing when no convo selected */}
       <main className="chat-main">
-        <div className="chat-topbar">
-          <div className="top-left">
-            <img src={contactObj(activeContact).avatar} alt="" className="top-avatar" />
-            <div className="top-meta">
-              <div className="top-name">{contactObj(activeContact).name}</div>
-              <div className="top-status">
-                {contactObj(activeContact).status === "online" ? "Active now" : "Offline"}
-              </div>
+        {!activeContact ? (
+          <div className="chat-landing">
+            <div className="landing-box">
+              <h2>Welcome to Chats</h2>
+              <p>Select a conversation from the left to start chatting.</p>
+              <p className="muted">Use the ✚ button to start a new message.</p>
             </div>
           </div>
+        ) : (
+          <>
+            <div className="chat-topbar">
+              <div className="top-left">
+                <img
+                  src={contactObj(activeContact).avatar}
+                  alt=""
+                  className="top-avatar"
+                />
+                <div className="top-meta">
+                  <div className="top-name">
+                    {contactObj(activeContact).name}
+                  </div>
+                  <div className="top-status">
+                    {contactObj(activeContact).status === "online"
+                      ? "Active now"
+                      : "Offline"}
+                  </div>
+                </div>
+              </div>
 
-          <div className="top-actions">
-            <button className="icon-btn small">📞</button>
-            <button className="icon-btn small">🎥</button>
-            <button
-              className="icon-btn small"
-              onClick={() => {
-                setShowCatalog((s) => !s);
-                setSelectedCatalogContact(activeContact);
-              }}
-              title="Products"
-            >
-              🛍️
-            </button>
+              <div className="top-actions">
+                <button className="icon-btn small" title="Call">
+                  <i className="fa-solid fa-phone" aria-hidden="true"></i>
+                </button>
+                <button className="icon-btn small" title="Video">
+                  <i className="fa-solid fa-video" aria-hidden="true"></i>
+                </button>
+                <button
+                  className="icon-btn small"
+                  onClick={() => {
+                    setShowCatalog((s) => !s);
+                    setSelectedCatalogContact(activeContact);
+                  }}
+                  title="Products"
+                >
+                  <i className="fa-solid fa-box-open" aria-hidden="true"></i>
+                </button>
 
-            {/* Exit Button */}
-            <button className="icon-btn small exit-btn" onClick={handleExit} title="Exit Chat">
-              ⬅️
-            </button>
-          </div>
-        </div>
+                {/* Exit Button */}
+                <button
+                  className="icon-btn small exit-btn"
+                  onClick={handleExit}
+                  title="Exit Chat"
+                >
+                  <i
+                    className="fa-solid fa-arrow-right-from-bracket"
+                    aria-hidden="true"
+                  ></i>
+                </button>
+              </div>
+            </div>
 
-        {/* Rest of chat remains unchanged */}
-        <div className="chat-body-area">
-          <div className="chat-wallpaper" />
-          <div className="messages-column">
-            {(!chats[activeContact] || chats[activeContact].messages.length === 0) && (
-              <div className="empty-chat">No messages yet. Say hello 👋</div>
-            )}
+            {/* Rest of chat remains unchanged */}
+            <div className="chat-body-area">
+              <div className="chat-wallpaper" />
+              <div className="messages-column">
+                {(!chats[activeContact] ||
+                  chats[activeContact].messages.length === 0) && (
+                  <div className="empty-chat">
+                    No messages yet. Say hello 👋
+                  </div>
+                )}
 
-            {(chats[activeContact]?.messages || []).map((m) => (
-              <div key={m.id} className={`message-row ${m.from === "You" ? "sent" : "recv"}`}>
-                <div className="message-bubble">
-                  <div className="message-text">{m.text}</div>
-                  {m.meta?.product && (
-                    <div className="message-product">
-                      <img src={m.meta.product.img} alt={m.meta.product.title} />
-                      <div>
-                        <div className="prod-title">{m.meta.product.title}</div>
-                        <div className="prod-price">₱{m.meta.product.price}</div>
+                {(chats[activeContact]?.messages || []).map((m) => (
+                  <div
+                    key={m.id}
+                    className={`message-row ${
+                      m.from === "You" ? "sent" : "recv"
+                    }`}
+                  >
+                    <div className="message-bubble">
+                      <div className="message-text">{m.text}</div>
+                      {m.meta?.product && (
+                        <div className="message-product">
+                          <img
+                            src={m.meta.product.img}
+                            alt={m.meta.product.title}
+                          />
+                          <div>
+                            <div className="prod-title">
+                              {m.meta.product.title}
+                            </div>
+                            <div className="prod-price">
+                              ₱{m.meta.product.price}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      <div className="message-footer">
+                        <span className="time">{m.time}</span>
+                        {m.from === "You" && (
+                          <button
+                            className="msg-del"
+                            onClick={() => deleteMessage(m.id)}
+                            title="Delete message"
+                          >
+                            <i
+                              className="fa-solid fa-xmark"
+                              aria-hidden="true"
+                            ></i>
+                          </button>
+                        )}
                       </div>
                     </div>
-                  )}
-                  <div className="message-footer">
-                    <span className="time">{m.time}</span>
-                    {m.from === "You" && (
-                      <button className="msg-del" onClick={() => deleteMessage(m.id)}>✕</button>
-                    )}
                   </div>
+                ))}
+                <div ref={messagesEndRef} />
+              </div>
+            </div>
+
+            <div className="chat-composer">
+              <div className="composer-left">
+                <button className="icon-btn" title="Emoji">
+                  <i className="fa-solid fa-smile" aria-hidden="true"></i>
+                </button>
+                <button
+                  className="icon-btn"
+                  onClick={() => {
+                    setShowCatalog((s) => !s);
+                    setSelectedCatalogContact(activeContact);
+                  }}
+                  title="Quick products"
+                >
+                  <i
+                    className="fa-solid fa-shopping-cart"
+                    aria-hidden="true"
+                  ></i>
+                </button>
+              </div>
+
+              <input
+                className="composer-input"
+                placeholder={`Message ${contactObj(activeContact).name}...`}
+                value={composer}
+                onChange={(e) => setComposer(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage(composer);
+                  }
+                }}
+              />
+
+              <div className="composer-right">
+                <button
+                  className="send-btn"
+                  onClick={() => sendMessage(composer)}
+                  disabled={!composer.trim()}
+                >
+                  Send
+                </button>
+              </div>
+            </div>
+
+            {showCatalog && selectedCatalogContact === activeContact && (
+              <div className="product-panel">
+                <div className="product-panel-header">
+                  <strong>Products</strong>
+                  <button
+                    className="icon-btn"
+                    onClick={() => setShowCatalog(false)}
+                    title="Close"
+                  >
+                    <i className="fa-solid fa-xmark" aria-hidden="true"></i>
+                  </button>
+                </div>
+                <div className="product-list">
+                  {PRODUCT_CATALOG.map((p) => (
+                    <div key={p.id} className="product-card">
+                      <img src={p.img} alt={p.title} />
+                      <div className="product-info">
+                        <div className="product-title">{p.title}</div>
+                        <div className="product-price">₱{p.price}</div>
+                        <div className="product-actions">
+                          <button onClick={() => insertProductInComposer(p)}>
+                            Insert
+                          </button>
+                          <button onClick={() => sendProduct(p)}>Send</button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            ))}
-            <div ref={messagesEndRef} />
-          </div>
-        </div>
-
-        <div className="chat-composer">
-          <div className="composer-left">
-            <button className="icon-btn">😊</button>
-            <button
-              className="icon-btn"
-              onClick={() => {
-                setShowCatalog((s) => !s);
-                setSelectedCatalogContact(activeContact);
-              }}
-              title="Quick products"
-            >
-              🛒
-            </button>
-          </div>
-
-          <input
-            className="composer-input"
-            placeholder={`Message ${contactObj(activeContact).name}...`}
-            value={composer}
-            onChange={(e) => setComposer(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage(composer);
-              }
-            }}
-          />
-
-          <div className="composer-right">
-            <button className="send-btn" onClick={() => sendMessage(composer)} disabled={!composer.trim()}>
-              Send
-            </button>
-          </div>
-        </div>
-
-        {showCatalog && selectedCatalogContact === activeContact && (
-          <div className="product-panel">
-            <div className="product-panel-header">
-              <strong>Products</strong>
-              <button className="icon-btn" onClick={() => setShowCatalog(false)}>✕</button>
-            </div>
-            <div className="product-list">
-              {PRODUCT_CATALOG.map((p) => (
-                <div key={p.id} className="product-card">
-                  <img src={p.img} alt={p.title} />
-                  <div className="product-info">
-                    <div className="product-title">{p.title}</div>
-                    <div className="product-price">₱{p.price}</div>
-                    <div className="product-actions">
-                      <button onClick={() => insertProductInComposer(p)}>Insert</button>
-                      <button onClick={() => sendProduct(p)}>Send</button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+            )}
+          </>
         )}
       </main>
     </div>

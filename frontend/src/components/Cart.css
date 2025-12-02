@@ -3,12 +3,17 @@
   max-width: 1000px;
   margin: 0 auto;
   padding: 20px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: #333;
-  background: #f8f9fa;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #525050;
+  background: #ffffff;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+.cart-wrapper {
+  background: #f5f5f5; /* subtle gray */
+  min-height: 100vh;
 }
 
 /* ===== Header ===== */
@@ -28,15 +33,15 @@
 
 .exit-btn {
   text-decoration: none;
-  color: #fff;
-  background: #ff6b6b;
+  color: #ffffff;
+  background: #800000;
   padding: 10px 20px;
   border-radius: 8px;
   transition: all 0.3s ease;
 }
 
 .exit-btn:hover {
-  background: #ff4c4c;
+  background: #8a0808;
   transform: translateY(-2px);
 }
 
@@ -50,23 +55,36 @@
 .empty-cart {
   text-align: center;
   font-size: 20px;
-  color: #888;
+  color: #fffcfc;
 }
 
 /* ===== Cart Card ===== */
 .cart-card {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   background: #fff;
   padding: 15px 20px;
   border-radius: 12px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  gap: 15px;
+  animation: float 6s ease-in-out infinite;
 }
 
 .cart-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12);
+  transform: translateY(-8px);
+  box-shadow: 0 16px 35px rgba(0, 0, 0, 0.15);
+}
+
+/* ===== Cart Checkbox ===== */
+.cart-checkbox {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #800000;
+  flex-shrink: 0;
+  margin-top: 50px;
 }
 
 .cart-img {
@@ -74,7 +92,6 @@
   height: 120px;
   object-fit: contain;
   border-radius: 10px;
-  margin-right: 20px;
 }
 
 .cart-info {
@@ -91,7 +108,7 @@
 
 .cart-info p {
   font-weight: bold;
-  color: #2c3e50;
+  color: #611010;
   margin-bottom: 12px;
 }
 
@@ -103,8 +120,8 @@
 }
 
 .quantity-control button {
-  background: #3498db;
-  color: #fff;
+  background: #800000;
+  color: #fdfcfc;
   border: none;
   border-radius: 50%;
   width: 32px;
@@ -115,7 +132,7 @@
 }
 
 .quantity-control button:hover {
-  background: #2980b9;
+  background: #51020e;
   transform: scale(1.1);
 }
 
@@ -140,7 +157,7 @@
 }
 
 .remove-btn {
-  background: #ff4757;
+  background: #94111b;
   border: none;
   padding: 8px 14px;
   border-radius: 8px;
@@ -151,7 +168,24 @@
 }
 
 .remove-btn:hover {
-  background: #e84118;
+  background: #800606;
+  transform: translateY(-2px);
+}
+
+/* ===== Cancel Button (Rent/Swap) ===== */
+.cancl-btn {
+  background: #94111b;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.cancl-btn:hover {
+  background: #800606;
   transform: translateY(-2px);
 }
 
@@ -171,7 +205,7 @@
 .cart-summary h3 {
   font-size: 22px;
   font-weight: bold;
-  color: #2c3e50;
+  color: #800000;
 }
 
 .cart-actions {
@@ -193,22 +227,22 @@
 }
 
 .add-another-btn {
-  background: #2ed573;
+  background: #660808;
   color: #fff;
 }
 
 .add-another-btn:hover {
-  background: #28a745;
+  background: #6c0316;
   transform: translateY(-2px);
 }
 
 .checkout-btn {
-  background: #ffa502;
+  background: #dd3a19;
   color: #fff;
 }
 
 .checkout-btn:hover {
-  background: #ff7f50;
+  background: #b4502b;
   transform: translateY(-2px);
 }
 
@@ -321,4 +355,16 @@
 .checkout-btn {
   transition: all 0.3s ease;
 }
+
+/* ===== Floating Animation ===== */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
 /* ===== End of Cart.css ===== */

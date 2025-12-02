@@ -168,3 +168,13 @@ export const registerUser = async (userData) => {
   }
   return response.json();
 };
+
+export const addProductPhoto = async (productId, photoUrl) => {
+  const response = await fetch(`${API_URL}/products/${productId}/photos`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ product_id: productId, photo_url: photoUrl }),
+  });
+  if (!response.ok) throw new Error("Failed to add photo");
+  return response.json();
+};
