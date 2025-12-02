@@ -5,6 +5,10 @@ import { fetchProducts } from "../../services/api";
 import "./HomePage.css";
 import AppNavbar from "../AppNavbar";
 import PostItemModal from "./PostItemModal";
+import ConfirmationModal from './ConfirmationMsg';
+import { useRentalRequests } from './RentalRequestContext';
+import { useSwapRequests } from './SwapRequestContext';
+
 
 export default function HomePage() {
   const { addToCart } = useCart();
@@ -17,6 +21,61 @@ export default function HomePage() {
   const [showFilters, setShowFilters] = useState(false);
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
 
+
+  //new consts for Confirmation modal
+  const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
+  const [confirmationItem, setConfirmationItem] = useState(null);
+  const [confirmationAction, setConfirmationAction] = useState("");
+  
+  const handleActionClick = (post, actionType) => {
+  setConfirmationItem(post);
+  setConfirmationAction(actionType);
+  setIsConfirmationOpen(true);
+};
+
+const { addRentalRequest } = useRentalRequests();
+const { addSwapRequest } = useSwapRequests();
+  const handleConfirm = () => {
+  if (!confirmationItem || !confirmationAction) return;
+
+  if (confirmationAction === "Buy") {
+    //handleAddToCart(confirmationItem);
+    alert(`You have successfully purchased ${confirmationItem.name}!`);
+  }
+
+  if (confirmationAction === "Rent") {
+    alert(`Your rent request is being processed!`);
+    
+    // Add request to rental requests
+    const newRequest = {
+      request_id: Date.now(), // temp unique id
+      product_name: confirmationItem.name,
+      renter_name: "Krislyn Sayat", // replace with logged-in user
+      rentee_name: confirmationItem.poster,
+      rent_start: new Date().toISOString(),
+      rent_end: new Date(Date.now() + 3*24*60*60*1000).toISOString(), // example 3 days
+      status: "pending",
+    };
+
+    addRentalRequest(newRequest);
+  }
+
+  if (confirmationAction === "Swap") {
+    alert(`Your swap request is being processed!`);
+
+     addSwapRequest({
+    swap_id: Date.now(),
+    requester_name: "Krislyn Sayat",
+    receiver_name: confirmationItem.poster,
+    product_offered_name: confirmationItem.name,
+    product_requested_name: confirmationItem.swapFor || "Not specified",
+    status: "pending",
+  });
+  }
+
+  setIsConfirmationOpen(false);
+};
+  
   // New states for backend data
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -324,6 +383,8 @@ export default function HomePage() {
                   <h4>{post.name}</h4>
                   <div className="post-actions">
                     <button className="price-btn">{post.type}</button>
+                    {post.type.startsWith("₱") && post.type !== "Rent" && post.type !== "Swap" && (
+                    
                     <button
                       className="addtocart-btn"
                       onClick={(e) => {
@@ -333,6 +394,8 @@ export default function HomePage() {
                     >
                       <i className="fa-solid fa-cart-plus"></i>
                     </button>
+                  )}
+
                     <button
                       className="chat-btn"
                       onClick={(e) => {
@@ -388,14 +451,30 @@ export default function HomePage() {
                 <strong>Description:</strong>{" "}
                 {selectedPost.description || "No description provided."}
               </p>
+
+
               <div className="modal-actions">
-                <button className="price-btn">{selectedPost.type}</button>
                 <button
-                  className="addtocart-btn"
-                  onClick={() => handleAddToCart(selectedPost)}
+                  className="price-btn"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (selectedPost.type.startsWith("₱")) handleActionClick(selectedPost, "Buy");
+                    if (selectedPost.type === "Rent") handleActionClick(selectedPost, "Rent");
+                    if (selectedPost.type === "Swap") handleActionClick(selectedPost, "Swap");
+                  }}
                 >
-                  <i className="fa-solid fa-cart-plus"></i>
+                  {selectedPost.type}
                 </button>
+
+                {selectedPost.type !== "Rent" && selectedPost.type !== "Swap" && selectedPost.type.startsWith("₱") && (
+                  <button
+                    className="addtocart-btn"
+                    onClick={() => handleAddToCart(selectedPost)}
+                  >
+                    <i className="fa-solid fa-cart-plus"></i>
+                  </button>
+                )}
+
                 <button
                   className="chat-btn"
                   onClick={(e) => {
@@ -422,6 +501,14 @@ export default function HomePage() {
           loadProducts(); // Refresh products after posting
         }}
         activeFilter={filter}
+      />
+
+      <ConfirmationModal
+        isOpen={isConfirmationOpen}
+        onClose={() => setIsConfirmationOpen(false)}
+        onConfirm={handleConfirm}
+        actionType={confirmationAction}
+        itemName={confirmationItem?.name}
       />
     </div>
   );

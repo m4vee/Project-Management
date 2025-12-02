@@ -19,6 +19,9 @@ import ProfileEdit from "./components/pages/ProfileEdit.jsx";
 import AccountSettings from "./components/pages/AccountSettings.jsx";
 import Feedback from "./components/pages/Feedback.jsx";
 import MyProfile from "./components/pages/MyProfile.jsx";
+import RentalRequests from "./components/pages/RentalRequests";
+import SwapRequests from './components/pages/SwapRequests';
+import ReviewsPage from "./components/pages/ReviewsPage.jsx";
 
 // E-Commerce and Chat
 import Cart from "./components/Cart.jsx";
@@ -28,6 +31,9 @@ import Chat from "./components/pages/Chat.jsx";
 
 // Context
 import { CartProvider } from "./context/CartContext.jsx";
+import { RentalRequestProvider } from "./components/pages/RentalRequestContext.jsx";
+import { SwapRequestProvider } from './components/pages/SwapRequestContext';
+
 
 function AppContent() {
   const location = useLocation();
@@ -39,7 +45,7 @@ function AppContent() {
     setIsLoggedIn(loggedIn);
   }, []);
 
-  const hideNavbarRoutes = ["/profile", "/inside-app", "/app-navbar", "/account-settings", "/feedback", "/my-profile"];
+  const hideNavbarRoutes = ["/profile", "/inside-app", "/app-navbar", "/account-settings", "/feedback", "/my-profile", "/reviews"];
 
   // ✅ Updated routes inside app layout
   const insideAppRoutes = [
@@ -53,10 +59,15 @@ function AppContent() {
     "/cart",
     "/checkout",
     "/receipt",
-    "/chat"
+    "/chat",
+    "/rentalrequests",
+    "/swaprequests",
+    "/reviews"
   ];
 
-  const isInsideApp = insideAppRoutes.includes(location.pathname);
+  const isInsideApp = insideAppRoutes.some(route =>
+      location.pathname.startsWith(route)
+    );
 
   return (
     <>
@@ -82,6 +93,13 @@ function AppContent() {
         <Route path="/profile/edit" element={<ProfileEdit />} /> {/* Profile Edit Page */}
         <Route path="/account-settings" element={<AccountSettings />} /> {/* Account Settings Page */}
         <Route path="/feedback" element={<Feedback />} /> {/* Feedback Page */}
+        <Route path="/feedback" element={<Feedback />} /> {/* Feedback Page */}
+        <Route path="/rentalrequests" element={<RentalRequests />} /> {/* Rental Requests Page */}
+        <Route path="/swaprequests" element={<SwapRequests />} /> {/* Swap Requests Page */}
+        <Route path="/reviews" element={<ReviewsPage />} />
+        <Route path="/reviews/:sellerId" element={<ReviewsPage />} />
+        <Route path="/reviews/:sellerId" element={<ReviewsPage reviews={[]} />} />
+
 
         {/* E-Commerce Routes */}
         <Route path="/cart" element={<Cart />} />
@@ -99,7 +117,11 @@ export default function App() {
   return (
     <Router>
       <CartProvider>
-        <AppContent />
+        <RentalRequestProvider>
+          <SwapRequestProvider>
+              <AppContent />
+            </SwapRequestProvider>
+        </RentalRequestProvider>
       </CartProvider>
     </Router>
   );

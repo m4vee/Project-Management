@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './AccountSettings.css';  // Update this to match the actual path of your CSS file
+import AppNavbar from '../AppNavbar';
+
 
 const AccountSettings = () => {
   const navigate = useNavigate();
@@ -39,6 +41,8 @@ const AccountSettings = () => {
   };
 
   return (
+    <>
+    <AppNavbar />
     <div className="account-settings-container">
       {/* Back Button */}
       <button className="back-button" onClick={handleBackClick}>
@@ -141,6 +145,7 @@ const AccountSettings = () => {
         </button>
       </div>
     </div>
+    </>
   );
 };
 

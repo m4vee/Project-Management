@@ -161,8 +161,8 @@
 /* FLOATING HOME BUTTON */
 .swap-floating-home-btn {
   position: fixed;
-  top: 20px;
-  right: 20px;   /* FIX: works on all screen sizes */
+  top: 27px;
+  right: 305px;   /* FIX: works on all screen sizes */
   z-index: 999;
   border: none;
   background: none;

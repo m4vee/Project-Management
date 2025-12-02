@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import './MyProfile.css'; // Ensure your styles are correctly linked
+import AppNavbar from "../AppNavbar";
+
 
 const MyProfile = () => {
   const navigate = useNavigate(); // Initialize the useNavigate hook
@@ -35,6 +37,8 @@ const MyProfile = () => {
   };
 
   return (
+    <>
+    <AppNavbar />
     <div className="my-profile-container">
       {/* Back Button */}
       <button className="my-back-button" onClick={handleBackClick}>
@@ -97,6 +101,7 @@ const MyProfile = () => {
         <button className="my-logout-button" onClick={handleLogout}>Log Out</button>
       </div>
     </div>
+    </>
   );
 };
 

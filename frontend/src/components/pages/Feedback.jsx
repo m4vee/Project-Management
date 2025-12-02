@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Feedback.css'; // Make sure your styles are correctly linked
+import AppNavbar from '../AppNavbar';
+
 
 const Feedback = () => {
   const navigate = useNavigate();
@@ -42,6 +44,8 @@ const Feedback = () => {
   };
 
   return (
+    <>
+    <AppNavbar />
     <div className="feedback-container">
       {/* Back Button */}
       <button className="back-button" onClick={handleBackClick}>
@@ -75,6 +79,7 @@ const Feedback = () => {
         {message && <p className="message">{message}</p>}
       </div>
     </div>
+    </>
   );
 };
 
