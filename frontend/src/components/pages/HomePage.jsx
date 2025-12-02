@@ -13,7 +13,6 @@ import { useSwapRequests } from './SwapRequestContext';
 export default function HomePage() {
   const { addToCart } = useCart();
   const [category, setCategory] = useState("");
-  const [priceRange, setPriceRange] = useState([0, 9999]);
   const [availability, setAvailability] = useState([]);
   const [filter, setFilter] = useState("all");
   const [isSticky, setIsSticky] = useState(false);
@@ -177,17 +176,12 @@ const { addSwapRequest } = useSwapRequests();
       !category ||
       (post.category && post.category.toLowerCase() === category.toLowerCase());
 
-    const numericPrice = parseFloat(post.type.replace(/[₱,]/g, "")) || 0;
-    const priceMatch =
-      !post.type.includes("₱") ||
-      (numericPrice >= priceRange[0] && numericPrice <= priceRange[1]);
-
     const availabilityMatch =
       availability.length === 0 ||
       (post.availability &&
         availability.some((day) => post.availability.includes(day)));
 
-    return serviceMatch && categoryMatch && priceMatch && availabilityMatch;
+    return serviceMatch && categoryMatch && availabilityMatch;
   });
 
   const handleAddToCart = (post) => {

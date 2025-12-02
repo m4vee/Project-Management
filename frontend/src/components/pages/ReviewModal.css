@@ -1,0 +1,147 @@
+/* Overlay */
+.review-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  z-index: 999999;
+  pointer-events: auto;
+  overflow-y: auto; /* 👈 mobile fix */
+}
+
+/* Modal box */
+.review-modal {
+  background: #fff;
+  width: 90%;
+  max-width: 420px;
+  padding: 25px;
+  border-radius: 14px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.25);
+  animation: pop 0.25s ease-out;
+  z-index: 9999999;
+}
+
+/* Title */
+.review-modal h2 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 22px;
+}
+
+/* Stars */
+.star-rating {
+  display: flex;
+  justify-content: left;
+  margin-bottom: 10px;
+}
+
+.star {
+  font-size: 32px;
+  color: #ccc;
+  margin-right: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+  pointer-events: auto !important;
+}
+
+/* Textarea */
+.review-textarea {
+  width: 100%;
+  height: 110px;
+  border-radius: 10px;
+  padding: 12px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+  resize: none;
+  outline: none;
+  margin-bottom: 15px;
+}
+
+/* Buttons */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.cancel-btn {
+  background: #ccc;
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+.submit-btn {
+  background: #a60707;
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.submit-btn:hover {
+  background: #7b0606;
+}
+
+/* Popup animation */
+@keyframes pop {
+  from { transform: scale(0.85); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* ------------------------------------------------------ */
+/* 📱 MOBILE RESPONSIVE POLISH */
+/* ------------------------------------------------------ */
+@media (max-width: 600px) {
+
+  .review-modal {
+    width: 100%;
+    max-width: 95%;
+    padding: 18px;
+  }
+
+  .star {
+    font-size: 26px;
+  }
+
+  .review-textarea {
+    height: 95px;
+    font-size: 14px;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .cancel-btn,
+  .submit-btn {
+    width: 100%;
+    padding: 10px;
+    font-size: 15px;
+  }
+}
+
+/* Even smaller screens (older phones) */
+@media (max-width: 360px) {
+
+  .review-modal {
+    border-radius: 10px;
+  }
+
+  .star {
+    font-size: 22px;
+  }
+
+  .review-textarea {
+    height: 85px;
+  }
+}

@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { fetchProducts, deleteProduct } from "../../services/api";
 import PostItemModal from "./PostItemModal";
+import RatingBox from "./RatingBox";
+import CreatePostModal from "./CreatePostModal";
 import "./Profile.css";
 import RatingBox from "./RatingBox";
 import PostActionModal from "./PostActionModal";

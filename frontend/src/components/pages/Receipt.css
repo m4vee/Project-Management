@@ -2,16 +2,16 @@
 
 /* CSS Variables for Consistency and Easy Theming */
 :root {
-  --primary-color: #2563eb; /* Professional blue */
-  --secondary-color: #64748b; /* Neutral gray */
-  --accent-color: #10b981; /* Green for success/confirmation */
-  --text-color: #1f2937; /* Dark gray for text */
-  --bg-color: #f8fafc; /* Light background */
+  --primary-color: #7b0000; /* Professional blue */
+  --secondary-color: #d8dbde; /* Neutral gray */
+  --accent-color: #fdfdfd; /* Green for success/confirmation */
+  --text-color: #181818; /* Dark gray for text */
+  --bg-color: #ffffff; /* White background */
   --card-bg: #ffffff; /* White card background */
-  --border-color: #e5e7eb; /* Light border */
+  --border-color: #970c3c; /* Light border */
   --shadow: 0 10px 25px rgba(0, 0, 0, 0.1); /* Subtle shadow */
   --border-radius: 12px; /* Rounded corners */
-  --font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Modern font stack */
+  --font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; /* Modern font stack */
 }
 
 /* Container */
@@ -21,7 +21,11 @@
   align-items: center;
   min-height: 100vh;
   padding: 20px;
-  background: linear-gradient(135deg, var(--bg-color) 0%, #e2e8f0 100%); /* Subtle gradient background */
+  background: linear-gradient(
+    135deg,
+    var(--bg-color) 0%,
+    #e2e8f0 100%
+  ); /* Subtle gradient background */
   font-family: var(--font-family);
 }
 
@@ -40,7 +44,11 @@
 .receipt-header {
   text-align: center;
   padding: 30px 20px 20px;
-  background: linear-gradient(135deg, var(--primary-color), #1d4ed8); /* Gradient header */
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    #800000
+  ); /* Gradient header */
   color: white;
 }
 
@@ -90,7 +98,7 @@
 }
 
 .receipt-item:hover {
-  background: rgba(37, 99, 235, 0.05); /* Subtle hover effect */
+  background: rgba(236, 81, 109, 0.05); /* Subtle hover effect */
 }
 
 .item-details {
@@ -176,9 +184,9 @@
 }
 
 .btn-primary:hover {
-  background: #1d4ed8;
+  background: #800000;
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 5px 15px rgba(228, 49, 49, 0.3);
 }
 
 .btn-secondary {
@@ -187,7 +195,7 @@
 }
 
 .btn-secondary:hover {
-  background: #475569;
+  background: #621825;
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(100, 116, 139, 0.3);
 }
@@ -214,7 +222,7 @@
   }
   .receipt-card {
     box-shadow: none;
-    border: 1px solid #ccc;
+    border: 1px solid #dd4e4e;
   }
 }
 
