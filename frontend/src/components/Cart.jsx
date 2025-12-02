@@ -61,11 +61,12 @@ export default function Cart() {
   };
 
   return (
+    <>
+    <AppNavbar />
     <div className="cart-wrapper">
-      <AppNavbar />
       <div className="cart-page">
         <header className="cart-header">
-          <h2>🛒 My Cart</h2>
+          <h1>My Cart</h1>
           <Link to="/inside-app" className="exit-btn" title="Exit to main app">
             <i className="fa-solid fa-arrow-left"></i> Exit
           </Link>
@@ -73,7 +74,7 @@ export default function Cart() {
 
         <div className="cart-body">
           {cartItems.length === 0 ? (
-            <p className="empty-cart">Your cart is empty 😢</p>
+            <p className="empty-cart">Your cart is empty</p>
           ) : (
             cartItems.map((item) => (
               <div className="cart-card" key={item.id}>
@@ -91,8 +92,8 @@ export default function Cart() {
                 />
                 <div className="cart-info">
                   <h3>{item.name}</h3>
-                  <p>₱{item.price.toLocaleString()}</p>
-                  <p>Service: {item.type}</p>{" "}
+                  <p><strong>₱{item.price.toLocaleString()}</strong></p>
+                  {/*<p>Service: {item.type}</p>{" "}*/}
                   {/* Added: Display service type */}
                   <div className="quantity-control">
                     <button
@@ -107,7 +108,7 @@ export default function Cart() {
                 </div>
                 <div className="cart-right">
                   <p className="cart-subtotal">
-                    ₱{(item.price * item.quantity).toLocaleString()}
+                    ₱ {(item.price * item.quantity).toLocaleString()}.00
                   </p>
                   <button
                     className="remove-btn"
@@ -130,7 +131,7 @@ export default function Cart() {
               onClick={handleAddAnother}
               title="Add more items to your cart"
             >
-              + Add Another Item
+              Add Item
             </button>
             {selectedItems.size > 0 && (
               <button
@@ -145,5 +146,6 @@ export default function Cart() {
         </div>
       </div>
     </div>
+    </>
   );
 }

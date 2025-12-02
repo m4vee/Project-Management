@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./Chat.css";
+import AppNavbar from "../AppNavbar";
 
 const CONTACTS = [
   {
@@ -245,6 +246,8 @@ export default function ChatPage() {
   };
 
   return (
+    <>
+    <AppNavbar />
     <div className="chat-root">
       {/* LEFT SIDEBAR */}
       <aside className="chat-sidebar">
@@ -508,5 +511,6 @@ export default function ChatPage() {
         )}
       </main>
     </div>
+    </>
   );
 }

@@ -1,19 +1,27 @@
 /* ===== General Page Styles ===== */
 .cart-page {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 20px;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  color: #525050;
-  background: #ffffff;
-  min-height: 100vh;
+  width: 100%;
+  height: 85vh;
   display: flex;
+  flex: 1;
   flex-direction: column;
+  overflow: hidden;
+  max-width: 1100px;
+  margin: 20px auto;
+  padding: 20px;
+  font-family: "Poppins", sans-serif;
+  color: black;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.667);
+  box-sizing: border-box;
+  overflow-y: auto;
+  scrollbar-width: thin;
 }
 
 .cart-wrapper {
-  background: #f5f5f5; /* subtle gray */
-  min-height: 100vh;
+  background: #fff; /* subtle gray */
+ 
 }
 
 /* ===== Header ===== */
@@ -24,25 +32,37 @@
   margin-bottom: 30px;
 }
 
-.cart-header h2 {
+.cart-header h1 {
   font-size: 28px;
   display: flex;
   align-items: center;
   gap: 10px;
+  color: black;
+  margin-left: 20px;
 }
 
-.exit-btn {
+/* Exit Button */
+.cart-header .exit-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   text-decoration: none;
-  color: #ffffff;
-  background: #800000;
-  padding: 10px 20px;
+  padding: 8px 16px;
+  background-color: #6a0a0a;
+  color: #fff;
   border-radius: 8px;
-  transition: all 0.3s ease;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
 }
 
-.exit-btn:hover {
-  background: #8a0808;
-  transform: translateY(-2px);
+.cart-header .exit-btn i {
+  font-size: 16px;
+}
+
+.cart-header .exit-btn:hover {
+  border: 1px solid #000;
+  color: black;
+  background-color: #ffffff;
 }
 
 /* ===== Cart Body ===== */
@@ -55,7 +75,7 @@
 .empty-cart {
   text-align: center;
   font-size: 20px;
-  color: #fffcfc;
+  color: #000000;
 }
 
 /* ===== Cart Card ===== */
@@ -65,11 +85,12 @@
   align-items: center;
   background: #fff;
   padding: 15px 20px;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.242);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   gap: 15px;
   animation: float 6s ease-in-out infinite;
+  border: 1px solid #00000094;
 }
 
 .cart-card:hover {
@@ -193,13 +214,14 @@
 .cart-summary {
   margin-top: auto;
   background: #fff;
-  padding: 20px;
+  padding: 10px;
   border-radius: 14px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
+  border: 1px solid #00000080;
 }
 
 .cart-summary h3 {
@@ -217,8 +239,8 @@
 /* ===== Buttons ===== */
 .add-another-btn,
 .checkout-btn {
-  padding: 12px 25px;
-  font-size: 16px;
+  padding: 5px 25px;
+  font-size: 15px;
   font-weight: bold;
   border: none;
   border-radius: 10px;

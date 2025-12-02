@@ -10,7 +10,7 @@ export default function ConfirmationModal({ isOpen, onClose, onConfirm, actionTy
         <h3>Confirm {actionType}</h3>
         <p>Are you sure you want to {actionType.toLowerCase()} <strong>{itemName}</strong>?</p>
         <div className="confirmation-buttons">
-          <button className="cancel-btn" onClick={onClose}>No</button>
+          <button className="cancell-btn" onClick={onClose}>No</button>
           <button className="confirm-btn" onClick={onConfirm}>Yes</button>
           
         </div>
