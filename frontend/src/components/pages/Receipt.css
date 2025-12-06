@@ -249,3 +249,94 @@
     padding: 14px;
   }
 }
+
+/* Add these styles to your Receipt.css */
+
+/* Status Badge Styling */
+.status-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-top: 1px solid #e5e7eb;
+  margin-top: 8px;
+}
+
+.status-row span:first-child {
+  font-weight: 600;
+  color: #374151;
+  font-size: 16px;
+}
+
+/* Base status badge */
+.status-row span[class^="status-"] {
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: capitalize;
+  letter-spacing: 0.3px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* Pending Status - Yellow/Orange */
+.status-pending {
+  background-color: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fbbf24;
+}
+
+/* Completed Status - Green */
+.status-completed {
+  background-color: #d1fae5;
+  color: #065f46;
+  border: 1px solid #10b981;
+}
+
+/* Cancelled Status - Red */
+.status-cancelled,
+.status-canceled {
+  background-color: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #ef4444;
+}
+
+/* Reserved Status - Blue */
+.status-reserved {
+  background-color: #dbeafe;
+  color: #1e40af;
+  border: 1px solid #3b82f6;
+}
+
+/* Processing Status - Purple */
+.status-processing {
+  background-color: #e9d5ff;
+  color: #6b21a8;
+  border: 1px solid #a855f7;
+}
+
+/* Failed Status - Dark Red */
+.status-failed {
+  background-color: #fecaca;
+  color: #7f1d1d;
+  border: 1px solid #dc2626;
+}
+
+/* Add a subtle animation for status */
+.status-row span[class^="status-"] {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

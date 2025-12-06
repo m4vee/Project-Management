@@ -10,10 +10,8 @@ import PostActionModal from "./PostActionModal";
 
 const DEFAULT_COVER =
   "https://images.unsplash.com/photo-1503264116251-35a269479413?q=80&w=1400&auto=format&fit=crop&crop=entropy";
-const DEFAULT_AVATAR =
-  "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=800&auto=format&fit=crop&crop=faces";
+const DEFAULT_AVATAR = "images/no_profile.jpg";
 
-  
 export default function Profile() {
   const navigate = useNavigate();
   const [isVisitorView] = useState(false); // true for visitor mode, false for owner
@@ -52,7 +50,6 @@ export default function Profile() {
     if (cat.includes("buy")) return "buy";
     return "";
   }
-
 
   // Ratings (sample - you can add this to backend later)
   const [ratings] = useState([5, 5, 4, 5, 4]);
@@ -170,21 +167,35 @@ export default function Profile() {
     }
   }
 
-  // Handle post deletion
-  const handleDeletePost = async (postId) => {
+  const handleDeletePost = async (productId) => {
+    console.log("🗑️ Delete button clicked for product:", productId);
+
     if (!window.confirm("Are you sure you want to delete this post?")) {
+      console.log("❌ User cancelled deletion");
       return;
     }
 
     try {
-      await deleteProduct(postId);
-      alert("Post deleted successfully!");
-      loadUserPosts(); // Refresh the list
-    } catch (err) {
-      alert("Failed to delete post: " + err.message);
+      console.log("🚀 Calling deleteProduct API...");
+      const result = await deleteProduct(productId);
+      console.log("✅ Delete API response:", result);
+
+      // Update UI by removing the deleted post
+      setPosts((prevPosts) => {
+        const updatedPosts = prevPosts.filter(
+          (post) => post.product_id !== productId
+        );
+        console.log("📝 Posts after deletion:", updatedPosts);
+        return updatedPosts;
+      });
+
+      alert("Post successfully deleted!");
+      setActionModalOpen(false);
+    } catch (error) {
+      console.error("❌ Error deleting post:", error);
+      alert(`Deletion failed: ${error.message}`);
     }
   };
-
   // Handle post editing
   const handleEditPost = (postId) => {
     navigate(`/products/${postId}/edit`);
@@ -236,14 +247,14 @@ export default function Profile() {
             </Link>
           </div>
 
-          <div className="top-search">
+          {/*<div className="top-search">
             <input
               type="text"
               placeholder="Search"
               value={globalQuery}
               onChange={(e) => setGlobalQuery(e.target.value)}
             />
-          </div>
+          </div>*/}
         </div>
 
         <div className="topbar-right">
@@ -262,11 +273,15 @@ export default function Profile() {
           </button>
 
           {dropdownOpen && (
-            <div className="profile-dropdown" onClick={(e) => e.stopPropagation()}>
-              <Link to="/my-profile" className="dd-item" onClick={() => setDropdownOpen(false)}>
-                My Profile
-              </Link>
-              <Link to="/cart" className="dd-item" onClick={() => setDropdownOpen(false)}>
+            <div
+              className="profile-dropdown"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Link
+                to="/cart"
+                className="dd-item"
+                onClick={() => setDropdownOpen(false)}
+              >
                 My Cart
               </Link>
               <Link
@@ -283,30 +298,6 @@ export default function Profile() {
               >
                 My Swaps
               </Link>
-              <Link
-                to="/account-settings"
-                className="dd-item"
-                onClick={() => setDropdownOpen(false)}
-              >
-                Account Settings
-              </Link>
-              <Link to="/feedback" className="dd-item" onClick={() => setDropdownOpen(false)}>
-                Give Feedback
-              </Link>
-
-              <div className="dd-item toggle-row">
-                <span>Dark Mode</span>
-                <label className="switch">
-                  <input
-                    type="checkbox"
-                    checked={theme === "dark"}
-                    onChange={() =>
-                      setTheme((t) => (t === "dark" ? "light" : "dark"))
-                    }
-                  />
-                  <span className="slider" />
-                </label>
-              </div>
 
               <button className="dd-item logout" onClick={handleLogout}>
                 Logout
@@ -369,49 +360,64 @@ export default function Profile() {
                       autoFocus
                     />
                   ) : (
-                <h1 onClick={() => setEditingName(true)}>{nickname}</h1>
-              )}
-              {avgRating >= 4.5 && (
-                <span className="verified" title="Verified seller">
-                  ✔︎
-                </span>
-              )}
-            </div>
+                    <h1 onClick={() => setEditingName(true)}>{nickname}</h1>
+                  )}
+                  {avgRating >= 4.5 && (
+                    <span className="verified" title="Verified seller">
+                      ✔︎
+                    </span>
+                  )}
+                </div>
 
-            <p className="subtitle">{user.email}</p>
-            <p className="subtitle small">{university}</p>
+                <p className="subtitle">{user.email}</p>
+                <p className="subtitle small">{university}</p>
 
-            {/* Stats */}
-            <div className="profile-stats">
-              <div className="stat-item">
-                <span className="stat-number">{totalPosts}</span>
-                <span className="stat-label"> Total Posts</span>
-              </div>
-              <div className="stat-item">
-                <span className="stat-number">{activePosts}</span>
-                <span className="stat-label"> Active</span>
-              </div>
-              <div className="stat-item">
-                <span className="stat-number">{soldPosts}</span>
-                <span className="stat-label"> Sold</span>
+                {/* Stats */}
+                <div className="profile-stats">
+                  <div className="stat-item">
+                    <span className="stat-number">{totalPosts}</span>
+                    <span className="stat-label"> Total Posts</span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-number">{activePosts}</span>
+                    <span className="stat-label"> Active</span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-number">{soldPosts}</span>
+                    <span className="stat-label"> Sold</span>
+                  </div>
+                </div>
               </div>
             </div>
-            </div>
-</div>
-             {/* RIGHT COLUMN — Rating Box */}
-            <div className="right-col">
+            {/* RIGHT COLUMN — Rating Box */}
+            {/*<div className="right-col">
               <div className="profile-info">
                 <RatingBox
                   sellerId="krislyn"
                   reviews={[
-                    { id: 1, user: "Anna", rating: 5, comment: "Very smooth transaction!" },
-                    { id: 2, user: "Mark", rating: 4, comment: "Item in good condition." },
-                    { id: 3, user: "Joan", rating: 5, comment: "Super bait seller!" },
+                    {
+                      id: 1,
+                      user: "Anna",
+                      rating: 5,
+                      comment: "Very smooth transaction!",
+                    },
+                    {
+                      id: 2,
+                      user: "Mark",
+                      rating: 4,
+                      comment: "Item in good condition.",
+                    },
+                    {
+                      id: 3,
+                      user: "Joan",
+                      rating: 5,
+                      comment: "Super bait seller!",
+                    },
                   ]}
                 />
               </div>
-            </div>
-            
+            </div>*/}
+
             {/*}
             <div className="profile-actions">
               <button
@@ -426,7 +432,7 @@ export default function Profile() {
             </div>*/}
           </div>
         </section>
-{/*}
+        {/*}
         <section className="left-column">
           <h3>Photos</h3>
           <div className="photos-grid">
@@ -445,375 +451,416 @@ export default function Profile() {
         </section>
 */}
         <section
-  className="content-column"
-  style={{ marginTop: "0px", marginLeft: "-270px" }}
->
-  <div className="filters-row">
-    <div
-      className="filter-buttons"
-      style={{ gap: "50px", marginLeft: "70px" }}
-    >
-      {["All Posts", "Buy/Sell", "Rent", "Swap"].map((f) => (
-        <button
-          key={f}
-          className={`filter-btn ${activeFilter === f ? "active" : ""}`}
-          onClick={() => setActiveFilter(f)}
+          className="content-column"
+          style={{ marginTop: "0px", marginLeft: "-270px" }}
         >
-          {f}
-        </button>
-      ))}
-    </div>
-
-    <div className="search-create-wrapper">
-      {!isVisitorView && (
-        <button
-          className="btn primary create-post-btn"
-          onClick={() => setShowModal(true)}
-        >
-          Create Post
-        </button>
-      )}
-    </div>
-  </div>
-
-  {/* Loading State */}
-  {loading && (
-    <div className="loading-state">
-      <i className="fa-solid fa-spinner fa-spin"></i> Loading your posts...
-    </div>
-  )}
-
-  {/* Error State */}
-  {error && (
-    <div className="error-state">
-      <i className="fa-solid fa-exclamation-circle"></i> {error}
-      <button onClick={loadUserPosts} className="retry-btn">
-        Retry
-      </button>
-    </div>
-  )}
-
-  {/* POSTS SECTION */}
-  {!loading && !error && (
-    <div className="posts-section">
-      {filteredPosts.length === 0 && (
-        <div className="no-posts">
-          <i className="fa-solid fa-box-open"></i>
-          <p>No posts to show.</p>
-          {!isVisitorView && (
-            <button
-              className="btn primary"
-              onClick={() => setShowModal(true)}
+          <div className="filters-row">
+            <div
+              className="filter-buttons"
+              style={{ gap: "50px", marginLeft: "70px" }}
             >
-              Create your first post
-            </button>
+              {["All Posts", "Buy/Sell", "Rent", "Swap"].map((f) => (
+                <button
+                  key={f}
+                  className={`filter-btn ${activeFilter === f ? "active" : ""}`}
+                  onClick={() => setActiveFilter(f)}
+                >
+                  {f}
+                </button>
+              ))}
+            </div>
+
+            <div className="search-create-wrapper">
+              {!isVisitorView && (
+                <button
+                  className="btn primary create-post-btn"
+                  onClick={() => setShowModal(true)}
+                >
+                  Create Post
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Loading State */}
+          {loading && (
+            <div className="loading-state">
+              <i className="fa-solid fa-spinner fa-spin"></i> Loading your
+              posts...
+            </div>
           )}
-        </div>
-      )}
 
-      {/* BUY/SELL */}
-      {activeFilter === "Buy/Sell" && (
-        <div className="buy-posts-container">
-          {filteredPosts.map((post) => (
-            <div
-              key={post.id}
-              className="buy-post-card"
-              onClick={() => {
-                setProfileSelectedPost(post);
-                setProfileCurrentImage(0);
-                setProfileShowModal(true);
-              }}
-            >
-              <div className="buy-post-image">
-                <img src={post.img} alt={post.title} />
-              </div>
+          {/* Error State */}
+          {error && (
+            <div className="error-state">
+              <i className="fa-solid fa-exclamation-circle"></i> {error}
+              <button onClick={loadUserPosts} className="retry-btn">
+                Retry
+              </button>
+            </div>
+          )}
 
-              <div className="buy-post-details">
-                <h4 className="buy-post-title">{post.title}</h4>
-
-                <div className="buy-post-actions">
-                  <button className="btn small">
-                    {post.category === "Buy/Sell"
-                      ? `₱${post.price}`
-                      : post.category}
-                  </button>
-
-                  {isVisitorView ? (
+          {/* POSTS SECTION */}
+          {!loading && !error && (
+            <div className="posts-section">
+              {filteredPosts.length === 0 && (
+                <div className="no-posts">
+                  <i className="fa-solid fa-box-open"></i>
+                  <p>No posts to show.</p>
+                  {!isVisitorView && (
                     <button
-                      className="btn small ghost"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        alert(
-                          `Chat with ${nickname} about "${post.title}"`
-                        );
-                      }}
+                      className="btn primary"
+                      onClick={() => setShowModal(true)}
                     >
-                      Chat
-                    </button>
-                  ) : (
-                    <button
-                      className="btn small ghost"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedPost(post);
-                        setActionModalOpen(true);
-                      }}
-                    >
-                      Edit
+                      Create your first post
                     </button>
                   )}
                 </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+              )}
 
-      {/* RENT */}
-      {activeFilter === "Rent" && (
-        <div className="rent-posts-container">
-          {filteredPosts.map((post) => (
-            <div
-              key={post.id}
-              className="rent-post-card"
-              onClick={() => {
-                setProfileSelectedPost(post);
-                setProfileCurrentImage(0);
-                setProfileShowModal(true);
-              }}
-            >
-              <div className="rent-post-image">
-                <img src={post.img} alt={post.title} />
-              </div>
-
-              <div className="rent-post-details">
-                <h4 className="rent-post-title">{post.title}</h4>
-
-                <div className="rent-post-actions">
-                  <button className="btn small">
-                    {post.category === "Rent" ? "Rent" : post.category}
-                  </button>
-
-                  {isVisitorView ? (
-                    <button
-                      className="btn small ghost"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        alert(
-                          `Chat with ${nickname} about "${post.title}"`
-                        );
+              {/* BUY/SELL */}
+              {activeFilter === "Buy/Sell" && (
+                <div className="buy-posts-container">
+                  {filteredPosts.map((post) => (
+                    <div
+                      key={post.id}
+                      className="buy-post-card"
+                      onClick={() => {
+                        setProfileSelectedPost(post);
+                        setProfileCurrentImage(0);
+                        setProfileShowModal(true);
                       }}
                     >
-                      Chat
-                    </button>
-                  ) : (
-                    <button
-                      className="btn small ghost"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedPost(post);
-                        setActionModalOpen(true);
-                      }}
-                    >
-                      Edit
-                    </button>
-                  )}
+                      <div className="buy-post-image">
+                        <img src={post.img} alt={post.title} />
+                      </div>
+
+                      <div className="buy-post-details">
+                        <h4 className="buy-post-title">{post.title}</h4>
+
+                        <div className="buy-post-actions">
+                          <button className="btn small">
+                            {post.category === "Buy/Sell"
+                              ? `₱${post.price}`
+                              : post.category}
+                          </button>
+
+                          {isVisitorView ? (
+                            <button
+                              className="btn small ghost"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                alert(
+                                  `Chat with ${nickname} about "${post.title}"`
+                                );
+                              }}
+                            >
+                              Chat
+                            </button>
+                          ) : (
+                            <button
+                              className="btn small ghost"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedPost(post);
+                                setActionModalOpen(true);
+                              }}
+                            >
+                              Edit
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+              )}
 
-      {/* SWAP */}
-      {activeFilter === "Swap" && (
-        <div className="swap-posts-container">
-          {filteredPosts.map((post) => (
-            <div
-              key={post.id}
-              className="swap-post-card"
-              onClick={() => {
-                setProfileSelectedPost(post);
-                setProfileCurrentImage(0);
-                setProfileShowModal(true);
-              }}
-            >
-              <div className="swap-post-image">
-                <img src={post.img} alt={post.title} />
-              </div>
-
-              <div className="swap-post-details">
-                <h4 className="swap-post-title">{post.title}</h4>
-
-                <div className="swap-post-actions">
-                  <button className="btn small">Swap</button>
-
-                  {isVisitorView ? (
-                    <button
-                      className="btn small ghost"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        alert(
-                          `Chat with ${nickname} about "${post.title}"`
-                        );
+              {/* RENT */}
+              {activeFilter === "Rent" && (
+                <div className="rent-posts-container">
+                  {filteredPosts.map((post) => (
+                    <div
+                      key={post.id}
+                      className="rent-post-card"
+                      onClick={() => {
+                        setProfileSelectedPost(post);
+                        setProfileCurrentImage(0);
+                        setProfileShowModal(true);
                       }}
                     >
-                      Chat
-                    </button>
-                  ) : (
-                    <button
-                      className="btn small ghost"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedPost(post);
-                        setActionModalOpen(true);
-                      }}
-                    >
-                      Edit
-                    </button>
-                  )}
+                      <div className="rent-post-image">
+                        <img src={post.img} alt={post.title} />
+                      </div>
+
+                      <div className="rent-post-details">
+                        <h4 className="rent-post-title">{post.title}</h4>
+
+                        <div className="rent-post-actions">
+                          <button className="btn small">
+                            {post.category === "Rent" ? "Rent" : post.category}
+                          </button>
+
+                          {isVisitorView ? (
+                            <button
+                              className="btn small ghost"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                alert(
+                                  `Chat with ${nickname} about "${post.title}"`
+                                );
+                              }}
+                            >
+                              Chat
+                            </button>
+                          ) : (
+                            <button
+                              className="btn small ghost"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedPost(post);
+                                setActionModalOpen(true);
+                              }}
+                            >
+                              Edit
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+              )}
 
-      {/* ALL POSTS */}
-      {activeFilter === "All Posts" && (
-        <div className="all-posts-container">
-          {filteredPosts.map((post) => (
-            <div
-              key={post.id}
-              className="all-post-card"
-              onClick={() => {
-                setProfileSelectedPost(post);
-                setProfileCurrentImage(0);
-                setProfileShowModal(true);
-              }}
-            >
-              <div className="all-post-image">
-                <img src={post.img} alt={post.title} />
-              </div>
-
-              <div className="all-post-details">
-                <h4 className="all-post-title">{post.title}</h4>
-
-                <div className="all-post-actions">
-                  <button className="btn small">
-                    {post.category === "Buy/Sell"
-                      ? `₱${post.price}`
-                      : post.category === "Rent"
-                      ? "Rent"
-                      : "Swap"}
-                  </button>
-
-                  {isVisitorView ? (
-                    <button
-                      className="btn small ghost"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        alert(
-                          `Chat with ${nickname} about "${post.title}"`
-                        );
+              {/* SWAP */}
+              {activeFilter === "Swap" && (
+                <div className="swap-posts-container">
+                  {filteredPosts.map((post) => (
+                    <div
+                      key={post.id}
+                      className="swap-post-card"
+                      onClick={() => {
+                        setProfileSelectedPost(post);
+                        setProfileCurrentImage(0);
+                        setProfileShowModal(true);
                       }}
                     >
-                      Chat
-                    </button>
-                  ) : (
-                    <button
-                      className="btn small ghost"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedPost(post);
-                        setActionModalOpen(true);
-                      }}
-                    >
-                      Edit
-                    </button>
-                  )}
+                      <div className="swap-post-image">
+                        <img src={post.img} alt={post.title} />
+                      </div>
+
+                      <div className="swap-post-details">
+                        <h4 className="swap-post-title">{post.title}</h4>
+
+                        <div className="swap-post-actions">
+                          <button className="btn small">Swap</button>
+
+                          {isVisitorView ? (
+                            <button
+                              className="btn small ghost"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                alert(
+                                  `Chat with ${nickname} about "${post.title}"`
+                                );
+                              }}
+                            >
+                              Chat
+                            </button>
+                          ) : (
+                            <button
+                              className="btn small ghost"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedPost(post);
+                                setActionModalOpen(true);
+                              }}
+                            >
+                              Edit
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  )}
-</section>
+              )}
 
+              {/* ALL POSTS */}
+              {activeFilter === "All Posts" && (
+                <div className="all-posts-container">
+                  {filteredPosts.map((post) => (
+                    <div
+                      key={post.id}
+                      className="all-post-card"
+                      onClick={() => {
+                        setProfileSelectedPost(post);
+                        setProfileCurrentImage(0);
+                        setProfileShowModal(true);
+                      }}
+                    >
+                      <div className="all-post-image">
+                        <img src={post.img} alt={post.title} />
+                      </div>
+
+                      <div className="all-post-details">
+                        <h4 className="all-post-title">{post.title}</h4>
+
+                        <div className="all-post-actions">
+                          <button className="btn small">
+                            {post.category === "Buy/Sell"
+                              ? `₱${post.price}`
+                              : post.category === "Rent"
+                              ? "Rent"
+                              : "Swap"}
+                          </button>
+
+                          {isVisitorView ? (
+                            <button
+                              className="btn small ghost"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                alert(
+                                  `Chat with ${nickname} about "${post.title}"`
+                                );
+                              }}
+                            >
+                              Chat
+                            </button>
+                          ) : (
+                            <button
+                              className="btn small ghost"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedPost(post);
+                                setActionModalOpen(true);
+                              }}
+                            >
+                              Edit
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </section>
       </main>
 
-
       {profileShowModal && profileSelectedPost && (
-  <div
-    className="profile-modal-overlay"
-    onClick={() => setProfileShowModal(false)}
-  >
-    <div className="profile-modal-content" onClick={(e) => e.stopPropagation()}>
-      <button
-        className="profile-close-btn"
-        onClick={() => setProfileShowModal(false)}
-      >
-        ×
-      </button>
+        <div
+          className="profile-modal-overlay"
+          onClick={() => setProfileShowModal(false)}
+        >
+          <div
+            className="profile-modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="profile-close-btn"
+              onClick={() => setProfileShowModal(false)}
+            >
+              ×
+            </button>
 
-      {/* LEFT IMAGE */}
-      <div className="profile-modal-left">
-        <img
-          src={profileSelectedPost.img || profileSelectedPost.images?.[0] || "/images/default.png"}
-          alt={profileSelectedPost.title || ""}
-          className="profile-modal-img"
-        />
-      </div>
+            {/* LEFT IMAGE */}
+            <div className="profile-modal-left">
+              <img
+                src={
+                  profileSelectedPost.img ||
+                  profileSelectedPost.images?.[0] ||
+                  "/images/default.png"
+                }
+                alt={profileSelectedPost.title || ""}
+                className="profile-modal-img"
+              />
+            </div>
 
-      {/* RIGHT INFO */}
-      <div className="profile-modal-right scrollable">
-        <h2>{profileSelectedPost.title}</h2>
+            {/* RIGHT INFO */}
+            <div className="profile-modal-right scrollable">
+              <h2>{profileSelectedPost.title}</h2>
 
-        {(() => {
-          const typeCategory = getPostTypeCategory(profileSelectedPost);
+              {(() => {
+                const typeCategory = getPostTypeCategory(profileSelectedPost);
 
-          return (
-            <>
-              {typeCategory === "rent" && (
-                <>
-                  <p><strong>Rent Price: </strong> {profileSelectedPost.rentPrice}</p>
-                  <p><strong>Renting Time: </strong> {profileSelectedPost.rentTime}</p>
-                </>
-              )}
+                return (
+                  <>
+                    {typeCategory === "rent" && (
+                      <>
+                        <p>
+                          <strong>Rent Price: </strong>{" "}
+                          {profileSelectedPost.rentPrice}
+                        </p>
+                        <p>
+                          <strong>Renting Time: </strong>{" "}
+                          {profileSelectedPost.rentTime}
+                        </p>
+                      </>
+                    )}
 
-              {typeCategory === "swap" && (
-                <>
-                  <p><strong>Item Offered: </strong> {profileSelectedPost.title}</p>
-                  <p><strong>Item Wanted: </strong> {profileSelectedPost.swapFor || "Not specified"}</p>
-                </>
-              )}
+                    {typeCategory === "swap" && (
+                      <>
+                        <p>
+                          <strong>Item Offered: </strong>{" "}
+                          {profileSelectedPost.title}
+                        </p>
+                        <p>
+                          <strong>Item Wanted: </strong>{" "}
+                          {profileSelectedPost.swapFor || "Not specified"}
+                        </p>
+                      </>
+                    )}
 
-              <p><strong>Posted by: </strong> {profileSelectedPost.poster || "You"}</p>
-              <p><strong>Date Posted: </strong> {profileSelectedPost.datePosted || "N/A"}</p>
-              <p><strong>Category: </strong> {profileSelectedPost.category}</p>
-              {profileSelectedPost.itemCategory && (
-                <p><strong>Item Category: </strong> {profileSelectedPost.itemCategory}</p>)}
-              <p><strong>Condition: </strong> {profileSelectedPost.condition || "N/A"}</p>
+                    <p>
+                      <strong>Posted by: </strong>{" "}
+                      {profileSelectedPost.poster || "You"}
+                    </p>
+                    <p>
+                      <strong>Date Posted: </strong>{" "}
+                      {profileSelectedPost.datePosted || "N/A"}
+                    </p>
+                    <p>
+                      <strong>Category: </strong> {profileSelectedPost.category}
+                    </p>
+                    {profileSelectedPost.itemCategory && (
+                      <p>
+                        <strong>Item Category: </strong>{" "}
+                        {profileSelectedPost.itemCategory}
+                      </p>
+                    )}
+                    <p>
+                      <strong>Condition: </strong>{" "}
+                      {profileSelectedPost.condition || "N/A"}
+                    </p>
 
-              {profileSelectedPost.availability && (
-                <p><strong>Meet-Up Availability: </strong> 
-                  {profileSelectedPost.availability.map(day => day.charAt(0).toUpperCase() + day.slice(1)).join(', ')}
-                </p>
-              )}
+                    {profileSelectedPost.availability && (
+                      <p>
+                        <strong>Meet-Up Availability: </strong>
+                        {profileSelectedPost.availability
+                          .map(
+                            (day) => day.charAt(0).toUpperCase() + day.slice(1)
+                          )
+                          .join(", ")}
+                      </p>
+                    )}
 
-              {/* Description for all types */}
-              {["buy", "rent", "swap"].includes(typeCategory) && (
-                <p><strong>Description: </strong> {profileSelectedPost.description || "No description"}</p>
-              )}
-            </>
-          );
-        })()}
-      </div>
-    </div>
-  </div>
-)}
+                    {/* Description for all types */}
+                    {["buy", "rent", "swap"].includes(typeCategory) && (
+                      <p>
+                        <strong>Description: </strong>{" "}
+                        {profileSelectedPost.description || "No description"}
+                      </p>
+                    )}
+                  </>
+                );
+              })()}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Use PostItemModal instead of CreatePostModal */}
       {showModal && (
@@ -832,22 +879,24 @@ export default function Profile() {
       )}
 
       {/*Updated Create Post using CreatePostModal*/}
-      
-    {/*}  {showModal && <CreatePostModal onClose={() => setShowModal(false)} onCreate={addPost} />}*/}
-    
-    {actionModalOpen && (
+
+      {/*}  {showModal && <CreatePostModal onClose={() => setShowModal(false)} onCreate={addPost} />}*/}
+
+      {actionModalOpen && (
         <PostActionModal
           post={selectedPost}
           onClose={() => setActionModalOpen(false)}
-          onDelete={(id) => {
-            setPosts((prev) => prev.filter((p) => p.id !== id));
-            setActionModalOpen(false);
-          }}
-          onEdit={(updatedPost) => {
-            setPosts((prev) =>
-              prev.map((p) => (p.id === updatedPost.id ? updatedPost : p))
-            );
-            setActionModalOpen(false);
+          onDelete={async (id) => {
+            // 1. Call the API handler and wait for it to confirm the deletion
+            const successfullyDeleted = await handleDeletePost(id);
+
+            if (successfullyDeleted) {
+              // 2. Only update the UI state if the API call succeeded
+              setPosts((prev) => prev.filter((p) => p.id !== id));
+              // You can add an alert here for success if you haven't already: alert("Post successfully deleted!");
+              setActionModalOpen(false);
+            }
+            // If successfullyDeleted is false, the modal stays open, and the user sees the error alert from handleDeletePost
           }}
         />
       )}

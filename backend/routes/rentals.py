@@ -5,9 +5,19 @@ bp = Blueprint('rentals', __name__, url_prefix='/api/rentals')
 
 @bp.route('/requests', methods=['POST'])
 def create_rental_request():
+    """
+    Creates a new rental request entry.
+    """
+    if request.method == 'OPTIONS':
+        return '', 200
     try:
         data = request.get_json()
         
+        # NOTE: Added validation for required fields
+        required_fields = ['product_id', 'renter_id', 'rentee_id', 'rent_start', 'rent_end']
+        if not all(field in data for field in required_fields):
+            return jsonify({'error': 'Missing required fields (product_id, renter_id, rentee_id, rent_start, rent_end)'}), 400
+
         conn = get_db_connection()
         cur = conn.cursor()
         
@@ -30,10 +40,15 @@ def create_rental_request():
         
         return jsonify(new_request), 201
     except Exception as e:
+        if conn: conn.rollback()
+        print(f"Error creating rental request: {e}")
         return jsonify({'error': str(e)}), 500
 
 @bp.route('/requests/<int:user_id>', methods=['GET'])
 def get_rental_requests(user_id):
+    """
+    Retrieves all rental requests where the user is either the renter (buyer) or the rentee (seller).
+    """
     try:
         conn = get_db_connection()
         cur = conn.cursor()
@@ -59,13 +74,25 @@ def get_rental_requests(user_id):
 
 @bp.route('/requests/<int:request_id>/status', methods=['PUT'])
 def update_rental_status(request_id):
+    """
+    Updates the status of a rental request. If approved, it creates a transaction 
+    record and updates the product status to 'rented'.
+    """
+    if request.method == 'OPTIONS':
+        return '', 200
+    
+    conn = None
     try:
         data = request.get_json()
         status = data.get('status')
         
+        if not status:
+             return jsonify({'error': 'Missing status field'}), 400
+
         conn = get_db_connection()
         cur = conn.cursor()
         
+        # 1. Update the RentalRequest status
         cur.execute('''
             UPDATE RentalRequests
             SET status = %s
@@ -75,18 +102,41 @@ def update_rental_status(request_id):
         
         updated_request = cur.fetchone()
         
-        # If approved, create rental record
-        if status == 'approved' and updated_request:
+        if not updated_request:
+            conn.rollback()
+            return jsonify({'error': 'Rental request not found'}), 404
+        
+        # 2. If approved, finalize the transaction and update product status
+        if status == 'approved':
+            # a. Fetch required product details (price and current status)
+            cur.execute("SELECT rental_price, status, listing_type FROM Products WHERE product_id = %s", (updated_request['product_id'],))
+            product_details = cur.fetchone()
+
+            if not product_details or product_details[1] != 'available' or product_details[2] != 'rent':
+                conn.rollback()
+                return jsonify({'error': 'Cannot approve: Product is unavailable or not a rental listing.'}), 400
+            
+            # Use the product's listed rental price (default to 0 if null)
+            rental_price = product_details[0] if product_details[0] is not None else 0
+
+            # b. Insert into the unified Transactions table
             cur.execute('''
-                INSERT INTO Rentals (product_id, borrower_id, owner_id, rent_start, rent_end)
-                VALUES (%s, %s, %s, %s, %s)
+                INSERT INTO Transactions (product_id, seller_id, buyer_id, price_paid, status, listing_type, transaction_date)
+                VALUES (%s, %s, %s, %s, 'completed', 'rent', CURRENT_TIMESTAMP)
+                RETURNING transaction_id
             ''', (
                 updated_request['product_id'],
-                updated_request['renter_id'],
-                updated_request['rentee_id'],
-                updated_request['rent_start'],
-                updated_request['rent_end']
+                updated_request['rentee_id'],  # RenTee is the Owner/Seller
+                updated_request['renter_id'],  # RenTer is the Borrower/Buyer
+                rental_price 
             ))
+            
+            # c. Update Product Status to 'rented'
+            cur.execute('''
+                UPDATE Products 
+                SET status = 'rented' 
+                WHERE product_id = %s
+            ''', (updated_request['product_id'],))
         
         conn.commit()
         cur.close()
@@ -94,4 +144,6 @@ def update_rental_status(request_id):
         
         return jsonify(updated_request), 200
     except Exception as e:
+        if conn: conn.rollback()
+        print(f"Error updating rental status: {e}")
         return jsonify({'error': str(e)}), 500

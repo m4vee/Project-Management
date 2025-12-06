@@ -3,17 +3,23 @@ from flask_cors import CORS
 from flask_mail import Mail
 from server import init_db
 from routes import users, products, messages, rentals, swaps
+from dotenv import load_dotenv
 from utils.email import mail
+from routes.transactions import bp as transactions_bp
 import os
 
+load_dotenv() # This loads all variables from .env into os.environ
+
 app = Flask(__name__)
-CORS(app, resources={
+CORS(app)
+"""CORS(app, resources={
     r"/api/*": {
         "origins": ["http://localhost:5173", "http://127.0.0.1:5173"],
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        "allow_headers": ["Content-Type"]
+        "allow_headers": ["Content-Type"],
+        "supports_credentials": True
     }
-})
+})"""
 
 # Email configuration
 app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER')
@@ -32,6 +38,8 @@ app.register_blueprint(products.bp)
 app.register_blueprint(messages.bp)
 app.register_blueprint(rentals.bp)
 app.register_blueprint(swaps.bp)
+
+app.register_blueprint(transactions_bp)
 
 @app.route('/')
 def index():

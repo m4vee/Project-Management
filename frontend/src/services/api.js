@@ -173,8 +173,98 @@ export const addProductPhoto = async (productId, photoUrl) => {
   const response = await fetch(`${API_URL}/products/${productId}/photos`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ product_id: productId, photo_url: photoUrl }),
+    //body: JSON.stringify({ product_id: productId, photo_url: photoUrl }),
+    body: JSON.stringify({ photo_url: photoUrl }),
   });
   if (!response.ok) throw new Error("Failed to add photo");
+  return response.json();
+};
+
+export const saveProductAvailability = async (productId, availabilityList) => {
+  const response = await fetch(
+    `${API_URL}/products/${productId}/availability`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      // CRITICAL: Send the list of days directly as the request body.
+      body: JSON.stringify(availabilityList),
+    }
+  );
+
+  if (!response.ok) {
+    // This will catch 400 or 500 errors from the server
+    const errorBody = await response.json();
+    throw new Error(
+      errorBody.error ||
+        `Failed to save availability (Status: ${response.status})`
+    );
+  }
+  return response.json();
+};
+
+export const fetchProductDetails = async (productId) => {
+  const API_URL = "http://127.0.0.1:5000/api/products"; // Confirm this base URL is correct
+
+  try {
+    const response = await fetch(`${API_URL}/${productId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      // Try to read a specific error message from the backend response body
+      const errorText = await response.text();
+      // Throw a clear error message that the frontend can display
+      throw new Error(
+        `API Error ${response.status}: ${
+          errorText || "Server returned an error."
+        }`
+      );
+    }
+
+    return response.json();
+  } catch (error) {
+    // This catches network failures or the specific API error thrown above
+    console.error("Critical API Fetch Failure:", error.message);
+    throw new Error(
+      `Failed to load product details. Details: ${error.message}`
+    );
+  }
+};
+
+export const createTransaction = async (transactionPayload) => {
+  const response = await fetch(`${API_URL}/transactions`, {
+    // <-- Updated URL
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(transactionPayload),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      data.error || "Failed to communicate with transaction service."
+    );
+  }
+
+  return data;
+};
+
+// src/services/api.js
+
+export const fetchTransactionDetails = async (transactionId) => {
+  const response = await fetch(`${API_URL}/transactions/${transactionId}`);
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("Server returned non-JSON error:", errorText);
+    throw new Error(`Failed to fetch transaction details: ${response.status}`);
+  }
+
   return response.json();
 };

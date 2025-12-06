@@ -17,29 +17,26 @@ export default function AppNavbar() {
           onClick={() => navigate("/inside-app")}
           style={{ cursor: "pointer" }}
         >
-          <img src="/images/logo.jpg" alt="TUPulse" />
           <h2>
             TUPulse <i className="fab fa-typo3"></i>
           </h2>
         </div>
 
-        <div className="search-bar">
+        {/*<div className="search-bar">
           <input type="text" placeholder="Search" />
           <i className="fa-solid fa-magnifying-glass"></i>
-        </div>
+        </div>*/}
       </div>
 
       {/* ===== Right Section ===== */}
       <div className="app-navbar-right">
-        <Notification />
-
         {/* 💬 Chat Icon */}
-        <i
+        {/*<i
           className="fa-solid fa-comment"
           onClick={() => navigate("/chat")}
           title="Chat"
           style={{ cursor: "pointer" }}
-        ></i>
+        ></i>*/}
 
         {/* 🛒 Cart Icon */}
         <div
@@ -70,7 +67,7 @@ export default function AppNavbar() {
         {/* 👤 Profile */}
         <div className="profile-icon">
           <Link to="/profile">
-            <img src="/images/mikha.webp" alt="User" />
+            <img src="/images/no_profile.jpg" alt="User" />
           </Link>
         </div>
       </div>

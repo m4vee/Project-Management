@@ -1,5 +1,9 @@
 import React, { useState } from "react";
-import { createProduct, addProductPhoto } from "../../services/api";
+import {
+  createProduct,
+  addProductPhoto,
+  saveProductAvailability,
+} from "../../services/api";
 import "./PostItemModal.css";
 import { uploadProductImage } from "../../services/imageUpload";
 

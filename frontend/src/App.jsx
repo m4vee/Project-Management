@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+} from "react-router-dom";
 import "./index.css";
 
 // Components
@@ -20,7 +25,7 @@ import AccountSettings from "./components/pages/AccountSettings.jsx";
 import Feedback from "./components/pages/Feedback.jsx";
 import MyProfile from "./components/pages/MyProfile.jsx";
 import RentalRequests from "./components/pages/RentalRequests";
-import SwapRequests from './components/pages/SwapRequests';
+import SwapRequests from "./components/pages/SwapRequests";
 import ReviewsPage from "./components/pages/ReviewsPage.jsx";
 
 // E-Commerce and Chat
@@ -32,8 +37,7 @@ import Chat from "./components/pages/Chat.jsx";
 // Context
 import { CartProvider } from "./context/CartContext.jsx";
 import { RentalRequestProvider } from "./components/pages/RentalRequestContext.jsx";
-import { SwapRequestProvider } from './components/pages/SwapRequestContext';
-
+import { SwapRequestProvider } from "./components/pages/SwapRequestContext";
 
 function AppContent() {
   const location = useLocation();
@@ -45,7 +49,15 @@ function AppContent() {
     setIsLoggedIn(loggedIn);
   }, []);
 
-  const hideNavbarRoutes = ["/profile", "/inside-app", "/app-navbar", "/account-settings", "/feedback", "/my-profile", "/reviews"];
+  const hideNavbarRoutes = [
+    "/profile",
+    "/inside-app",
+    "/app-navbar",
+    "/account-settings",
+    "/feedback",
+    "/my-profile",
+    "/reviews",
+  ];
 
   // ✅ Updated routes inside app layout
   const insideAppRoutes = [
@@ -62,21 +74,17 @@ function AppContent() {
     "/chat",
     "/rentalrequests",
     "/swaprequests",
-    "/reviews"
+    "/reviews",
   ];
 
-  const isInsideApp = insideAppRoutes.some(route =>
-      location.pathname.startsWith(route)
-    );
+  const isInsideApp = insideAppRoutes.some((route) =>
+    location.pathname.startsWith(route)
+  );
 
   return (
     <>
       {/* ✅ Navbar logic */}
-      {isLoggedIn && isInsideApp ? (
-        <AppNavbar />
-      ) : (
-        !isInsideApp && <Navbar />
-      )}
+      {isLoggedIn && isInsideApp ? <AppNavbar /> : !isInsideApp && <Navbar />}
 
       {/* ✅ Routes */}
       <Routes>
@@ -85,42 +93,42 @@ function AppContent() {
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/services" element={<Services />} />
         <Route path="/login" element={<Login />} />
-
         {/* Inside App Pages */}
         <Route path="/inside-app" element={<HomePage />} />
         <Route path="/profile" element={<Profile />} /> {/* Profile Page */}
-        <Route path="/my-profile" element={<MyProfile />} /> {/* My Profile Page */}
-        <Route path="/profile/edit" element={<ProfileEdit />} /> {/* Profile Edit Page */}
-        <Route path="/account-settings" element={<AccountSettings />} /> {/* Account Settings Page */}
+        <Route path="/my-profile" element={<MyProfile />} />{" "}
+        {/* My Profile Page */}
+        <Route path="/profile/edit" element={<ProfileEdit />} />{" "}
+        {/* Profile Edit Page */}
+        <Route path="/account-settings" element={<AccountSettings />} />{" "}
+        {/* Account Settings Page */}
         <Route path="/feedback" element={<Feedback />} /> {/* Feedback Page */}
         <Route path="/feedback" element={<Feedback />} /> {/* Feedback Page */}
-        <Route path="/rentalrequests" element={<RentalRequests />} /> {/* Rental Requests Page */}
-        <Route path="/swaprequests" element={<SwapRequests />} /> {/* Swap Requests Page */}
+        <Route path="/rentalrequests" element={<RentalRequests />} />{" "}
+        {/* Rental Requests Page */}
+        <Route path="/swaprequests" element={<SwapRequests />} />{" "}
+        {/* Swap Requests Page */}
         <Route path="/reviews" element={<ReviewsPage />} />
         <Route path="/reviews/:sellerId" element={<ReviewsPage />} />
-        <Route path="/reviews/:sellerId" element={<ReviewsPage reviews={[]} />} />
-
-
         {/* E-Commerce Routes */}
         <Route path="/cart" element={<Cart />} />
-        <Route path="/checkout" element={<Checkout />} />
-        <Route path="/receipt" element={<Receipt />} />
-
+        <Route path="/checkout/:productId" element={<Checkout />} />
+        <Route path="/receipt/:transactionId" element={<Receipt />} />
         {/* Chat Route */}
         <Route path="/chat" element={<Chat />} />
       </Routes>
     </>
   );
 }
-  
+
 export default function App() {
   return (
     <Router>
       <CartProvider>
         <RentalRequestProvider>
           <SwapRequestProvider>
-              <AppContent />
-            </SwapRequestProvider>
+            <AppContent />
+          </SwapRequestProvider>
         </RentalRequestProvider>
       </CartProvider>
     </Router>
