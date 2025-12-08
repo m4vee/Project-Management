@@ -84,11 +84,17 @@ export const fetchProduct = async (productId) => {
 };
 
 export const createProduct = async (productData) => {
-  const response = await fetch(`${API_URL}/products`, {
+  const isFormData = productData instanceof FormData;
+  const options = {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(productData),
-  });
+    body: isFormData ? productData : JSON.stringify(productData),
+  };
+
+  if (!isFormData) {
+    options.headers = { "Content-Type": "application/json" };
+  }
+
+  const response = await fetch(`${API_URL}/products`, options);
   if (!response.ok) throw new Error("Failed to create product");
   return response.json();
 };
@@ -277,7 +283,6 @@ export const fetchTransactionDetails = async (transactionId) => {
   return response.json();
 };
 
-// [NEW] Forgot Password APIs
 export const sendForgotPasswordOTP = async (email) => {
   const response = await fetch(`${API_URL}/users/forgot-password-otp`, {
     method: "POST",
@@ -298,4 +303,21 @@ export const resetPasswordConfirm = async (email, otp, new_password) => {
   const data = await response.json();
   if (!response.ok) throw new Error(data.error || "Failed to reset password");
   return data;
+};
+
+// [NEW] PROFILE APIs
+export const fetchUserProfile = async (userId) => {
+  const response = await fetch(`${API_URL}/users/profile/${userId}`);
+  if (!response.ok) throw new Error("Failed to fetch profile");
+  return response.json();
+};
+
+export const updateUserProfile = async (formData) => {
+  // Use FormData for file upload support
+  const response = await fetch(`${API_URL}/users/profile`, {
+    method: "PUT",
+    body: formData, // No headers needed, browser sets boundary
+  });
+  if (!response.ok) throw new Error("Failed to update profile");
+  return response.json();
 };

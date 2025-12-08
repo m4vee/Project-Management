@@ -7,85 +7,111 @@ import { useSwapRequests } from "./SwapRequestContext";
 const SwapRequests = () => {
   const { swapRequests, updateSwapRequest } = useSwapRequests();
   const navigate = useNavigate();
-  const currentUser = "Krislyn Sayat";
-  const [activeTab, setActiveTab] = useState("requested");
+  const [activeTab, setActiveTab] = useState("incoming"); // Changed to 'incoming'/'outgoing' for clarity
 
-  const handleAction = (swapId, action) => {
-    updateSwapRequest(swapId, action);
+  // Get current user ID from storage (Saved during login)
+  const currentUserId = parseInt(localStorage.getItem("user_id"));
+
+  // Helper: Filter requests
+  // "Incoming" = Requests sent TO me (I am the owner/receiver)
+  // "Outgoing" = Requests I sent (I am the requester)
+  // Note: Your backend logic needs to return *all* requests involving the user for this to work fully.
+  // Assuming 'swapRequests' contains mixed data, we filter here.
+  
+  const incomingRequests = swapRequests.filter(
+    (req) => req.receiver_id === currentUserId || req.product_owner_id === currentUserId // Adjust based on DB column name
+  );
+
+  const outgoingRequests = swapRequests.filter(
+    (req) => req.requester_id === currentUserId
+  );
+
+  const handleAction = async (swapId, action) => {
+    await updateSwapRequest(swapId, action);
+    alert(`Swap request ${action}!`);
   };
 
-  const renderRequests = (requests, isRequestedByMe = false) =>
-    requests.length === 0 ? (
-      <p>No swap requests found.</p>
-    ) : (
-      requests.map((req) => (
-        <div key={req.swap_id} className="swap-card">
-          <div className="swap-request-info">
-            <p>
-              <strong>Product Requested:</strong> {req.product_requested_name}
-            </p>
-            <p>
-              <strong>Product Offered:</strong> {req.product_offered_name}
-            </p>
-            <p>
-              <strong>Requested by:</strong> {req.requester_name}
-            </p>
-            <p>
-              <strong>Requested to:</strong> {req.receiver_name}
-            </p>
-            <p>
-              <span className={`swap-request-status ${req.status}`}>
-                {req.status.charAt(0).toUpperCase() + req.status.slice(1)}
-              </span>
-            </p>
-          </div>
-
-          <div className="swap-actions">
-            {isRequestedByMe && req.status === "pending" && (
-              <button
-                className="swap-cancel-btn"
-                onClick={() => handleAction(req.swap_id, "cancelled")}
-              >
-                Cancel
-              </button>
-            )}
-
-            {!isRequestedByMe && req.status === "pending" && (
-              <>
-                <button
-                  className="swap-accept-btn"
-                  onClick={() => handleAction(req.swap_id, "accepted")}
-                >
-                  Accept
-                </button>
-                <button
-                  className="swap-decline-btn"
-                  onClick={() => handleAction(req.swap_id, "declined")}
-                >
-                  Decline
-                </button>
-              </>
-            )}
-
-            {!isRequestedByMe && req.status === "accepted" && (
-              <button
-                className="swap-done-btn"
-                onClick={() => handleAction(req.swap_id, "completed")}
-              >
-                Done
-              </button>
-            )}
-          </div>
+  const renderRequests = (requests, isOutgoing) => {
+    if (!requests || requests.length === 0) {
+      return (
+        <div className="no-requests">
+            <i className="fa-solid fa-box-open" style={{fontSize: '3rem', color: '#ccc', marginBottom: '10px'}}></i>
+            <p>No {isOutgoing ? "outgoing" : "incoming"} swap requests found.</p>
         </div>
-      ))
-    );
+      );
+    }
 
-  const myRequestedSwaps = swapRequests.filter(
-    (req) => req.requester_name === currentUser
-  );
-  const myReceivedSwaps = swapRequests.filter(
-    (req) => req.receiver_name === currentUser
-  );
+    return requests.map((req) => (
+      <div key={req.id} className="swap-card">
+        <div className="swap-header">
+           <span className={`status-badge ${req.status}`}>{req.status}</span>
+           <span className="swap-date">{new Date(req.created_at).toLocaleDateString()}</span>
+        </div>
+
+        <div className="swap-body">
+            {/* Left: What THEY want (My Item) */}
+            <div className="swap-item">
+                <p className="label">Requesting Your:</p>
+                <h4>{req.product_name}</h4>
+                {/* <img src={req.product_image} alt="My Item" /> */}
+            </div>
+
+            <div className="swap-icon">
+                <i className="fa-solid fa-arrow-right-arrow-left"></i>
+            </div>
+
+            {/* Right: What THEY offer */}
+            <div className="swap-item">
+                <p className="label">Offering:</p>
+                <h4>{req.offer_description}</h4>
+                <p className="user-info">by User #{req.requester_id}</p> 
+            </div>
+        </div>
+
+        {/* Actions for INCOMING requests (I am the owner) */}
+        {!isOutgoing && req.status === "pending" && (
+          <div className="swap-actions">
+            <button
+              className="swap-accept-btn"
+              onClick={() => handleAction(req.id, "accepted")}
+            >
+              <i className="fa-solid fa-check"></i> Accept
+            </button>
+            <button
+              className="swap-decline-btn"
+              onClick={() => handleAction(req.id, "rejected")}
+            >
+              <i className="fa-solid fa-xmark"></i> Decline
+            </button>
+          </div>
+        )}
+
+        {/* Actions for OUTGOING requests (I am the requester) */}
+        {isOutgoing && req.status === "pending" && (
+          <div className="swap-actions">
+            <button
+              className="swap-cancel-btn"
+              onClick={() => handleAction(req.id, "cancelled")}
+            >
+              Cancel Request
+            </button>
+          </div>
+        )}
+
+        {/* Completed State */}
+        {!isOutgoing && req.status === "accepted" && (
+          <div className="swap-actions">
+            <button
+              className="swap-done-btn"
+              onClick={() => handleAction(req.id, "completed")}
+            >
+              Mark as Completed
+            </button>
+          </div>
+        )}
+      </div>
+    ));
+  };
 
   return (
     <div className="swap-requests-wrapper">
@@ -98,31 +124,34 @@ const SwapRequests = () => {
         <i className="fa-solid fa-house"></i>
       </button>
 
-      <div className="swap-requests-page swap-scroll-box">
-        <h2>Swap Inventory</h2>
+      <div className="swap-requests-page">
+        <div className="page-header">
+             <h2>Swap Inventory</h2>
+             <p>Manage your item exchanges</p>
+        </div>
 
         <div className="swap-tabs-wrapper">
           <div className="swap-tabs">
             <button
-              className={activeTab === "requested" ? "active" : ""}
-              onClick={() => setActiveTab("requested")}
+              className={activeTab === "incoming" ? "active" : ""}
+              onClick={() => setActiveTab("incoming")}
             >
-              My Swap Requests
+              Offers Received
             </button>
 
             <button
-              className={activeTab === "received" ? "active" : ""}
-              onClick={() => setActiveTab("received")}
+              className={activeTab === "outgoing" ? "active" : ""}
+              onClick={() => setActiveTab("outgoing")}
             >
-              Swaps Offered to Me
+              My Requests
             </button>
           </div>
         </div>
 
         <div className="swap-request-container">
-          {activeTab === "requested"
-            ? renderRequests(myRequestedSwaps, true)
-            : renderRequests(myReceivedSwaps, false)}
+          {activeTab === "incoming"
+            ? renderRequests(incomingRequests, false)
+            : renderRequests(outgoingRequests, true)}
         </div>
       </div>
     </div>

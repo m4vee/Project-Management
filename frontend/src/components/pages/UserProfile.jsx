@@ -1,23 +1,29 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { fetchProducts, deleteProduct, updateUserProfile } from "../../services/api";
-import PostItemModal from "./PostItemModal";
-import PostActionModal from "./PostActionModal";
-import "./Profile.css";
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { fetchProducts } from "../../services/api";
+import PostItemModal from "./PostItemModal"; // Reuse modal for viewing items
+import "./Profile.css"; // Reuse Profile CSS
 
 const DEFAULT_COVER = "https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2000&auto=format&fit=crop";
 const DEFAULT_AVATAR = "/images/no_profile.jpg";
 const BACKEND_URL = "http://127.0.0.1:5000";
 
-export default function Profile() {
+export default function UserProfile() {
+  const { userId } = useParams(); // Get ID from URL
   const navigate = useNavigate();
-  const userId = localStorage.getItem("user_id");
-  const storedName = localStorage.getItem("username"); // Fallback name
+  const currentUserId = localStorage.getItem("user_id");
+
+  // Redirect to my profile if viewing myself
+  useEffect(() => {
+    if (userId === currentUserId) {
+        navigate("/profile");
+    }
+  }, [userId, currentUserId, navigate]);
 
   const [profileData, setProfileData] = useState({
-    name: storedName || "User",
-    bio: "No bio yet.",
-    course: "TUP Student",
+    name: "Loading...",
+    bio: "",
+    course: "",
     year: "",
     avatar: DEFAULT_AVATAR,
     cover: DEFAULT_COVER,
@@ -26,22 +32,12 @@ export default function Profile() {
     isVerified: true, 
   });
 
-  const [activeFilter, setActiveFilter] = useState("All");
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-  
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [actionModalOpen, setActionModalOpen] = useState(false);
-  const [selectedPost, setSelectedPost] = useState(null);
-
-  const avatarInputRef = useRef(null);
-  const coverInputRef = useRef(null);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [activeFilter, setActiveFilter] = useState("All");
 
   useEffect(() => {
-    if (!userId) {
-      navigate("/login");
-      return;
-    }
     loadProfile();
     loadUserPosts();
   }, [userId]);
@@ -53,9 +49,9 @@ export default function Profile() {
               const data = await response.json();
               setProfileData(prev => ({
                   ...prev,
-                  name: data.username || storedName,
+                  name: data.username,
                   bio: data.bio || "No bio yet.",
-                  course: data.course || "TUP Student",
+                  course: data.course || "Student",
                   year: data.year_level || "",
                   avatar: data.profile_image ? `${BACKEND_URL}${data.profile_image}` : DEFAULT_AVATAR,
               }));
@@ -89,77 +85,33 @@ export default function Profile() {
     }
   };
 
+  const handleFollow = () => {
+      setIsFollowing(!isFollowing);
+      // TODO: Add backend API for follow
+  };
+
   const filteredPosts = posts.filter(post => {
     if (activeFilter === "All") return true;
     return post.type.toLowerCase() === activeFilter.toLowerCase();
   });
 
-  const handleDeletePost = async (id) => {
-    if(!window.confirm("Delete this item permanently?")) return;
-    try {
-      await deleteProduct(id); 
-      setPosts(prev => prev.filter(p => p.id !== id));
-      setActionModalOpen(false);
-    } catch (err) {
-      alert("Failed to delete item.");
-    }
-  };
-
-  const handleImageUpload = async (e, type) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    // Optimistic Update
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-        setProfileData(prev => ({ ...prev, [type]: ev.target.result }));
-    };
-    reader.readAsDataURL(file);
-
-    const formData = new FormData();
-    formData.append("user_id", userId);
-    formData.append("image", file);
-    formData.append("bio", profileData.bio || ""); 
-    formData.append("course", profileData.course || "");
-
-    try {
-      await updateUserProfile(formData);
-    } catch(err) {
-      alert("Failed to save image. Is the database updated?");
-      loadProfile(); 
-    }
-  };
-
   return (
     <div className="profile-page fade-in">
-      {/* HEADER CARD */}
       <div className="profile-header-card">
-        {/* Removed Settings Icon as requested */}
-
-        <div 
-          className="profile-cover" 
-          style={{ backgroundImage: `url(${profileData.cover})` }}
-        >
-          <div className="cover-overlay"></div>
-          <button className="edit-cover-btn" onClick={() => coverInputRef.current.click()}>
-            <i className="fa-solid fa-camera"></i> <span>Edit Cover</span>
-          </button>
-          <input type="file" ref={coverInputRef} hidden accept="image/*" onChange={(e) => handleImageUpload(e, 'cover')} />
+        <div className="profile-cover" style={{ backgroundImage: `url(${profileData.cover})` }}>
+           <div className="cover-overlay"></div>
         </div>
 
         <div className="profile-info-section">
-          <div className="profile-avatar-wrapper" onClick={() => avatarInputRef.current.click()}>
+          <div className="profile-avatar-wrapper">
              <img src={profileData.avatar} alt="Profile" className="profile-avatar" />
-             <div className="edit-avatar-badge"><i className="fa-solid fa-camera"></i></div>
-             <input type="file" ref={avatarInputRef} hidden accept="image/*" onChange={(e) => handleImageUpload(e, 'avatar')} />
           </div>
 
           <div className="profile-text">
              <div className="name-badge-row">
                 <h1>{profileData.name}</h1>
-                {profileData.isVerified && <i className="fa-solid fa-circle-check verified-icon" title="Verified"></i>}
+                {profileData.isVerified && <i className="fa-solid fa-circle-check verified-icon"></i>}
              </div>
-             
              <p className="profile-role">{profileData.course} {profileData.year ? `• ${profileData.year}` : ''}</p>
              <p className="profile-bio">{profileData.bio}</p>
              
@@ -177,11 +129,22 @@ export default function Profile() {
                     <span className="stat-label">Following</span>
                 </div>
              </div>
+
+             <div className="profile-actions-row">
+                <button 
+                    className={`btn-follow ${isFollowing ? 'following' : ''}`} 
+                    onClick={handleFollow}
+                >
+                    {isFollowing ? "Following" : "Follow"}
+                </button>
+                <button className="btn-edit" onClick={() => navigate("/chat")}>
+                    <i className="fa-solid fa-message"></i> Message
+                </button>
+             </div>
           </div>
         </div>
       </div>
 
-      {/* BODY CONTENT */}
       <div className="profile-content">
         <div className="profile-tabs-wrapper">
              <div className="tabs-list">
@@ -195,24 +158,19 @@ export default function Profile() {
                     </button>
                 ))}
              </div>
-             
-             {/* Styled "Post Item" Button */}
-             <button className="btn-post-new desktop-only" onClick={() => setShowCreateModal(true)}>
-                <i className="fa-solid fa-plus"></i> Post Item
-             </button>
         </div>
 
         <div className="profile-grid">
             {loading ? (
-                 <div className="loading-state"><i className="fa-solid fa-spinner fa-spin"></i> Loading...</div>
+                 <div className="loading-state">Loading...</div>
             ) : filteredPosts.length === 0 ? (
                 <div className="empty-state">
                     <i className="fa-solid fa-folder-open"></i>
-                    <p>No posts yet.</p>
+                    <p>No items posted yet.</p>
                 </div>
             ) : (
                 filteredPosts.map(post => (
-                    <div key={post.id} className="pro-card" onClick={() => setSelectedPost(post)}>
+                    <div key={post.id} className="pro-card">
                         <div className="pro-card-img">
                             <img src={post.image} alt={post.title} onError={(e) => e.target.src="/images/placeholder.jpg"} />
                             <span className={`pro-badge ${post.type}`}>{post.type}</span>
@@ -224,34 +182,11 @@ export default function Profile() {
                                 <span className="date">{post.date}</span>
                             </div>
                         </div>
-                        <button className="pro-card-opt" onClick={(e) => { e.stopPropagation(); setSelectedPost(post); setActionModalOpen(true); }}>
-                            <i className="fa-solid fa-ellipsis-vertical"></i>
-                        </button>
                     </div>
                 ))
             )}
         </div>
       </div>
-
-      {/* Floating Action Button (Mobile Only) */}
-      <button className="fab-add mobile-only" onClick={() => setShowCreateModal(true)}>
-        <i className="fa-solid fa-plus"></i>
-      </button>
-
-      {/* Modals */}
-      <PostItemModal 
-        isOpen={showCreateModal} 
-        onClose={() => { setShowCreateModal(false); loadUserPosts(); }} 
-        activeFilter={activeFilter === 'All' ? 'sell' : activeFilter.toLowerCase()}
-      />
-
-      {actionModalOpen && selectedPost && (
-        <PostActionModal 
-          post={selectedPost} 
-          onClose={() => setActionModalOpen(false)}
-          onDelete={handleDeletePost}
-        />
-      )}
     </div>
   );
 }

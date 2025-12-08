@@ -1,26 +1,37 @@
-import React, { useState } from "react";
-import {
-  createProduct,
-  addProductPhoto,
-  saveProductAvailability,
-} from "../../services/api";
+import React, { useState, useEffect } from "react";
+// Import createProduct from api service
+import { createProduct } from "../../services/api"; 
 import "./PostItemModal.css";
-import { uploadProductImage } from "../../services/imageUpload";
 
 const PostItemModal = ({ isOpen, onClose, activeFilter }) => {
+  // Determine default listing type
+  const defaultType = 
+    activeFilter === "buy/sell" ? "sell" :
+    activeFilter === "rent" ? "rent" :
+    activeFilter === "swap" ? "swap" : "sell";
+
   const [itemName, setItemName] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
-  const [condition, setCondition] = useState("new");
+  const [condition, setCondition] = useState("New");
   const [price, setPrice] = useState("");
   const [rentDuration, setRentDuration] = useState("");
   const [itemWanted, setItemWanted] = useState("");
   const [availability, setAvailability] = useState([]);
   const [image, setImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null); 
 
-  // New states for API handling
+  const [listingType, setListingType] = useState(defaultType);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // Sync listing type when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setListingType(defaultType);
+      setError(""); 
+    }
+  }, [isOpen, activeFilter, defaultType]);
 
   if (!isOpen) return null;
 
@@ -34,59 +45,30 @@ const PostItemModal = ({ isOpen, onClose, activeFilter }) => {
     const file = e.target.files[0];
     if (file) {
       setImage(file);
+      setImagePreview(URL.createObjectURL(file)); 
     }
   };
 
   const getTitle = () => {
-    switch (activeFilter) {
-      case "buy/sell":
-        return "Sell Your Item";
-      case "rent":
-        return "Rent Out Your Item";
-      case "swap":
-        return "Swap Your Item";
-      default:
-        return "Post Item";
+    switch (listingType) {
+      case "sell": return "Sell Your Item";
+      case "rent": return "Rent Out Your Item";
+      case "swap": return "Swap Your Item";
+      default: return "Post Item";
     }
-  };
-
-  const getListingType = () => {
-    switch (activeFilter) {
-      case "buy/sell":
-        return "sell";
-      case "rent":
-        return "rent";
-      case "swap":
-        return "swap";
-      default:
-        return "sell";
-    }
-  };
-
-  // Map your category names to category IDs from database
-  const getCategoryId = (categoryName) => {
-    const categoryMap = {
-      electronics: 1,
-      books: 2,
-      clothing: 3,
-      arts: 1, // Map to existing category or add new ones
-      uniform: 3,
-      gadgets: 1,
-      others: 1,
-    };
-    return categoryMap[categoryName] || 1;
   };
 
   const resetForm = () => {
     setItemName("");
     setDescription("");
     setCategory("");
-    setCondition("new");
+    setCondition("New");
     setPrice("");
     setRentDuration("");
     setItemWanted("");
     setAvailability([]);
     setImage(null);
+    setImagePreview(null);
     setError("");
   };
 
@@ -96,63 +78,48 @@ const PostItemModal = ({ isOpen, onClose, activeFilter }) => {
     setError("");
 
     try {
-      // Get logged-in user
-      const user = JSON.parse(localStorage.getItem("user") || "{}");
-
-      if (!user.user_id) {
-        setError("Please log in to post items.");
-        setLoading(false);
-        return;
+      const userId = localStorage.getItem("user_id");
+      if (!userId) {
+        throw new Error("You must be logged in to post.");
       }
 
-      // Prepare product data for backend
-      const productData = {
-        name: itemName,
-        description: description,
-        condition: condition,
-        category_id: getCategoryId(category),
-        listing_type: getListingType(),
-        role_in_post: "seller",
-        posted_by: user.user_id,
-      };
+      // Prepare FormData
+      const formData = new FormData();
+      formData.append("seller_id", userId);
+      formData.append("name", itemName);
+      formData.append("description", description);
+      formData.append("category", category);
+      formData.append("condition", condition);
+      formData.append("listing_type", listingType);
+      formData.append("availability", availability.join(",")); 
 
-      // Add price based on listing type
-      if (activeFilter === "buy/sell") {
-        productData.price = parseFloat(price);
-        productData.rental_price = null;
-      } else if (activeFilter === "rent") {
-        productData.price = null;
-        productData.rental_price = parseFloat(price);
-      } else if (activeFilter === "swap") {
-        productData.price = null;
-        productData.rental_price = null;
+      // Handle Price logic
+      if (listingType === "sell") {
+        if (!price) throw new Error("Price is required for selling.");
+        formData.append("price", price);
+      } else if (listingType === "rent") {
+        if (!price) throw new Error("Rental price is required.");
+        formData.append("price", price); // Backend maps to price/rental_price
+        formData.append("description", `${description} \n(Duration: ${rentDuration || "Not specified"})`); 
+      } else if (listingType === "swap") {
+        formData.append("price", 0);
+        formData.append("description", `${description} \n(Wants: ${itemWanted || "Any"})`); 
       }
-
-      console.log("Submitting product data:", productData);
-
-      // Create product in database
-      const newProduct = await createProduct(productData);
-
-      console.log("Product created successfully:", newProduct);
 
       if (image) {
-        console.log("Uploading image...");
-        const imageUrl = await uploadProductImage(image);
-        console.log("Image uploaded:", imageUrl);
-
-        // Save image URL to database
-        await addProductPhoto(newProduct.product_id, imageUrl);
-        console.log("Image URL saved to database");
+        formData.append("image", image);
+      } else {
+         // Optional: Throw error if image is mandatory
+         // throw new Error("Image is required.");
       }
 
-      // TODO: Save availability if you have availability endpoint
-      if (availability.length > 0 && newProduct.product_id) {
-        await saveProductAvailability(newProduct.product_id, availability);
-      }
+      // Use the API service function
+      await createProduct(formData);
 
-      alert("Product posted successfully!");
+      alert("Item posted successfully!");
       resetForm();
-      onClose(); // This will trigger refresh in HomePage
+      onClose(); 
+
     } catch (err) {
       console.error("Error posting product:", err);
       setError(err.message || "Failed to post product. Please try again.");
@@ -162,7 +129,7 @@ const PostItemModal = ({ isOpen, onClose, activeFilter }) => {
   };
 
   const renderSpecificFields = () => {
-    if (activeFilter === "buy/sell") {
+    if (listingType === "sell") {
       return (
         <div className="form-group">
           <label htmlFor="price">Price (₱) *</label>
@@ -180,7 +147,7 @@ const PostItemModal = ({ isOpen, onClose, activeFilter }) => {
         </div>
       );
     }
-    if (activeFilter === "rent") {
+    if (listingType === "rent") {
       return (
         <>
           <div className="form-group">
@@ -207,12 +174,11 @@ const PostItemModal = ({ isOpen, onClose, activeFilter }) => {
               placeholder="e.g., 3 days minimum"
               disabled={loading}
             />
-            <small>Optional: Add rental duration notes</small>
           </div>
         </>
       );
     }
-    if (activeFilter === "swap") {
+    if (listingType === "swap") {
       return (
         <div className="form-group">
           <label htmlFor="itemWanted">Item Wanted in Return</label>
@@ -224,7 +190,6 @@ const PostItemModal = ({ isOpen, onClose, activeFilter }) => {
             placeholder="e.g., old textbooks, calculator"
             disabled={loading}
           />
-          <small>Optional: What would you like to swap for?</small>
         </div>
       );
     }
@@ -234,14 +199,12 @@ const PostItemModal = ({ isOpen, onClose, activeFilter }) => {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content-post" onClick={(e) => e.stopPropagation()}>
-        <button
-          className="modal-close-btn"
-          onClick={onClose}
-          disabled={loading}
-        >
-          &times;
-        </button>
-        <h2>{getTitle()}</h2>
+        <div className="modal-header">
+           <h2>{getTitle()}</h2>
+           <button className="modal-close-btn" onClick={onClose} disabled={loading}>
+             &times;
+           </button>
+        </div>
 
         {error && (
           <div className="error-banner">
@@ -251,6 +214,43 @@ const PostItemModal = ({ isOpen, onClose, activeFilter }) => {
         )}
 
         <form onSubmit={handleSubmit}>
+          
+          {/* Image Upload Preview Section */}
+          <div className="form-group" style={{textAlign: 'center', marginBottom: '20px'}}>
+             <label htmlFor="imageUpload" style={{cursor: 'pointer'}}>
+                {imagePreview ? (
+                    <img 
+                      src={imagePreview} 
+                      alt="Preview" 
+                      style={{width: '100%', maxHeight: '200px', objectFit: 'contain', borderRadius: '8px', border: '2px dashed #ccc'}} 
+                    />
+                ) : (
+                    <div style={{
+                        padding: '30px', 
+                        border: '2px dashed #ccc', 
+                        borderRadius: '8px', 
+                        color: '#666',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '10px'
+                    }}>
+                        <i className="fa-solid fa-cloud-arrow-up" style={{fontSize: '2rem'}}></i>
+                        <span>Click to Upload Image *</span>
+                    </div>
+                )}
+             </label>
+             <input
+              type="file"
+              id="imageUpload"
+              accept="image/*"
+              onChange={handleImageChange}
+              disabled={loading}
+              style={{display: 'none'}} 
+              required={!image} // Make required only if no image selected yet
+            />
+          </div>
+
           <div className="form-group">
             <label htmlFor="itemName">Item Name *</label>
             <input
@@ -288,12 +288,13 @@ const PostItemModal = ({ isOpen, onClose, activeFilter }) => {
                 disabled={loading}
               >
                 <option value="">Select a category</option>
-                <option value="electronics">Electronics</option>
-                <option value="books">Books</option>
-                <option value="clothing">Clothing/Uniform</option>
-                <option value="arts">Arts and Crafts</option>
-                <option value="gadgets">Gadgets</option>
-                <option value="others">Others</option>
+                <option value="Electronics">Electronics</option>
+                <option value="Books">Books</option>
+                <option value="Clothing">Clothing/Uniform</option>
+                <option value="Furniture">Furniture</option>
+                <option value="Sports">Sports & Outdoors</option>
+                <option value="Gadgets">Gadgets</option>
+                <option value="Others">Others</option>
               </select>
             </div>
 
@@ -306,11 +307,11 @@ const PostItemModal = ({ isOpen, onClose, activeFilter }) => {
                 required
                 disabled={loading}
               >
-                <option value="new">New</option>
-                <option value="like new">Like New</option>
-                <option value="good">Good</option>
-                <option value="fair">Fair</option>
-                <option value="poor">Poor</option>
+                <option value="New">Brand New</option>
+                <option value="Like New">Like New</option>
+                <option value="Used">Used</option>
+                <option value="Fair">Fair</option>
+                <option value="Poor">Poor</option>
               </select>
             </div>
           </div>
@@ -319,7 +320,7 @@ const PostItemModal = ({ isOpen, onClose, activeFilter }) => {
 
           <div className="form-group">
             <label>Meetup Availability</label>
-            <small>Select days you're available to meet</small>
+            <small style={{display: 'block', marginBottom: '5px', color: '#666'}}>Select days you're available to meet</small>
             <div className="availability-grid">
               {[
                 "monday",
@@ -343,18 +344,6 @@ const PostItemModal = ({ isOpen, onClose, activeFilter }) => {
             </div>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="imageUpload">Upload Image</label>
-            <input
-              type="file"
-              id="imageUpload"
-              accept="image/*"
-              onChange={handleImageChange}
-              disabled={loading}
-            />
-            <small>Optional: Image upload feature coming soon</small>
-          </div>
-
           <button type="submit" className="submit-post-btn" disabled={loading}>
             {loading ? (
               <>
@@ -362,7 +351,7 @@ const PostItemModal = ({ isOpen, onClose, activeFilter }) => {
               </>
             ) : (
               <>
-                <i className="fa-solid fa-check"></i> Submit Post
+                <i className="fa-solid fa-paper-plane"></i> Submit Post
               </>
             )}
           </button>

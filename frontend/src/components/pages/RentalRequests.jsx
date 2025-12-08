@@ -1,229 +1,149 @@
-import React, { useEffect, useState } from "react";
-import "./RentalRequests.css";
+import React, { useState, useEffect } from "react";
 import AppNavbar from "../AppNavbar";
 import { useNavigate } from "react-router-dom";
-import { useRentalRequests } from './RentalRequestContext';
+import { useRentalRequests } from "./RentalRequestContext";
+import "./RentalRequests.css";
 
-
-
-/*
-// Sample data for testing
-const sampleRenterRequests = [
-  {
-    request_id: 1,
-    product_name: "Canon DSLR Camera",
-    renter_name: "John Doe",
-    rentee_name: "Alice Santos",
-    rent_start: "2025-11-20T10:00:00",
-    rent_end: "2025-11-22T18:00:00",
-    status: "pending",
-  },
-  {
-    request_id: 2,
-    product_name: "Graphing Calculator",
-    renter_name: "John Doe",
-    rentee_name: "Mark Reyes",
-    rent_start: "2025-11-15T09:00:00",
-    rent_end: "2025-11-16T12:00:00",
-    status: "accepted",
-  },
-  {
-    request_id: 3,
-    product_name: "Canon DSLR Camera",
-    renter_name: "John Doe",
-    rentee_name: "Alice Santos",
-    rent_start: "2025-11-20T10:00:00",
-    rent_end: "2025-11-22T18:00:00",
-    status: "pending",
-  },
-  {
-    request_id: 4,
-    product_name: "Canon DSLR Camera",
-    renter_name: "John Doe",
-    rentee_name: "Alice Santos",
-    rent_start: "2025-11-20T10:00:00",
-    rent_end: "2025-11-22T18:00:00",
-    status: "pending",
-  },
-  {
-    request_id: 5,
-    product_name: "Canon DSLR Camera",
-    renter_name: "John Doe",
-    rentee_name: "Alice Santos",
-    rent_start: "2025-11-20T10:00:00",
-    rent_end: "2025-11-22T18:00:00",
-    status: "pending",
-  },
-];
-
-const sampleRenteeRequests = [
-  {
-    request_id: 3,
-    product_name: "Laptop Dell XPS 13",
-    renter_name: "Mary Jane",
-    rentee_name: "John Doe",
-    rent_start: "2025-11-19T09:00:00",
-    rent_end: "2025-11-20T17:00:00",
-    status: "pending",
-  },
-  {
-    request_id: 4,
-    product_name: "Textbook: Data Analytics",
-    renter_name: "Alex Tan",
-    rentee_name: "John Doe",
-    rent_start: "2025-11-12T08:00:00",
-    rent_end: "2025-11-14T16:00:00",
-    status: "declined",
-  },
-];
-*/
-
-//const RentalRequests = ({ userId, fetchRequestsAPI, updateRequestAPI }) => {
-  const RentalRequests = ({ userId, fetchRequestsAPI }) => {
-  //const [renterRequests, setRenterRequests] = useState(sampleRenterRequests);
- // const [renteeRequests, setRenteeRequests] = useState(sampleRenteeRequests);
-  
-  const { renterRequests, renteeRequests, updateRequestAPI } = useRentalRequests();
+const RentalRequests = () => {
+  const { renterRequests, updateRequestAPI } = useRentalRequests();
   const navigate = useNavigate();
-  const currentUser = "Krislyn Sayat"; // replace this with your actual logged-in username
-  const [activeTab, setActiveTab] = useState("renter");
-  /*const [renterRequests, setRenterRequests] = useState([]);
-  const [renteeRequests, setRenteeRequests] = useState([]);
-*/
+  const [activeTab, setActiveTab] = useState("renter"); // 'renter' (My Requests) vs 'rentee' (Requests received)
 
-  // Fetch rental requests from backend (pass your API functions)
- /* const fetchRequests = async () => {
-    try {
-      const renterData = await fetchRequestsAPI({ renterId: userId });
-      const renteeData = await fetchRequestsAPI({ renteeId: userId });
-      setRenterRequests(renterData);
-      setRenteeRequests(renteeData);
-    } catch (err) {
-      console.error(err);
-    }
-  };*/
-/*
-  useEffect(() => {
-    fetchRequests();
-  }, [userId]);
-*/
-/*
-  const handleAction = async (requestId, action) => {
-    try {
-      await updateRequestAPI(requestId, action); // accept or decline
-      fetchRequests(); // refresh data
-    } catch (err) {
-      console.error(err);
-    }
-  };*/
+  // Get current user ID
+  const currentUserId = parseInt(localStorage.getItem("user_id"));
 
-  const handleAction = (requestId, action) => {
-      updateRequestAPI(requestId, action); // directly update context state
+  // Helper: Filter requests
+  // "Renter" = Requests I made (I am the renter)
+  // "Rentee" = Requests made to me (I am the product owner/rentee)
+  // Note: Backend currently returns "received" requests mostly. 
+  // You might need a separate endpoint for "sent" requests or filter client-side if all are returned.
+  
+  const myRequests = renterRequests.filter(
+    (req) => req.renter_id === currentUserId
+  );
+
+  const receivedRequests = renterRequests.filter(
+    (req) => req.owner_id === currentUserId || req.seller_id === currentUserId // Adjust based on your API response field
+  );
+  
+  // Fallback: If backend returns all requests in one list, use that.
+  // If backend only returns one type based on endpoint, use 'renterRequests' directly for now.
+  const displayRequests = activeTab === "renter" ? myRequests : receivedRequests;
+
+  const handleAction = async (requestId, status) => {
+    await updateRequestAPI(requestId, status);
+    alert(`Rental request ${status}!`);
   };
 
-  const getStatus = (status, start, end) => {
-    const now = new Date();
-    const startDate = new Date(start);
-    const endDate = new Date(end);
-
-    if (status === "cancelled") return "cancelled";
-    if (status !== "pending" && status !== "declined" && now >= startDate && now <= endDate) return "ongoing";
-    if (status !== "pending" && now > endDate) return "ended"; 
-    return status;
+  const getStatusClass = (status) => {
+      if (!status) return "";
+      return status.toLowerCase();
   };
 
-  const renderRequests = (requests, isRentee = false) =>
-    requests.length === 0 ? (
-      <p>No requests found.</p>
-    ) : (
-      requests.map((req) => {
-        const status = getStatus(req.status, req.rent_start, req.rent_end);
-        return (
-          <div key={req.request_id} className="request-card">
-            <div className="request-info">
-              <p><strong>Product:</strong> {req.product_name}</p>
-              <p><strong>Renter:</strong> {req.renter_name}</p>
-              <p><strong>Rentee:</strong> {req.rentee_name}</p>
+  const renderRequests = (requests, isReceived) => {
+    if (!requests || requests.length === 0) {
+      return (
+        <div className="no-requests">
+          <i className="fa-solid fa-box-open" style={{fontSize: '3rem', color: '#ccc', marginBottom: '10px'}}></i>
+          <p>No rental requests found.</p>
+        </div>
+      );
+    }
+
+    return requests.map((req) => (
+      <div key={req.id} className="request-card">
+        <div className="request-info">
+          <p><strong>Product:</strong> {req.product_name}</p>
+          <p><strong>Renter:</strong> {req.renter_name || "User #" + req.renter_id}</p>
+          
+          {/* Display dates if available */}
+          {req.rent_start && (
               <p>
-                <strong>Period:</strong> {new Date(req.rent_start).toLocaleString()} - {new Date(req.rent_end).toLocaleString()}
+                <strong>Period:</strong> {new Date(req.rent_start).toLocaleDateString()} - {new Date(req.rent_end).toLocaleDateString()}
               </p>
-            </div>
+          )}
+        </div>
 
-            <div className="request-card-header">
-                <span className={`request-status ${status}`}>
-                  {status.charAt(0).toUpperCase() + status.slice(1)}
-              </span>
-            </div>
+        <div className="request-card-header">
+            <span className={`request-status ${getStatusClass(req.status)}`}>
+                {req.status ? req.status.charAt(0).toUpperCase() + req.status.slice(1) : "Pending"}
+            </span>
+        </div>
 
-            {isRentee && req.status === "pending" && (
-              <div className="request-actions">
-                <button className="accept-btn" onClick={() => handleAction(req.request_id, "accepted")}>Accept</button>
-                <button className="decline-btn" onClick={() => handleAction(req.request_id, "declined")}>Decline</button>
-              </div>
-            )}
-
-                {!isRentee && req.status === "pending" && (
+        {/* Actions for Received Requests (I am the owner) */}
+        {isReceived && req.status === "pending" && (
           <div className="request-actions">
-            <button className="cancl-btn" onClick={() => handleAction(req.request_id, "cancelled")}>
-              Cancel
+            <button className="accept-btn" onClick={() => handleAction(req.id, "accepted")}>
+                <i className="fa-solid fa-check"></i> Accept
+            </button>
+            <button className="decline-btn" onClick={() => handleAction(req.id, "declined")}>
+                <i className="fa-solid fa-xmark"></i> Decline
             </button>
           </div>
         )}
 
-        {isRentee && req.status !== "pending" && req.status !== "ended" && (
+        {/* Actions for My Requests (I am the renter) */}
+        {!isReceived && req.status === "pending" && (
           <div className="request-actions">
-            <button className="done-btn" onClick={() => handleAction(req.request_id, "ended")}>
-              Done
+            <button className="cancl-btn" onClick={() => handleAction(req.id, "cancelled")}>
+              Cancel Request
             </button>
           </div>
         )}
 
+        {/* Completed State */}
+        {isReceived && req.status === "accepted" && (
+          <div className="request-actions">
+            <button className="done-btn" onClick={() => handleAction(req.id, "completed")}>
+              Mark as Returned
+            </button>
           </div>
-        );
-      })
-    );
-
-    // Filter requests based on current user
-const myRenterRequests = renterRequests.filter(req => req.renter_name === currentUser);
-const myRenteeRequests = renteeRequests.filter(req => req.rentee_name === currentUser);
+        )}
+      </div>
+    ));
+  };
 
   return (
     <div className="rental-requests-wrapper">
       <AppNavbar />
+      
       <button
           className="floating-home-btn" onClick={() => navigate("/inside-app")}>
-          <i class="fa-solid fa-house"></i> 
+          <i className="fa-solid fa-house"></i> 
       </button>
 
-    <div className="rental-requests-page scroll-box">
-      <h2>Rentals Inventory</h2>
+      <div className="rental-requests-page scroll-box">
+        <div className="page-header" style={{textAlign: 'center', marginBottom: '20px'}}>
+             <h2 style={{color: '#8B0000'}}>Rentals Inventory</h2>
+        </div>
 
-            <div className="tabs-wrapper">
-              <div className="tabs">
-              <button
+        <div className="tabs-wrapper">
+            <div className="tabs">
+            <button
                 className={activeTab === "renter" ? "active" : ""}
                 onClick={() => setActiveTab("renter")}
-              >
-                My Rentals
-              </button>
+            >
+                My Rental Requests
+            </button>
 
-              <button
+            <button
                 className={activeTab === "rentee" ? "active" : ""}
                 onClick={() => setActiveTab("rentee")}
-              >
-                My Items Lent
-              </button>
-          </div>
+            >
+                Requests Received
+            </button>
+            </div>
         </div>
 
-
-      <div className="requests-container">
-        {activeTab === "renter"
-          ? renderRequests(myRenterRequests)
-          : renderRequests(myRenteeRequests, true)}
+        <div className="requests-container">
+            {/* If tab is 'rentee' (received), pass true for isReceived */}
+            {renderRequests(
+                activeTab === "renter" ? myRequests : receivedRequests, 
+                activeTab === "rentee"
+            )}
+        </div>
       </div>
     </div>
-        </div>
   );
 };
 

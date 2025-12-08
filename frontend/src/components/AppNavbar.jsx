@@ -21,67 +21,69 @@ export default function AppNavbar() {
   };
 
   return (
-    <nav className="app-navbar">
-      <div className="app-navbar-left">
-        <div
-          className="app-logo"
-          onClick={() => navigate("/inside-app")}
-          style={{ cursor: "pointer" }}
-        >
-          <h2>
-            TUPulse <i className="fab fa-typo3"></i>
-          </h2>
-        </div>
-      </div>
-
-      <div className="app-navbar-right">
-        <div
-          className="cart-icon-wrapper"
-          style={{ position: "relative", cursor: "pointer" }}
-          onClick={() => navigate("/cart")}
-          title="Cart"
-        >
-          <i className="fa-solid fa-cart-shopping"></i>
-          {cartItems.length > 0 && (
-            <span
-              style={{
-                position: "absolute",
-                top: "-6px",
-                right: "-8px",
-                background: "#00c3ff",
-                color: "white",
-                borderRadius: "50%",
-                padding: "2px 6px",
-                fontSize: "12px",
-                fontWeight: "bold"
-              }}
-            >
-              {cartItems.length}
-            </span>
-          )}
+    <>
+      <nav className="app-navbar">
+        <div className="app-navbar-left">
+          <div
+            className="app-logo"
+            onClick={() => navigate("/inside-app")}
+            style={{ cursor: "pointer" }}
+          >
+            <h2>
+              TUPulse <i className="fab fa-typo3"></i>
+            </h2>
+          </div>
         </div>
 
-        <div className="profile-menu-container" style={{ position: "relative" }}>
-          <div className="profile-icon" onClick={toggleDropdown}>
-            <img src="/images/no_profile.jpg" alt="User" />
+        <div className="app-navbar-right">
+          {/* 💬 Message Icon */}
+          <div className="nav-icon-container" title="Messages" onClick={() => navigate("/chat")}>
+            <i className="fa-solid fa-comment-dots nav-icon"></i>
           </div>
 
-          {isDropdownOpen && (
-            <div className="dropdown-menu">
-              <div className="dropdown-item" onClick={() => { navigate("/profile"); setIsDropdownOpen(false); }}>
-                <i className="fa-solid fa-user"></i> My Profile
-              </div>
-              <div className="dropdown-item" onClick={() => { navigate("/account-settings"); setIsDropdownOpen(false); }}>
-                <i className="fa-solid fa-gear"></i> Settings
-              </div>
-              <div className="dropdown-divider"></div>
-              <div className="dropdown-item logout" onClick={handleLogout}>
-                <i className="fa-solid fa-right-from-bracket"></i> Logout
-              </div>
+          {/* 🔔 Notification Icon */}
+          <div className="nav-icon-container" title="Notifications">
+            <i className="fa-solid fa-bell nav-icon"></i>
+            <span className="nav-badge-dot"></span>
+          </div>
+
+          {/* 👤 Profile Dropdown */}
+          <div className="profile-menu-container" style={{ position: "relative" }}>
+            <div className="profile-icon" onClick={toggleDropdown}>
+              <img src="/images/no_profile.jpg" alt="User" />
             </div>
-          )}
+
+            {isDropdownOpen && (
+              <div className="dropdown-menu">
+                <div className="dropdown-item" onClick={() => { navigate("/profile"); setIsDropdownOpen(false); }}>
+                  <i className="fa-solid fa-user"></i> My Profile
+                </div>
+                <div className="dropdown-item" onClick={() => { navigate("/account-settings"); setIsDropdownOpen(false); }}>
+                  <i className="fa-solid fa-gear"></i> Settings
+                </div>
+                <div className="dropdown-divider"></div>
+                <div className="dropdown-item logout" onClick={handleLogout}>
+                  <i className="fa-solid fa-right-from-bracket"></i> Logout
+                </div>
+              </div>
+            )}
+          </div>
         </div>
+      </nav>
+
+      {/* 🛒 FLOATING CART BUTTON (Bottom Right) */}
+      <div 
+        className="floating-cart-btn" 
+        onClick={() => navigate("/cart")}
+        title="View Cart"
+      >
+        <i className="fa-solid fa-cart-shopping"></i>
+        {cartItems.length > 0 && (
+          <span className="floating-cart-badge">
+            {cartItems.length}
+          </span>
+        )}
       </div>
-    </nav>
+    </>
   );
 }

@@ -5,276 +5,224 @@
   justify-content: space-between;
   align-items: center;
   height: 80px;
-  padding: 0 25px;
+  padding: 0 30px;
   position: sticky;
   top: 0;
   z-index: 999;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 /* ===== LEFT SIDE ===== */
 .app-navbar-left {
   display: flex;
   align-items: center;
-  gap: 90px;
 }
 
-/* Logo + App Name */
 .app-logo {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 10px;
   cursor: pointer;
 }
 
-.app-logo img {
-  width: 55px;
-  height: 55px;
-  object-fit: contain;
-  border-radius: 50%;
-}
-
 .app-logo h2 {
-  font-size: 1.9rem;
+  font-size: 1.8rem;
   margin: 0;
-}
-
-/* Search bar */
-.search-bar {
-  position: relative;
-}
-
-.search-bar input {
-  padding: 8px 35px 8px 15px;
-  border: none;
-  border-radius: 25px;
-  background: rgba(255,255,255,0.2);
-  color: #fff;
-  outline: none;
-  font-size: 0.95rem;
-  width: 300px;
-  transition: all 0.3s ease;
-}
-
-.search-bar input::placeholder {
-  color: #ddd;
-}
-
-.search-bar input:focus {
-  background: rgba(255,255,255,0.3);
-  width: 350px;
-}
-
-.search-bar i {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
 
 /* ===== RIGHT SIDE ===== */
 .app-navbar-right {
   display: flex;
   align-items: center;
-  gap: 40px;
-  font-size: 1.3rem;
+  gap: 25px; /* Spacing between icons */
 }
 
-.app-navbar-right i {
-  cursor: pointer;
-  transition: color 0.3s ease;
-}
-
-.app-navbar-right i:hover {
-  color: #fff704;
-}
-
-/* Profile icon wrapper for Dropdown positioning */
-.profile-menu-container {
+/* Top Nav Icons (Message & Bell) */
+.nav-icon-container {
   position: relative;
   cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.3s ease;
+}
+
+.nav-icon-container:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.nav-icon {
+  font-size: 1.4rem;
+  color: rgba(255, 255, 255, 0.9);
+  transition: transform 0.2s, color 0.2s;
+}
+
+.nav-icon-container:hover .nav-icon {
+  color: #FFD700; /* Gold highlight */
+  transform: scale(1.1);
+}
+
+/* Red Notification Dot */
+.nav-badge-dot {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 10px;
+  height: 10px;
+  background-color: #ff4d4d;
+  border-radius: 50%;
+  border: 2px solid #4b0000;
+}
+
+/* Profile Icon */
+.profile-menu-container {
+  margin-left: 10px;
 }
 
 .profile-icon img {
-  width: 50px;
-  height: 50px;
+  width: 45px;
+  height: 45px;
   border-radius: 50%;
   cursor: pointer;
-  border: 2px solid #fff;
-  transition: border-color 0.3s ease;
+  border: 2px solid rgba(255,255,255,0.7);
+  transition: all 0.3s ease;
+  object-fit: cover;
 }
 
 .profile-icon img:hover {
-  border-color: #fff704;
+  border-color: #FFD700;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
 }
 
-.notification-container {
-  position: relative;
-}
-
-/* ===== DROPDOWN MENU STYLES (NEW) ===== */
+/* ===== DROPDOWN MENU ===== */
 .dropdown-menu {
   position: absolute;
-  top: 65px;
+  top: 60px;
   right: 0;
   width: 220px;
-  background: rgba(30, 30, 30, 0.95); /* Dark Glassmorphism */
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 15px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
   overflow: hidden;
   animation: slideIn 0.2s ease-out forwards;
   z-index: 1000;
-  display: flex;
-  flex-direction: column;
+  border: 1px solid #eee;
 }
 
 .dropdown-item {
-  padding: 15px 20px;
+  padding: 14px 20px;
   font-size: 0.95rem;
-  color: #e0e0e0;
+  color: #333;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 15px;
-  transition: background 0.2s, color 0.2s;
-  text-decoration: none; /* Just in case it's a link */
-}
-
-.dropdown-item i {
-  font-size: 1.1rem;
-  width: 20px;
-  text-align: center;
-  color: #bbb;
+  gap: 12px;
+  transition: background 0.2s;
+  font-weight: 500;
 }
 
 .dropdown-item:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
+  background: #f5f5f5;
+  color: #8B0000;
 }
 
-.dropdown-item:hover i {
-  color: #fff704; /* Yellow highlight on hover */
+.dropdown-item i {
+  width: 20px;
+  text-align: center;
+  font-size: 1.1rem;
 }
 
 .dropdown-divider {
   height: 1px;
-  background: rgba(255, 255, 255, 0.1);
-  margin: 5px 0;
+  background: #eee;
+  margin: 4px 0;
 }
 
 .dropdown-item.logout {
-  color: #ff6b6b; /* Reddish for logout */
+  color: #d32f2f;
 }
 
 .dropdown-item.logout:hover {
-  background: rgba(255, 107, 107, 0.15);
-  color: #ff4d4d;
+  background: #ffebee;
 }
 
-.dropdown-item.logout i {
-  color: #ff6b6b;
-}
-
-/* Dropdown Animation */
 @keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* ===== Responsive Design ===== */
-@media (max-width: 960px) {
+/* ===== 🛒 FLOATING CART BUTTON (Bottom Right) ===== */
+.floating-cart-btn {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 65px;
+  height: 65px;
+  /* Gold/Orange Gradient to stand out from Red */
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); 
+  color: #8B0000; /* Maroon Icon */
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.8rem;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  cursor: pointer;
+  z-index: 2000; /* Top of everything */
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Bouncy effect */
+}
+
+.floating-cart-btn:hover {
+  transform: scale(1.1) rotate(-5deg);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+}
+
+.floating-cart-btn:active {
+  transform: scale(0.95);
+}
+
+/* Cart Badge Number */
+.floating-cart-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: #d32f2f;
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 800;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 3px solid #f5f5f5; /* White border to make it pop */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
   .app-navbar {
-    flex-direction: column;
-    align-items: stretch;
-    height: auto;
-    padding: 12px 18px;
-    gap: 10px;
-  }
-
-  .app-navbar-left {
-    width: 100%;
-    justify-content: space-between;
-    gap: 20px;
-  }
-
-  /* Search bar centered and fits screen */
-  .search-bar {
-    width: 50%;
-    display: flex;
-    justify-content: center;
-  }
-
-  .search-bar input {
-    width: 90%;
-    max-width: 350px;
-    border-radius: 25px;
-    background: rgba(255,255,255,0.25);
-    font-size: 0.95rem;
-    color: #fff;
-    text-align: left;
-    transition: none;
-  }
-
-  .search-bar input::placeholder {
-    color: #f2f2f2;
-  }
-
-  .app-navbar-right {
-    width: 100%;
-    justify-content: space-evenly;
-    font-size: 1.2rem;
-    margin-top: 5px;
+    padding: 0 20px;
+    height: 70px;
   }
   
-  /* Adjust dropdown position for mobile */
-  .dropdown-menu {
-    right: 50%;
-    transform: translateX(50%);
-    top: 55px;
-  }
-}
-
-/* ===== Smaller screens ===== */
-@media (max-width: 600px) {
-  .app-logo img {
-    width: 20px;
-    height: 20px;
-  }
-
-  .app-logo i {
-    font-size: 1rem;
-    margin-left: 5px;
-    color: #fff;
-    vertical-align: middle;
-  }
-
   .app-logo h2 {
-    font-size: 1.3rem;
+    font-size: 1.5rem;
   }
 
-  .search-bar input {
-    width: 100%;
-    max-width: 280px;
-    font-size: 0.9rem;
-  }
-
-  .app-navbar-right {
-    font-size: 1.1rem;
-    gap: 25px;
-  }
-
-  .profile-icon img {
-    width: 35px;
-    height: 35px;
+  /* Move FAB higher on mobile if needed */
+  .floating-cart-btn {
+    bottom: 80px; 
+    right: 20px;
+    width: 55px;
+    height: 55px;
+    font-size: 1.5rem;
   }
 }

@@ -6,7 +6,8 @@ import "./Login.css";
 const Login = () => {
   const navigate = useNavigate();
 
-  const [step, setStep] = useState(1);
+  // STATES
+  const [step, setStep] = useState(1); // 1: Credentials, 2: OTP
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -14,13 +15,13 @@ const Login = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setError(""); 
   };
 
+  // STEP 1: VALIDATE PASSWORD & SEND OTP
   const handleCredentialsSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -36,6 +37,7 @@ const Login = () => {
     }
   };
 
+  // STEP 2: VERIFY OTP
   const handleOtpSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -43,10 +45,19 @@ const Login = () => {
 
     try {
       const userData = await verifyLoginOtp(formData.email, formData.otp);
+      
+      // Save Token & User Info to LocalStorage
       localStorage.setItem("token", userData.token); 
       localStorage.setItem("username", userData.username);
+      
+      // ✅ FIX: Save user_id so posting works!
+      if (userData.user_id) {
+          localStorage.setItem("user_id", userData.user_id);
+      }
+      
       localStorage.setItem("isLoggedIn", "true");
       window.dispatchEvent(new Event("storage"));
+      
       navigate("/inside-app"); 
     } catch (err) {
       setError(err.message || "Invalid OTP code.");
@@ -60,6 +71,7 @@ const Login = () => {
       <div className="login-wrapper">
         <div className="form-box-login">
           
+          {/* --- STEP 1 FORM --- */}
           {step === 1 && (
             <form onSubmit={handleCredentialsSubmit} className="fade-in">
               <h1>Login</h1>
@@ -81,7 +93,7 @@ const Login = () => {
 
               <div className="input-box">
                 <input
-                  type={showPassword ? "text" : "password"}
+                  type="password"
                   name="password"
                   placeholder="Password"
                   value={formData.password}
@@ -89,23 +101,14 @@ const Login = () => {
                   disabled={loading}
                   required
                 />
-                <i 
-                  className={`fa-solid ${showPassword ? "fa-eye-slash" : "fa-eye"}`}
-                  onClick={() => setShowPassword(!showPassword)}
-                  style={{ cursor: "pointer", pointerEvents: "auto" }}
-                ></i>
+                <i className="fa-solid fa-lock"></i>
               </div>
 
               <div className="options-row">
                  <label className="remember-me">
                    <input type="checkbox" /> Remember Me
                  </label>
-                 <span 
-                   className="forgot-password" 
-                   onClick={() => navigate("/forgot-password")}
-                 >
-                   Forgot Password?
-                 </span>
+                 <span className="forgot-password">Forgot Password?</span>
               </div>
 
               <button type="submit" className="login-btn" disabled={loading}>
@@ -120,6 +123,7 @@ const Login = () => {
             </form>
           )}
 
+          {/* --- STEP 2 FORM: OTP --- */}
           {step === 2 && (
             <form onSubmit={handleOtpSubmit} className="fade-in">
               <h1>Verification</h1>

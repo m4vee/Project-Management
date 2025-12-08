@@ -3,11 +3,13 @@ import { useCart } from "../../context/CartContext";
 import { useNavigate } from "react-router-dom";
 import { fetchProducts } from "../../services/api";
 import "./HomePage.css";
-import AppNavbar from "../AppNavbar";
+// import AppNavbar from "../AppNavbar"; 
 import PostItemModal from "./PostItemModal";
 import ConfirmationModal from "./ConfirmationMsg";
 import { useRentalRequests } from "./RentalRequestContext";
 import { useSwapRequests } from "./SwapRequestContext";
+
+const BACKEND_URL = "http://127.0.0.1:5000";
 
 export default function HomePage() {
   const { addToCart } = useCart();
@@ -22,23 +24,23 @@ export default function HomePage() {
   
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOption, setSortOption] = useState("newest");
+  const [wishlist, setWishlist] = useState([]); 
 
-  // Confirmation Modal States
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
   const [confirmationItem, setConfirmationItem] = useState(null);
   const [confirmationAction, setConfirmationAction] = useState("");
 
-  // Backend Data States
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [wishlist, setWishlist] = useState([]); // NEW FEATURE: Wishlist State
+
+  // GET CURRENT USER ID (To check ownership)
+  const currentUserId = parseInt(localStorage.getItem("user_id"));
 
   const navigate = useNavigate();
   const { addRentalRequest } = useRentalRequests();
   const { addSwapRequest } = useSwapRequests();
 
-  // Scroll & User Effect
   useEffect(() => {
     const handleScroll = () => setIsSticky(window.scrollY > 80);
     window.addEventListener("scroll", handleScroll);
@@ -46,19 +48,10 @@ export default function HomePage() {
     const storedUser = localStorage.getItem("username");
     if (storedUser) setUsername(storedUser);
 
-    // Load wishlist from storage on mount
     const savedWishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
     setWishlist(savedWishlist);
 
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  // Fetch Products
-  useEffect(() => {
-    loadProducts();
-    const handleFocus = () => loadProducts();
-    window.addEventListener("focus", handleFocus);
-    return () => window.removeEventListener("focus", handleFocus);
   }, []);
 
   const loadProducts = async () => {
@@ -67,41 +60,54 @@ export default function HomePage() {
       setError("");
       const data = await fetchProducts({});
 
-      const transformedPosts = data.map((product) => ({
-        id: product.product_id,
-        image: product.photos?.[0]?.photo_url || "/images/placeholder.jpg",
-        name: product.name,
-        profile: "/images/default-profile.jpg",
-        poster: product.seller_name,
-        type: getTypeDisplay(product),
-        description: product.description,
-        condition: product.condition,
-        rentTime: "Contact seller for details",
-        datePosted: new Date(product.created_at).toLocaleDateString("en-US", {
-          month: "short", day: "numeric", year: "numeric",
-        }),
-        category: product.category_name,
-        availability: product.availability?.map((day) => day.toLowerCase()) || [],
-        product_id: product.product_id,
-        listing_type: product.listing_type,
-        price: product.price,
-        rental_price: product.rental_price,
-        posted_by: product.posted_by,
-        status: product.status,
-      }));
+      const transformedPosts = data.map((product) => {
+        let imageUrl = "/images/placeholder.jpg";
+        if (product.image_url) {
+            imageUrl = product.image_url.startsWith("http") 
+                ? product.image_url 
+                : `${BACKEND_URL}${product.image_url}`;
+        }
+
+        return {
+            id: product.id, 
+            seller_id: product.seller_id,
+            image: imageUrl, 
+            name: product.name,
+            profile: "/images/default-profile.jpg", 
+            poster: product.seller_name || "Unknown",
+            type: getTypeDisplay(product),
+            description: product.description,
+            condition: product.condition,
+            datePosted: new Date(product.created_at).toLocaleDateString("en-US", {
+            month: "short", day: "numeric", year: "numeric",
+            }),
+            category: product.category,
+            availability: product.availability ? product.availability.split(",") : [],
+            listing_type: product.listing_type,
+            price: product.price,
+            status: product.status,
+        };
+      });
 
       setPosts(transformedPosts);
     } catch (err) {
       console.error("Error loading products:", err);
-      setError("Failed to load products. Please try again.");
+      setError("Failed to load products. Please check if backend is running.");
     } finally {
       setLoading(false);
     }
   };
 
+  useEffect(() => {
+    loadProducts();
+    const handleFocus = () => loadProducts();
+    window.addEventListener("focus", handleFocus);
+    return () => window.removeEventListener("focus", handleFocus);
+  }, []);
+
   const getTypeDisplay = (product) => {
-    if (product.listing_type === "sell" && product.price) return `₱${parseFloat(product.price).toLocaleString()}`;
-    if (product.listing_type === "rent" && product.rental_price) return "Rent";
+    if (product.listing_type === "sell") return `₱${parseFloat(product.price || 0).toLocaleString()}`;
+    if (product.listing_type === "rent") return `Rent: ₱${product.price || 0}/day`;
     if (product.listing_type === "swap") return "Swap";
     return "N/A";
   };
@@ -118,43 +124,37 @@ export default function HomePage() {
     if (confirmationAction === "Buy") {
       navigate(`/checkout/${confirmationItem.id}`);
     } else if (confirmationAction === "Rent") {
-      alert(`Your rent request is being processed!`);
+      alert(`Rent request sent!`);
       addRentalRequest({
-        request_id: Date.now(),
+        product_id: confirmationItem.id, 
         product_name: confirmationItem.name,
         renter_name: username,
-        rentee_name: confirmationItem.poster,
-        rent_start: new Date().toISOString(),
-        rent_end: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
-        status: "pending",
       });
     } else if (confirmationAction === "Swap") {
-      alert(`Your swap request is being processed!`);
+      alert(`Swap request sent!`);
       addSwapRequest({
-        swap_id: Date.now(),
+        product_id: confirmationItem.id, 
+        offer_description: "Offer to swap",
         requester_name: username,
-        receiver_name: confirmationItem.poster,
-        product_offered_name: confirmationItem.name,
-        product_requested_name: confirmationItem.swapFor || "Not specified",
-        status: "pending",
       });
     }
     setIsConfirmationOpen(false);
   };
 
   const handleAddToCart = (post) => {
-    const price = post.type.includes("₱") ? parseFloat(post.type.replace(/[₱,]/g, "")) || 0 : 0;
+    const priceStr = String(post.type); 
+    const price = priceStr.includes("₱") ? parseFloat(priceStr.replace(/[^\d.]/g, "")) : 0;
+    
     addToCart({
       id: post.id,
       name: post.name,
       img: post.image,
       price: price,
-      type: post.type,
+      type: post.listing_type,
     });
     alert(`${post.name} added to cart!`);
   };
 
-  // NEW: Wishlist Toggle Logic
   const handleToggleWishlist = (post, e) => {
     e.stopPropagation();
     const isWished = wishlist.includes(post.id);
@@ -168,6 +168,11 @@ export default function HomePage() {
     localStorage.setItem('wishlist', JSON.stringify(newWishlist));
   };
   
+  const goToSellerProfile = (e, sellerId) => {
+      e.stopPropagation();
+      navigate(`/profile/${sellerId}`); 
+  };
+  
   const getButtonText = () => {
     switch (filter) {
       case "buy/sell": return "Sell Item";
@@ -177,42 +182,33 @@ export default function HomePage() {
     }
   };
   
-  // PERFORMANCE FIX: Use useMemo for heavy filtering/sorting
   const sortedAndFilteredPosts = useMemo(() => {
     let tempPosts = posts
       .filter((post) => {
-        const serviceMatch = filter === "all" ? true :
-          filter === "buy/sell" ? post.type.includes("₱") :
-          post.type.toLowerCase() === filter;
-
-        const categoryMatch = !category || (post.category && post.category.toLowerCase() === category.toLowerCase());
-        
-        const availabilityMatch = availability.length === 0 ||
-          (post.availability && availability.some((day) => post.availability.includes(day)));
-        
-        const searchMatch = post.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                            post.description.toLowerCase().includes(searchTerm.toLowerCase());
-
-        return serviceMatch && categoryMatch && availabilityMatch && searchMatch;
+        if (filter !== "all") {
+            if (filter === "buy/sell" && post.listing_type !== "sell") return false;
+            if (filter === "rent" && post.listing_type !== "rent") return false;
+            if (filter === "swap" && post.listing_type !== "swap") return false;
+        }
+        if (category && post.category !== category) return false;
+        if (searchTerm && !post.name.toLowerCase().includes(searchTerm.toLowerCase())) return false;
+        return true;
       })
       .sort((a, b) => {
+        if (sortOption === "newest") {
+            return new Date(b.datePosted) - new Date(a.datePosted);
+        }
         if (sortOption === "price_asc") {
-          const priceA = parseFloat(a.price || a.rental_price || 0);
-          const priceB = parseFloat(b.price || b.rental_price || 0);
-          return priceA - priceB;
+           return (parseFloat(a.price) || 0) - (parseFloat(b.price) || 0);
         }
         if (sortOption === "price_desc") {
-          const priceA = parseFloat(a.price || a.rental_price || 0);
-          const priceB = parseFloat(b.price || b.rental_price || 0);
-          return priceB - priceA;
+           return (parseFloat(b.price) || 0) - (parseFloat(a.price) || 0);
         }
-        // Default: newest (by datePosted or created_at)
-        return new Date(b.datePosted) - new Date(a.datePosted);
+        return 0;
       });
       return tempPosts;
-  }, [posts, filter, category, availability, searchTerm, sortOption]); // Dependencies
+  }, [posts, filter, category, searchTerm, sortOption]);
 
-  // Render Skeleton Loader
   const renderSkeletons = () => (
     Array(6).fill(0).map((_, index) => (
       <div key={index} className="post-card skeleton-card">
@@ -223,22 +219,22 @@ export default function HomePage() {
     ))
   );
 
-  // Helper function for Category Icon
   const getCategoryIcon = (cat) => {
-    switch(cat.toLowerCase()) {
-        case 'electronics': return 'fa-solid fa-bolt';
-        case 'books': return 'fa-solid fa-book';
-        case 'clothing': return 'fa-solid fa-shirt';
-        case 'furniture': return 'fa-solid fa-chair';
-        default: return 'fa-solid fa-layer-group';
-    }
+    if(!cat) return 'fa-solid fa-layer-group';
+    const map = {
+        'electronics': 'fa-bolt',
+        'books': 'fa-book',
+        'clothing': 'fa-shirt',
+        'furniture': 'fa-chair',
+        'gadgets': 'fa-mobile-screen',
+        'sports': 'fa-basketball',
+        'others': 'fa-box'
+    };
+    return `fa-solid ${map[cat.toLowerCase()] || 'fa-layer-group'}`;
   };
 
   return (
     <div className="homepage">
-      <AppNavbar />
-
-      {/* Hero Welcome Section */}
       <div className="hero-section">
         <div className="hero-content">
           <h1>Welcome back, <span>{username}</span>! 👋</h1>
@@ -259,9 +255,7 @@ export default function HomePage() {
           ))}
         </div>
 
-        {/* Search and Sort Group */}
         <div className="search-sort-group">
-          
           <div className="search-input-group">
             <input
               type="text"
@@ -278,69 +272,55 @@ export default function HomePage() {
             <option value="price_asc">Price Low → High</option>
             <option value="price_desc">Price High → Low</option>
           </select>
-          
+
           <button className="post-item-btn desktop-only" onClick={() => setIsPostModalOpen(true)}>
             {getButtonText()} <i className="fa-solid fa-plus"></i>
           </button>
           
-          {/* NEW: My Posts Shortcut */}
           <button className="my-posts-btn" onClick={() => navigate("/my-posts")}>
             <i className="fa-solid fa-store"></i> My Posts
           </button>
-
         </div>
-
       </div>
 
       <div className="homepage-container">
-        {/* Sidebar Filters */}
         <div className={`sidebar ${showFilters ? "show" : ""}`}>
-          <div className="sidebar-header">
-            <h3>Filters</h3>
-            <button className="close-filter-btn" onClick={() => setShowFilters(false)}>&times;</button>
-          </div>
-
-          <div className="filter-section">
-            <label><i className="fa-solid fa-layer-group"></i> Category</label>
-            <select value={category} onChange={(e) => setCategory(e.target.value)}>
-              <option value="">All Categories</option>
-              <option value="electronics">Electronics</option>
-              <option value="books">Books</option>
-              <option value="clothing">Clothing</option>
-              <option value="furniture">Furniture</option>
-              <option value="sports & outdoors">Sports & Outdoors</option>
-              <option value="others">Others</option>
-            </select>
-          </div>
-
-          <div className="filter-section">
-            <label><i className="fa-regular fa-calendar-check"></i> Availability</label>
-            <div className="availability-options">
-              {["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"].map((day) => (
-                <label key={day} className="availability-checkbox">
-                  <input
-                    type="checkbox"
-                    checked={availability.includes(day)}
-                    onChange={(e) => {
-                      if (e.target.checked) setAvailability([...availability, day]);
-                      else setAvailability(availability.filter((d) => d !== day));
-                    }}
-                  />
-                  <span>{day.charAt(0).toUpperCase() + day.slice(1)}</span>
-                </label>
-              ))}
+            <div className="sidebar-header">
+                <h3>Filters</h3>
+                <button className="close-filter-btn" onClick={() => setShowFilters(false)}>&times;</button>
             </div>
-          </div>
-          
-          {/* NEW: Show Only Available Toggle */}
-          <div className="filter-section">
-            <label><i className="fa-solid fa-check-circle"></i> Stock</label>
-            <label className="availability-checkbox">
-                <input type="checkbox" />
-                <span>Show Only Available</span>
-            </label>
-          </div>
-
+            <div className="filter-section">
+                <label>Category</label>
+                <select value={category} onChange={(e) => setCategory(e.target.value)}>
+                <option value="">All Categories</option>
+                <option value="Electronics">Electronics</option>
+                <option value="Books">Books</option>
+                <option value="Clothing">Clothing</option>
+                <option value="Furniture">Furniture</option>
+                <option value="Gadgets">Gadgets</option>
+                <option value="Sports">Sports</option>
+                <option value="Others">Others</option>
+                </select>
+            </div>
+            
+            <div className="filter-section">
+                <label>Availability</label>
+                <div className="availability-options">
+                  {["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"].map((day) => (
+                    <label key={day} className="availability-checkbox">
+                      <input
+                        type="checkbox"
+                        checked={availability.includes(day)}
+                        onChange={(e) => {
+                          if (e.target.checked) setAvailability([...availability, day]);
+                          else setAvailability(availability.filter((d) => d !== day));
+                        }}
+                      />
+                      <span>{day.charAt(0).toUpperCase() + day.slice(1)}</span>
+                    </label>
+                  ))}
+                </div>
+            </div>
         </div>
 
         <main className="posts-container">
@@ -348,80 +328,82 @@ export default function HomePage() {
             <div className="posts-grid">{renderSkeletons()}</div>
           ) : error ? (
             <div className="error-message">
-              <img src="/images/error-icon.png" alt="Error" width="50" />
               <p>{error}</p>
-              <button onClick={loadProducts} className="retry-btn">
-                <i className="fa-solid fa-rotate-right"></i> Retry
-              </button>
+              <button onClick={loadProducts} className="retry-btn">Retry</button>
             </div>
           ) : sortedAndFilteredPosts.length === 0 ? (
             <div className="no-products">
-              <i className="fa-solid fa-box-open fa-3x"></i>
-              <p>No items found matching your criteria.</p>
+              <i className="fa-solid fa-box-open fa-3x" style={{color: '#ccc', marginBottom: '15px'}}></i>
+              <p>No items found.</p>
               <button className="post-item-btn" onClick={() => setIsPostModalOpen(true)}>
-                Post an Item
+                Post the first item!
               </button>
             </div>
           ) : (
             <div className="posts-grid">
-              {sortedAndFilteredPosts.map((post) => (
-                <div key={post.id} className="post-card" onClick={() => setSelectedPost(post)}>
-                  <div className="card-image-container">
-                    <img src={post.image} alt={post.name} loading="lazy" />
-                    <span className={`badge ${post.listing_type}`}>{post.type}</span>
-                    
-                    {/* NEW: Wishlist Icon */}
-                    <button 
-                        className={`wishlist-btn ${wishlist.includes(post.id) ? 'active' : ''}`}
-                        onClick={(e) => handleToggleWishlist(post, e)}
-                    >
-                        <i className={`fa-heart ${wishlist.includes(post.id) ? 'fa-solid' : 'fa-regular'}`}></i>
-                    </button>
+              {sortedAndFilteredPosts.map((post) => {
+                // Check if the current user is the owner of the post
+                const isOwner = post.seller_id === currentUserId;
 
-                  </div>
-                  
-                  <div className="post-info">
-                    <div className="poster-meta">
-                      <img src={post.profile} alt="User" onError={(e) => e.target.src='/images/default-profile.jpg'} />
-                      <span className="poster-name">{post.poster}</span>
-                      {/* Optional: Verified Badge Icon here */}
-                    </div>
-                    <h4>{post.name}</h4>
-                    
-                    {/* NEW: Condition and Category Chip */}
-                    <div className="item-details-row">
-                        <span className="condition-tag">{post.condition || "Used"}</span>
-                        <span className="category-tag"><i className={getCategoryIcon(post.category)}></i> {post.category}</span>
-                    </div>
-
-                    <p className="post-date"><i className="fa-regular fa-clock"></i> {post.datePosted}</p>
-                    
-                    <div className="post-actions">
-                      {post.type.startsWith("₱") && (
+                return (
+                  <div key={post.id} className="post-card" onClick={() => setSelectedPost(post)}>
+                    <div className="card-image-container">
+                      <img src={post.image} alt={post.name} loading="lazy" onError={(e) => { e.target.src = "/images/placeholder.jpg"; }} />
+                      <span className={`badge ${post.listing_type}`}>{post.listing_type}</span>
+                      
+                      {!isOwner && (
                         <button 
-                          className="action-btn buy-btn"
-                          onClick={(e) => { e.stopPropagation(); handleAddToCart(post); }}
+                            className={`wishlist-btn ${wishlist.includes(post.id) ? 'active' : ''}`}
+                            onClick={(e) => handleToggleWishlist(post, e)}
                         >
-                          <i className="fa-solid fa-cart-plus"></i> Add
+                            <i className={`fa-heart ${wishlist.includes(post.id) ? 'fa-solid' : 'fa-regular'}`}></i>
                         </button>
                       )}
-                      {/* NEW: Chat Button on Card */}
-                      <button 
-                          className="action-btn chat-card-btn"
-                          onClick={(e) => { e.stopPropagation(); navigate("/chat"); }}
-                      >
-                          <i className="fa-solid fa-comment-dots"></i> Chat
-                      </button>
+                    </div>
+                    
+                    <div className="post-info">
+                      <div className="poster-meta" onClick={(e) => goToSellerProfile(e, post.seller_id)} style={{cursor: 'pointer'}}>
+                        <img src={post.profile} alt="User" onError={(e) => e.target.src='/images/default-profile.jpg'} />
+                        <span className="poster-name">{isOwner ? "You" : post.poster}</span>
+                      </div>
+
+                      <h4>{post.name}</h4>
+                      
+                      <div className="item-details-row">
+                          <span className="condition-tag">{post.condition || "Used"}</span>
+                          <span className="category-tag"><i className={getCategoryIcon(post.category)}></i> {post.category}</span>
+                      </div>
+
+                      <p className="post-date"><i className="fa-regular fa-clock"></i> {post.datePosted}</p>
+                      
+                      <div className="post-actions">
+                           <span style={{fontWeight: 'bold', color: '#8B0000'}}>{post.type}</span>
+                           
+                           {/* LOGIC: Hide buttons if owner, show badge instead */}
+                           {isOwner ? (
+                               <span className="owner-badge">Your Item</span>
+                           ) : (
+                               <>
+                                   {post.listing_type === 'sell' && (
+                                       <button className="action-btn buy-btn" onClick={(e) => { e.stopPropagation(); handleAddToCart(post); }}>
+                                          <i className="fa-solid fa-cart-plus"></i>
+                                       </button>
+                                   )}
+                                   <button className="action-btn chat-card-btn" onClick={(e) => { e.stopPropagation(); navigate("/chat"); }}>
+                                        <i className="fa-solid fa-comment-dots"></i>
+                                   </button>
+                               </>
+                           )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </main>
       </div>
 
-      {/* Floating Action Button for Mobile */}
       <button className="fab-post mobile-only" onClick={() => setIsPostModalOpen(true)}>
         <i className="fa-solid fa-plus"></i>
       </button>
@@ -443,11 +425,13 @@ export default function HomePage() {
                   <h2>{selectedPost.name}</h2>
                 </div>
 
-                <div className="seller-card">
-                  <img src={selectedPost.profile} alt="Seller" />
+                <div className="seller-card" onClick={(e) => goToSellerProfile(e, selectedPost.seller_id)} style={{cursor: 'pointer'}}>
+                  <img src={selectedPost.profile} alt="Seller" onError={(e) => e.target.src='/images/default-profile.jpg'} />
                   <div>
                     <p className="seller-label">Listed by</p>
-                    <p className="seller-name">{selectedPost.poster}</p>
+                    <p className="seller-name">
+                        {selectedPost.seller_id === currentUserId ? "You" : selectedPost.poster}
+                    </p>
                   </div>
                 </div>
 
@@ -472,19 +456,27 @@ export default function HomePage() {
                 </div>
 
                 <div className="modal-footer-actions">
-                  {selectedPost.type.startsWith("₱") ? (
-                    <button className="primary-action-btn" onClick={() => handleActionClick(selectedPost, "Buy")}>
-                      Buy Now
-                    </button>
+                  {/* LOGIC: Hide Action Buttons in Modal if Owner */}
+                  {selectedPost.seller_id === currentUserId ? (
+                      <button className="secondary-action-btn" style={{width: '100%', cursor: 'default', background: '#f0f0f0', border: 'none'}}>
+                        This is your item
+                      </button>
                   ) : (
-                    <button className="primary-action-btn" onClick={() => handleActionClick(selectedPost, selectedPost.listing_type === 'rent' ? "Rent" : "Swap")}>
-                      Request {selectedPost.listing_type === 'rent' ? "Rent" : "Swap"}
-                    </button>
+                      <>
+                        {selectedPost.listing_type === 'sell' ? (
+                            <button className="primary-action-btn" onClick={() => handleActionClick(selectedPost, "Buy")}>
+                            Buy Now
+                            </button>
+                        ) : (
+                            <button className="primary-action-btn" onClick={() => handleActionClick(selectedPost, selectedPost.listing_type === 'rent' ? "Rent" : "Swap")}>
+                            Request {selectedPost.listing_type === 'rent' ? "Rent" : "Swap"}
+                            </button>
+                        )}
+                        <button className="secondary-action-btn" onClick={() => navigate("/chat")}>
+                            <i className="fa-solid fa-comment-dots"></i> Message Seller
+                        </button>
+                      </>
                   )}
-                  {/* NEW: Chat Seller Button in Modal */}
-                  <button className="secondary-action-btn" onClick={() => navigate("/chat")}>
-                    <i className="fa-solid fa-comment-dots"></i> Message Seller
-                  </button>
                 </div>
               </div>
             </div>
@@ -496,7 +488,7 @@ export default function HomePage() {
         isOpen={isPostModalOpen}
         onClose={() => {
           setIsPostModalOpen(false);
-          loadProducts();
+          loadProducts(); 
         }}
         activeFilter={filter}
       />
