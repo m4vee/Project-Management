@@ -12,14 +12,42 @@
   gap: 20px;
 }
 
-/* ===== Sidebar ===== */
+/* ===== HERO SECTION (Vibrant Theme) ===== */
+.hero-section {
+  background: linear-gradient(135deg, #8B0000 0%, #B22222 100%);
+  color: white;
+  padding: 40px 30px;
+  margin: 20px;
+  border-radius: 15px; /* Slightly less rounded */
+  box-shadow: 0 10px 25px rgba(139, 0, 0, 0.3); /* Stronger shadow */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hero-content h1 {
+  font-size: 2rem;
+  margin-bottom: 10px;
+  font-weight: 800; /* Extra bold */
+}
+
+.hero-content span {
+  color: #FFD700; /* Gold highlight */
+}
+
+.hero-content p {
+  font-size: 1rem;
+  opacity: 0.95;
+}
+
+/* ===== Sidebar Filters (Desktop) ===== */
 .sidebar {
   position: sticky;
   background: white;
   width: 250px;
   padding: 20px;
   border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.15); /* Stronger sidebar shadow */
   height: fit-content;
   top: 150px;
   justify-content: space-between;
@@ -28,6 +56,7 @@
 .sidebar h3 {
   margin-bottom: 15px;
   color: #800000;
+  font-size: 1.2rem;
 }
 
 .filter-section {
@@ -35,601 +64,516 @@
 }
 
 .filter-section label {
-  font-weight: bold;
+  font-weight: 600;
   display: block;
-  margin-bottom: 5px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #333;
 }
 
-.filter-section select,
-.filter-section input[type="range"] {
+.filter-section select {
   width: 100%;
-  padding: 6px;
+  padding: 8px;
   border-radius: 6px;
   border: 1px solid #ccc;
 }
 
-/* ===== Posts ===== */
-.posts-container {
-  flex: 1;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 20px;
-  margin-bottom: 0;
+/* Availability Checkboxes */
+.availability-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
-.post-card {
-  background: white;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  transition: transform 0.3s ease;
-}
-
-.post-card:hover {
-  transform: translateY(-5px);
-}
-
-.post-image {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-}
-
-.post-info {
-  padding: 15px;
-}
-
-.poster-info {
+.availability-checkbox {
   display: flex;
   align-items: center;
-  margin-bottom: 10px;
+  gap: 4px;
+  font-size: 0.9rem;
+  color: #555;
 }
 
-.poster-pic {
-  width: 35px;
-  height: 35px;
-  border-radius: 50%;
-  margin-right: 8px;
-}
-
-.poster-name {
-  font-weight: 600;
-}
-
-.post-actions {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 10px;
-  gap: 5px; 
-}
-
-.price-btn {
-  background: #800000;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 20px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-
-.addtocart-btn {
-  background: #eee;
-  color: rgb(0, 0, 0);
-  border: none;
-  padding: 10px 30px;
-  border-radius: 20px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.chat-btn {
-  background: #eee;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 20px;
-  cursor: pointer;
-}
-
-.chat-btn:hover {
-  background: #ddd;
-}
-
-/* ===== Service Navbar ===== */
+/* ===== Service Navbar (Filter Chips, Search & Sort) ===== */
 .service-navbar {
   display: flex;
-  justify-content: space-between; /* Default: buttons on left, post button on right */
+  justify-content: space-between; 
   align-items: center;
-  gap: 30px;
+  gap: 20px;
   padding: 12px 35px;
   border-radius: 12px;
-  box-shadow: 0 0 0 rgba(0,0,0,0.2);
-  margin: 0 20px 10px 290px;
+  margin: 0 20px 20px 20px; 
   position: sticky;
   top: 80px; 
   z-index: 10;
   transition: all 0.3s ease;
-}
-.service-navbar.centered-nav {
-  justify-content: center; /* Override to center the buttons */
+  background: white; 
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* Visible sticky header shadow */
 }
 
+.service-navbar.scrolled {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
 
-.service-navbar > div {
+.filter-tabs {
   display: flex;
-  gap: 30px;
+  gap: 15px;
+  overflow-x: auto; 
+  padding-bottom: 5px;
+  flex-shrink: 0;
 }
 
-.service-navbar > div {
-  display: flex;
-  gap: 30px; /* This keeps your original 30px gap */
+.service-btn {
+  background: #f5f5f5;
+  border: none;
+  padding: 8px 25px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #555;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.service-btn:hover,
+.service-btn.active {
+  background: #800000;
+  color: white;
 }
 
 .post-item-btn {
   background-color: #800000;
   color: white;
   border: none;
-  padding: 10px 15px;
-  border-radius: 20px; /* Matched your .service-btn style */
+  padding: 10px 20px;
+  border-radius: 25px;
   cursor: pointer;
   font-weight: bold;
-  font-size: 15px;
+  font-size: 14px;
   transition: background-color 0.3s ease;
-  white-space: nowrap; /* Prevents button from wrapping */
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .post-item-btn:hover {
   background-color: #600000;
 }
 
-.post-item-btn i {
-  margin-left: 8px;
-}
-.service-navbar.scrolled {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  background: #ffffff;
-}
-
-.service-btn {
-  background: #f5f5f5;
-  border: none;
-  padding: 10px 50px;
-  border-radius: 20px;
-  cursor: pointer;
-  font-weight: 600;
-  color: #333;
-  transition: all 0.3s ease;
-  font-size: 15px;
-}
-
-.service-btn:hover {
-  background: #800000;
-  color: white;
-}
-
-.service-btn.active {
-  background: #800000;
-  color: white;
-}
-
-/* MODAL STYLING */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.6);
+/* Search and Sort Group Styling */
+.search-sort-group {
   display: flex;
   align-items: center;
-  justify-content: center;
-  z-index: 999;
-}
-
-.modal-content {
-  background: #fff;
-  border-radius: 16px;
-  display: flex;
-  gap: 30px;
-  padding: 30px;
-  width: 70%;
-  max-width: 900px;
-  position: relative;
-  animation: fadeIn 0.3s ease;
-  align-items: flex-start;
-}
-
-.modal-image {
-  width: 300px;
-  height: 300px;
-  border-radius: 12px;
-  object-fit: cover;
-}
-
-.modal-details {
-  flex: 1;
-  font-family: "Poppins", sans-serif;
-  font-size: 18px;
-  line-height: 1.5; /* adds nice vertical spacing */
-  color: #333;
-}
-
-.modal-details h2 {
-  margin-bottom: 0px;
-  font-size: 25px;
-  color: #800000;
-  font-weight: 600;
-}
-
-.modal-details p {
-  margin: 5px 0; /* adds space top & bottom for each line */
-  font-weight: 200; /* ensures text is not bold */
-}
-
-.modal-details strong {
-  color: #800000;
-  font-weight: 500;
-}
-
-
-.modal-actions {
-  margin-top: 15px;
-  display: flex;
-  gap: 35px;
-}
-
-/* ===== Modal Buttons ===== */
-.modal-buttons {
-  display: flex;
   gap: 15px;
-  margin-top: 25px;
+  flex-shrink: 0;
 }
 
-.modal-price-btn {
-  background: #800000;
-  color: white;
-  border: none;
-  padding: 12px 25px;
-  border-radius: 30px;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: "Poppins", sans-serif;
-  transition: all 0.3s ease;
+.search-input-group {
+  position: relative;
 }
 
-.modal-price-btn:hover {
-  background: #a00000;
-  transform: translateY(-2px);
+.search-input {
+  padding: 8px 40px 8px 15px;
+  border-radius: 20px;
+  border: 1px solid #ddd;
+  width: 200px;
+  transition: width 0.3s;
 }
 
-.modal-chat-btn {
-  background: #f5f5f5;
-  color: #333;
-  border: 1px solid #ccc;
-  padding: 12px 25px;
-  border-radius: 30px;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: "Poppins", sans-serif;
-  transition: all 0.3s ease;
+.search-input:focus {
+  outline: none;
+  border-color: #8B0000;
+  box-shadow: 0 0 5px rgba(139, 0, 0, 0.2);
 }
 
-.modal-chat-btn:hover {
-  background: #eaeaea;
-  transform: translateY(-2px);
-}
-
-
-.close-btn {
+.search-icon {
   position: absolute;
-  top: -20px;
-  right: 10px;
-  font-size: 2.8rem;
-  background: none;
-  border: none;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #8B0000;
+  font-size: 1rem;
+}
+
+.sort-dropdown {
+  padding: 8px 15px;
+  border-radius: 20px;
+  border: 1px solid #ddd;
+  background: white;
+  color: #555;
+  font-size: 0.9rem;
   cursor: pointer;
-  color: #b00000;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+.my-posts-btn {
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  color: #555;
+  padding: 8px 15px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.2s;
+}
+
+.my-posts-btn:hover {
+  background: #eee;
 }
 
 
-/* ===== RESPONSIVE DESIGN ===== */
-@media (max-width: 760px) {
-  .homepage-container {
-    flex-direction:column;
-  }
+/* ===== POSTS GRID & CARDS (The Catchy Part) ===== */
+.posts-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
 
-  .service-navbar {
-    margin: 10px;
-    position:sticky;
+.posts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.post-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1); /* Default shadow */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.post-card:hover {
+  transform: translateY(-8px); /* Stronger lift */
+  box-shadow: 0 15px 40px rgba(0,0,0,0.2); /* Much stronger shadow on hover */
+}
+
+.card-image-container {
+  position: relative;
+  overflow: hidden;
+  height: 180px;
+}
+
+.card-image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.post-card:hover .card-image-container img {
+    transform: scale(1.05); /* Slight zoom on hover */
+}
+
+/* Listing Badges */
+.badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 4px 10px;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: white;
+  z-index: 5;
+}
+
+.badge.sell, .badge.rent {
+  background: #8B0000;
+}
+
+.badge.swap {
+  background: #007bff; 
+}
+
+/* Wishlist Button */
+.wishlist-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
     justify-content: center;
-    top: 110px;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    z-index: 5;
+}
 
-  }
+.wishlist-btn i {
+    color: #8B0000;
+    font-size: 1.2rem;
+    transition: color 0.2s;
+}
 
-  .sidebar {
-    display: none;
-  }
+.wishlist-btn.active i {
+    color: #FFD700; /* Gold when active */
+    font-size: 1.3rem;
+}
 
-  .filter-toggle-btn {
-    display: block;
-  }
+/* Post Info */
+.post-info {
+  padding: 15px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
 
-  .posts-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* smaller min width */
-    gap: 15px;
-    padding: 10px;
-  }
-/*
-  .post-card {
-    transform: scale(0.95);
-    transition: transform 0.2s ease;
-  }
+.poster-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
 
-  .post-card:hover {
-    transform: scale(1);
-  }
+.poster-meta img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #ddd;
+}
 
-  .post-card img {
-    height: 120px;
-    object-fit: cover;
-    border-radius: 10px;
-  }
+.poster-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #555;
+}
 
-  .post-card h3 {
+.post-info h4 {
+  font-size: 1.2rem; /* Slightly bigger title */
+  margin: 0 0 5px;
+  color: #333;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-weight: 700; 
+}
+
+.item-details-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.condition-tag {
+    background: #fbe6e6; /* Light red/maroon background */
+    color: #8B0000;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.category-tag {
+    background: #e0f7fa;
+    color: #007bff;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.post-date {
+  font-size: 0.8rem;
+  color: #999;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 5px;
+}
+
+.post-actions {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+  margin-top: auto; 
+  padding-top: 10px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.action-btn {
+    border: none;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-weight: 600;
     font-size: 0.9rem;
-  }
-
-  .post-card p {
-    font-size: 0.8rem;
-  }
-
-  .poster-info {
+    cursor: pointer;
     display: flex;
     align-items: center;
     gap: 6px;
-    margin-bottom: 8px;
-    flex-shrink: 0;
-  }
-*/
-/*
-  .poster-pic {
-    width: 32px;           /* responsive smaller size 
-    height: 32px;
-    border-radius: 50%;     /* perfectly circular 
-    object-fit: cover;      /* maintains aspect ratio
-    border: 1px solid #ddd; /* clean outline 
-    aspect-ratio: 1 / 1; 
-  }
-*/
-/*
-  .poster-name {
-    font-size: 0.85rem;
-    font-weight: 500;
+    transition: background 0.2s;
+}
+
+.action-btn.buy-btn {
+  background: #8B0000;
+  color: white;
+}
+
+.action-btn.buy-btn:hover {
+    background: #600000;
+}
+
+.action-btn.chat-card-btn {
+    background: #eee;
     color: #333;
-  }*/
+}
+
+.action-btn.chat-card-btn:hover {
+    background: #ddd;
 }
 
 
-@media (max-width: 600px) {
-  .modal-content {
-    width: 90%;
-    max-width: 375px; /* smaller, centered modal */
-    flex-direction: row; /* keep side-by-side design */
-    align-items: flex-start;
-    justify-content: center;
-    gap: 15px;
-    padding: 15px;
-    border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  }
-
-  .modal-image {
-    width: 45%;
-    height: auto;
-    border-radius: 10px;
-  }
-
-  .modal-details {
-    width: 55%;
-    text-align: left;
-    font-size: 0.9rem;
-  }
-
-  .modal-details h2 {
-    font-size: 1.2rem;
-    margin-bottom: 5px;
-  }
-
-  .modal-details p {
-    margin: 3px 0;
-    font-size: 12px;
-  }
-
-  .modal-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 10px;
-  }
-
-  .modal-actions .price-btn,
-  .modal-actions .chat-btn,
-  .modal-actions .add {
-    flex: 1;
-    font-size: 0.7rem;
-    padding: 6px 5px;
-  }
-
-  .close-btn {
-    top: -20px;
-    right: 5px;
-    font-size: 1.8rem;
-  }
-
-  .service-navbar {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-  }
-
-  .service-btn {
-    padding: 8px 25px;
-  }
-
- /* .posts-container {
-    grid-template-columns: 1fr;
-*/
+/* ERROR/NO PRODUCTS STATES */
+.loading-message, .error-message, .no-products {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px;
+  font-size: 1.2rem;
+  color: #666;
 }
 
-/* ===== FILTER TOGGLE (ADDED ONLY FOR MOBILE) ===== */
-.filter-toggle {
-  display: none;
-  background: #800000;
+.error-message i, .no-products i {
+  color: #8B0000;
+  margin-bottom: 15px;
+}
+
+/* SKELETON LOADER */
+.skeleton-card {
+  pointer-events: none;
+}
+
+.skeleton-image {
+  width: 100%;
+  height: 180px;
+  background: #eee;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.skeleton-text {
+  background: #eee;
+  height: 15px;
+  margin: 15px 15px 0;
+  border-radius: 4px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+/* FLOATING ACTION BUTTON (FAB) */
+.fab-post {
+  display: none; 
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #8B0000;
   color: white;
   border: none;
-  padding: 10px 15px;
-  border-radius: 25px;
-  font-weight: 600;
+  font-size: 24px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  z-index: 100;
   cursor: pointer;
-  font-family: 'Poppins';
-  margin: 5px auto;
-  transition: all 0.3s ease;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
 }
 
-.filter-toggle:hover {
-  background: #a00000;
-}
-
-@media (max-width: 760px) {
-  .close-filter-btn {
-    display: block !important;
-    position: absolute;
-    top: 12px;
-    right: 15px;
-    background: none;
-    border: none;
-    color: #800000;  /* deep maroon – visible on white */
-    font-size: 2rem;
-    cursor: pointer;
-    z-index: 3000;   /* higher than sidebar */
-    line-height: 1;
+/* MOBILE RESPONSIVENESS */
+@media (max-width: 960px) {
+  .search-sort-group {
+    display: none;
   }
-
-  .close-filter-btn:hover {
-    color: #ffffff;
-    background: none;
-  }
-}
-
-/* Show toggle and make sidebar slide in mobile */
-@media (max-width: 760px) {
-  .filter-toggle {
-    display: block;
-    position: fixed;
-    bottom: 10px;         /* adjust based on your navbar height */
-    right: 9px;        /* aligns to the left edge */
-    z-index: 1;     /* above other content */
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  
+  .homepage-container {
+    flex-direction: column;
+    padding: 0 15px 80px; 
   }
 
   .sidebar {
-    display: block;
     position: fixed;
-    top: 90px; /* adjust to appear below navbar */
+    top: 0;
     left: -100%;
-    width: 75%;
-    max-width: 320px;
-    height: 100%;
-    background: #fff;
-    border-radius: 0 16px 16px 0;
-    box-shadow: 3px 0 15px rgba(0,0,0,0.2);
-    padding: 20px;
-    z-index: 1000;
-    overflow-y: auto;
+    width: 80%;
+    height: 100vh;
+    z-index: 2000;
     transition: left 0.3s ease;
+    border-radius: 0;
+    box-shadow: 5px 0 15px rgba(0,0,0,0.1);
   }
 
   .sidebar.show {
     left: 0;
   }
 
-  .close-filter-btn {
-    display: block;
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    background: none;
-    border: none;
-    color: #800000;
-    font-size: 1.8rem;
-    cursor: pointer;
-    z-index: 2000;
+  .service-navbar {
+    margin: 0 15px 15px;
+    padding: 10px 15px;
+    overflow-x: auto;
+    justify-content: flex-start;
   }
 
-  .close-filter-btn:hover {
-    background: #a00000;
+  .post-item-btn.desktop-only {
+    display: none;
   }
 
-  .price-btn {
-  background: #800000;
-  color: white;
-  border: none;
-  padding: 7px 15px;
-  border-radius: 20px;
-  font-weight: bold;
-  cursor: pointer;
-  font-size: 12px;
-}
-
-.addtocart-btn {
-  background: #eee;
-  color: rgb(0, 0, 0);
-  border: none;
-  padding: 7px 15px;
-  border-radius: 20px;
-  font-weight: bold;
-  cursor: pointer;
-  font-size: 12px;
-}
-
-.chat-btn {
-  background: #eee;
-  border: none;
-  padding: 7px 10px;
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 12px;
-}
-}
-
-.close-filter-btn {
-  display: none;
-}
-
-/* ===== FIX: Desktop Posts Not Dependent on Sidebar Height ===== */
-@media (min-width: 761px) {
-  .homepage-container {
-    display: flex;
-    align-items: flex-start; /* stop stretching vertically */
-    gap: 20px;
+  .fab-post.mobile-only {
+    display: flex; 
   }
 
-  .sidebar {
-    flex: 0 0 250px;     /* fixed width */
-    height: auto;        /* natural height */
+  .hero-section {
+    padding: 30px 20px;
+    margin: 15px;
+    text-align: center;
   }
 
-  .posts-container {
-    flex: 1;             /* take up remaining width */
-    align-self: flex-start; /* ensure independent height */
-    margin-bottom: 0;
+  .hero-content h1 {
+    font-size: 1.5rem;
+  }
+
+  .posts-grid {
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 12px;
+  }
+
+  .post-image {
+    height: 140px;
+  }
+}
+
+@media (max-width: 480px) {
+  .posts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* MODAL ADJUSTMENTS FOR UX */
+@media (max-width: 768px) {
+  .product-modal-grid {
+    flex-direction: column;
+  }
+  .product-image-section {
+    height: 250px;
   }
 }

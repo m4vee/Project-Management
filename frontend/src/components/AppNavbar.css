@@ -24,6 +24,7 @@
   display: flex;
   align-items: center;
   gap: 20px;
+  cursor: pointer;
 }
 
 .app-logo img {
@@ -89,20 +90,107 @@
   color: #fff704;
 }
 
-/* Profile icon */
+/* Profile icon wrapper for Dropdown positioning */
+.profile-menu-container {
+  position: relative;
+  cursor: pointer;
+}
+
 .profile-icon img {
   width: 50px;
   height: 50px;
   border-radius: 50%;
   cursor: pointer;
   border: 2px solid #fff;
+  transition: border-color 0.3s ease;
+}
+
+.profile-icon img:hover {
+  border-color: #fff704;
 }
 
 .notification-container {
   position: relative;
 }
 
-/* ===== Responsive Design ===== */
+/* ===== DROPDOWN MENU STYLES (NEW) ===== */
+.dropdown-menu {
+  position: absolute;
+  top: 65px;
+  right: 0;
+  width: 220px;
+  background: rgba(30, 30, 30, 0.95); /* Dark Glassmorphism */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  animation: slideIn 0.2s ease-out forwards;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+}
+
+.dropdown-item {
+  padding: 15px 20px;
+  font-size: 0.95rem;
+  color: #e0e0e0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  transition: background 0.2s, color 0.2s;
+  text-decoration: none; /* Just in case it's a link */
+}
+
+.dropdown-item i {
+  font-size: 1.1rem;
+  width: 20px;
+  text-align: center;
+  color: #bbb;
+}
+
+.dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.dropdown-item:hover i {
+  color: #fff704; /* Yellow highlight on hover */
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 5px 0;
+}
+
+.dropdown-item.logout {
+  color: #ff6b6b; /* Reddish for logout */
+}
+
+.dropdown-item.logout:hover {
+  background: rgba(255, 107, 107, 0.15);
+  color: #ff4d4d;
+}
+
+.dropdown-item.logout i {
+  color: #ff6b6b;
+}
+
+/* Dropdown Animation */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* ===== Responsive Design ===== */
 @media (max-width: 960px) {
   .app-navbar {
@@ -134,7 +222,7 @@
     font-size: 0.95rem;
     color: #fff;
     text-align: left;
-    transition:none;
+    transition: none;
   }
 
   .search-bar input::placeholder {
@@ -147,6 +235,13 @@
     font-size: 1.2rem;
     margin-top: 5px;
   }
+  
+  /* Adjust dropdown position for mobile */
+  .dropdown-menu {
+    right: 50%;
+    transform: translateX(50%);
+    top: 55px;
+  }
 }
 
 /* ===== Smaller screens ===== */
@@ -157,12 +252,11 @@
   }
 
   .app-logo i {
-  font-size: 1rem; /* smaller icon */
-  margin-left: 5px;  /* a little space from text */
-  color: #fff;       /* ensure it matches your navbar */
-  vertical-align: middle;
-}
-
+    font-size: 1rem;
+    margin-left: 5px;
+    color: #fff;
+    vertical-align: middle;
+  }
 
   .app-logo h2 {
     font-size: 1.3rem;

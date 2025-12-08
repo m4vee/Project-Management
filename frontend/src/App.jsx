@@ -7,17 +7,16 @@ import {
 } from "react-router-dom";
 import "./index.css";
 
-// Components
 import Navbar from "./components/Navbar.jsx";
 import AppNavbar from "./components/AppNavbar.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
-// Pages
 import Home from "./components/pages/Home.jsx";
 import Services from "./components/pages/Services.jsx";
 import Login from "./components/pages/Login.jsx";
 import SignUp from "./components/pages/SignUp.jsx";
+import ForgotPassword from "./components/pages/ForgotPassword.jsx";
 
-// Pages (Inside App)
 import HomePage from "./components/pages/HomePage.jsx";
 import Profile from "./components/pages/Profile.jsx";
 import ProfileEdit from "./components/pages/ProfileEdit.jsx";
@@ -28,13 +27,11 @@ import RentalRequests from "./components/pages/RentalRequests";
 import SwapRequests from "./components/pages/SwapRequests";
 import ReviewsPage from "./components/pages/ReviewsPage.jsx";
 
-// E-Commerce and Chat
 import Cart from "./components/Cart.jsx";
 import Checkout from "./components/Checkout.jsx";
 import Receipt from "./components/pages/Receipt.jsx";
 import Chat from "./components/pages/Chat.jsx";
 
-// Context
 import { CartProvider } from "./context/CartContext.jsx";
 import { RentalRequestProvider } from "./components/pages/RentalRequestContext.jsx";
 import { SwapRequestProvider } from "./components/pages/SwapRequestContext";
@@ -43,23 +40,11 @@ function AppContent() {
   const location = useLocation();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // Check login state from localStorage
   useEffect(() => {
     const loggedIn = localStorage.getItem("isLoggedIn") === "true";
     setIsLoggedIn(loggedIn);
   }, []);
 
-  const hideNavbarRoutes = [
-    "/profile",
-    "/inside-app",
-    "/app-navbar",
-    "/account-settings",
-    "/feedback",
-    "/my-profile",
-    "/reviews",
-  ];
-
-  // ✅ Updated routes inside app layout
   const insideAppRoutes = [
     "/inside-app",
     "/profile",
@@ -83,39 +68,32 @@ function AppContent() {
 
   return (
     <>
-      {/* ✅ Navbar logic */}
-      {isLoggedIn && isInsideApp ? <AppNavbar /> : !isInsideApp && <Navbar />}
+      {isInsideApp ? <AppNavbar /> : <Navbar />}
 
-      {/* ✅ Routes */}
       <Routes>
-        {/* Public Pages */}
         <Route path="/" element={<Home />} />
         <Route path="/sign-up" element={<SignUp />} />
+        <Route path="/signup" element={<SignUp />} />
         <Route path="/services" element={<Services />} />
         <Route path="/login" element={<Login />} />
-        {/* Inside App Pages */}
-        <Route path="/inside-app" element={<HomePage />} />
-        <Route path="/profile" element={<Profile />} /> {/* Profile Page */}
-        <Route path="/my-profile" element={<MyProfile />} />{" "}
-        {/* My Profile Page */}
-        <Route path="/profile/edit" element={<ProfileEdit />} />{" "}
-        {/* Profile Edit Page */}
-        <Route path="/account-settings" element={<AccountSettings />} />{" "}
-        {/* Account Settings Page */}
-        <Route path="/feedback" element={<Feedback />} /> {/* Feedback Page */}
-        <Route path="/feedback" element={<Feedback />} /> {/* Feedback Page */}
-        <Route path="/rentalrequests" element={<RentalRequests />} />{" "}
-        {/* Rental Requests Page */}
-        <Route path="/swaprequests" element={<SwapRequests />} />{" "}
-        {/* Swap Requests Page */}
-        <Route path="/reviews" element={<ReviewsPage />} />
-        <Route path="/reviews/:sellerId" element={<ReviewsPage />} />
-        {/* E-Commerce Routes */}
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/checkout/:productId" element={<Checkout />} />
-        <Route path="/receipt/:transactionId" element={<Receipt />} />
-        {/* Chat Route */}
-        <Route path="/chat" element={<Chat />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+
+        <Route element={<ProtectedRoute />}>
+          <Route path="/inside-app" element={<HomePage />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/my-profile" element={<MyProfile />} />
+          <Route path="/profile/edit" element={<ProfileEdit />} />
+          <Route path="/account-settings" element={<AccountSettings />} />
+          <Route path="/feedback" element={<Feedback />} />
+          <Route path="/rentalrequests" element={<RentalRequests />} />
+          <Route path="/swaprequests" element={<SwapRequests />} />
+          <Route path="/reviews" element={<ReviewsPage />} />
+          <Route path="/reviews/:sellerId" element={<ReviewsPage />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout/:productId" element={<Checkout />} />
+          <Route path="/receipt/:transactionId" element={<Receipt />} />
+          <Route path="/chat" element={<Chat />} />
+        </Route>
       </Routes>
     </>
   );

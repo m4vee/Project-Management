@@ -1,16 +1,27 @@
-import React from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useCart } from "../context/CartContext.jsx"; // ✅ for cart context
-import Notification from "./Notification";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useCart } from "../context/CartContext.jsx";
 import "./AppNavbar.css";
 
 export default function AppNavbar() {
   const navigate = useNavigate();
-  const { cartItems } = useCart(); // ✅ real-time cart updates from context
+  const { cartItems } = useCart();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("username");
+    localStorage.removeItem("isLoggedIn");
+    window.dispatchEvent(new Event("storage"));
+    navigate("/login");
+  };
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
 
   return (
     <nav className="app-navbar">
-      {/* ===== Left Section ===== */}
       <div className="app-navbar-left">
         <div
           className="app-logo"
@@ -21,24 +32,9 @@ export default function AppNavbar() {
             TUPulse <i className="fab fa-typo3"></i>
           </h2>
         </div>
-
-        {/*<div className="search-bar">
-          <input type="text" placeholder="Search" />
-          <i className="fa-solid fa-magnifying-glass"></i>
-        </div>*/}
       </div>
 
-      {/* ===== Right Section ===== */}
       <div className="app-navbar-right">
-        {/* 💬 Chat Icon */}
-        {/*<i
-          className="fa-solid fa-comment"
-          onClick={() => navigate("/chat")}
-          title="Chat"
-          style={{ cursor: "pointer" }}
-        ></i>*/}
-
-        {/* 🛒 Cart Icon */}
         <div
           className="cart-icon-wrapper"
           style={{ position: "relative", cursor: "pointer" }}
@@ -52,11 +48,12 @@ export default function AppNavbar() {
                 position: "absolute",
                 top: "-6px",
                 right: "-8px",
-                background: "red",
+                background: "#00c3ff",
                 color: "white",
                 borderRadius: "50%",
                 padding: "2px 6px",
                 fontSize: "12px",
+                fontWeight: "bold"
               }}
             >
               {cartItems.length}
@@ -64,11 +61,25 @@ export default function AppNavbar() {
           )}
         </div>
 
-        {/* 👤 Profile */}
-        <div className="profile-icon">
-          <Link to="/profile">
+        <div className="profile-menu-container" style={{ position: "relative" }}>
+          <div className="profile-icon" onClick={toggleDropdown}>
             <img src="/images/no_profile.jpg" alt="User" />
-          </Link>
+          </div>
+
+          {isDropdownOpen && (
+            <div className="dropdown-menu">
+              <div className="dropdown-item" onClick={() => { navigate("/profile"); setIsDropdownOpen(false); }}>
+                <i className="fa-solid fa-user"></i> My Profile
+              </div>
+              <div className="dropdown-item" onClick={() => { navigate("/account-settings"); setIsDropdownOpen(false); }}>
+                <i className="fa-solid fa-gear"></i> Settings
+              </div>
+              <div className="dropdown-divider"></div>
+              <div className="dropdown-item logout" onClick={handleLogout}>
+                <i className="fa-solid fa-right-from-bracket"></i> Logout
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </nav>

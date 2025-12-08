@@ -1,42 +1,67 @@
-/* 🌆 Background setup */
+/* GLOBAL RESET */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* BACKGROUND SETUP */
 .signup-page {
-  height: 100vh;
+  min-height: 100vh;
+  width: 100%;
+  /* Mas maliwanag na background rendering */
   background: url('/images/login2.jpg') no-repeat center center/cover;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-family: 'Poppins', sans-serif;
+  position: relative;
+  padding: 20px;
 }
 
-/* Wrapper */
-.wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+/* OVERLAY - Pinalitan ko ng very light gradient para LUMITAW ang PULA */
+.signup-page::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
+  height: 100%;
+  /* Dati: 0.5 (Madilim). Ngayon: 0.1 nalang para vibrant pa rin */
+  background: rgba(0, 0, 0, 0.1); 
+  z-index: 0;
 }
 
-/* 💎 Glassmorphism sign-up box */
-.form-box-signup {
-  background: rgba(255, 255, 255, 0.15);
+/* GLASS CARD DESIGN */
+.signup-wrapper {
+  position: relative;
+  z-index: 1;
+  /* Mas malinaw na glass effect */
+  background: rgba(255, 255, 255, 0.1); 
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-radius: 20px;
-  padding: 40px 50px;
-  box-shadow: 0 32px 32px rgba(0, 0, 0, 0.37);
-  width: 350px;
+  /* White border para umangat sa red background */
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-top: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 24px;
+  padding: 40px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
   text-align: center;
   color: white;
 }
 
-/* Title */
-.form-box-signup h1 {
-  font-size: 2rem;
+/* TITLE */
+.signup-wrapper h1 {
+  font-size: 2.2rem;
   margin-bottom: 1.5rem;
-  color: #ffffff;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
-/* Input fields */
+/* INPUT GROUPS */
 .input-box {
   position: relative;
   margin: 20px 0;
@@ -44,124 +69,147 @@
 
 .input-box input {
   width: 100%;
-  padding: 12px 40px 12px 15px;
-  border: none;
-  border-radius: 25px;
-  outline: none;
-  background: rgba(255, 255, 255, 0.25);
+  padding: 14px 50px 14px 20px;
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
   color: #fff;
   font-size: 1rem;
+  outline: none;
+  transition: 0.3s;
 }
 
 .input-box input::placeholder {
-  color: #eee;
+  color: rgba(255, 255, 255, 0.7);
 }
 
-/* Icons */
+.input-box input:focus {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: #00c3ff;
+  box-shadow: 0 0 15px rgba(0, 195, 255, 0.2);
+}
+
+/* ICONS */
 .input-box i {
   position: absolute;
-  right: 15px;
+  right: 20px;
   top: 50%;
   transform: translateY(-50%);
-  color: #fff;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1.2rem;
 }
 
-/* Sign Up button */
-.signup-btn {
-  width: 100%;
-  padding: 12px;
-  border: none;
-  border-radius: 25px;
-  background: linear-gradient(135deg, #00c3ff, #0062ff);
-  color: white;
-  font-weight: bold;
-  font-size: 1rem;
+/* CLICKABLE ICONS (EYE) */
+.input-box i.fa-eye, .input-box i.fa-eye-slash {
   cursor: pointer;
-  transition: all 0.3s ease;
+  z-index: 10;
 }
 
-.signup-btn:hover {
-  background: linear-gradient(135deg, #0062ff, #00c3ff);
-}
-
-/* Login link */
-.login-link {
-  margin-top: 20px;
+/* ERROR & SUCCESS MESSAGES */
+.message {
+  padding: 12px;
+  border-radius: 10px;
   font-size: 0.9rem;
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.message.error {
+  background: rgba(220, 38, 38, 0.2);
+  border: 1px solid #ff5f5f;
+  color: #ffcccc;
+}
+
+.input-box input.input-error {
+  border-color: #ff4d4d;
+  box-shadow: 0 0 10px rgba(255, 77, 77, 0.3);
+  animation: shake 0.3s ease-in-out;
+}
+.message.success {
+  background: rgba(22, 163, 74, 0.2);
+  border: 1px solid #4ade80;
+  color: #dcfce7;
+}
+
+/* TERMS CHECKBOX */
+.terms-container {
+  display: flex;
+  align-items: center;
+  font-size: 0.85rem;
+  margin: 15px 0 20px;
   text-align: left;
 }
 
-.login-link a {
-  color: #00c3ff;
-  text-decoration: none;
+.terms-container input {
+  width: 16px;
+  height: 16px;
+  margin-right: 10px;
+  accent-color: #00c3ff;
+  cursor: pointer;
 }
 
-.login-link a:hover {
+/* MAIN BUTTON */
+.signup-btn {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #00c3ff, #007bff);
+  color: white;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+}
+
+.signup-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 123, 255, 0.4);
+}
+
+.signup-btn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* LOGIN LINK (UPDATED: MAY KULAY NA!) */
+.login-link {
+  margin-top: 25px;
+  font-size: 0.95rem;
+  color: #eee;
+}
+
+.login-link span {
+  color: #00c3ff; /* Bright Blue */
+  font-weight: 700;
+  cursor: pointer;
+  margin-left: 5px;
+  transition: 0.3s;
+}
+
+.login-link span:hover {
+  color: #69d9ff;
   text-decoration: underline;
+  text-shadow: 0 0 8px rgba(0, 195, 255, 0.6);
 }
 
-/* 🌈 Fade-in animation */
-.fade-in {
-  animation: fadeIn 0.4s ease-in forwards;
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
 }
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
+/* MOBILE RESPONSIVE */
+@media (max-width: 480px) {
+  .signup-wrapper {
+    padding: 30px 20px;
   }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-/* 📱 Responsive design */
-@media (max-width: 768px) {
-  .form-box-signup {
-    width: 90%;
-    padding: 30px 25px;
-  }
-
-  .form-box-signup h1 {
+  .signup-wrapper h1 {
     font-size: 1.8rem;
   }
-
   .input-box input {
-    font-size: 0.95rem;
-  }
-
-  .signup-btn {
-    padding: 10px;
-  }
-
-  .login-link {
-    text-align: center;
+    font-size: 16px; /* Prevents zoom on iOS */
   }
 }
-
-@media (max-width: 480px) {
-  .form-box-signup {
-    width: 85%;
-    padding: 25px 20px;
-  }
-
-  .form-box-signup h1 {
-    font-size: 1.6rem;
-  }
-}
-
-/* ✅ Apply glassmorphism to your existing wrapper */
-.signup-wrapper {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 20px;
-  padding: 40px 50px;
-  box-shadow: 0 32px 32px rgba(0, 0, 0, 0.37);
-  width: 350px;
-  text-align: center;
-  color: white;
-}
-

@@ -1,11 +1,32 @@
 const API_URL = "http://127.0.0.1:5000/api";
 
-// Users API
+export const initiateLogin = async (email, password) => {
+  const response = await fetch(`${API_URL}/users/login-initiate`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || "Login failed");
+  return data;
+};
+
+export const verifyLoginOtp = async (email, otp) => {
+  const response = await fetch(`${API_URL}/users/login-verify`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, otp }),
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || "Invalid OTP");
+  return data;
+};
+
 export const loginUser = async (email, password) => {
   const response = await fetch(`${API_URL}/users/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }), // ← Make sure it's sending BOTH
+    body: JSON.stringify({ email, password }),
   });
   if (!response.ok) {
     const error = await response.json();
@@ -14,7 +35,41 @@ export const loginUser = async (email, password) => {
   return response.json();
 };
 
-// Products API
+export const sendOTP = async (email, username) => {
+  const response = await fetch(`${API_URL}/users/send-otp`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, username }),
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || "Failed to send OTP");
+  return data;
+};
+
+export const verifyOTP = async (email, otp_code) => {
+  const response = await fetch(`${API_URL}/users/verify-otp`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, otp: otp_code }),
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || "Invalid OTP");
+  return data;
+};
+
+export const registerUser = async (userData) => {
+  const response = await fetch(`${API_URL}/users/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(userData),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.error || "Registration failed");
+  }
+  return data;
+};
+
 export const fetchProducts = async (filters = {}) => {
   const params = new URLSearchParams(filters);
   const response = await fetch(`${API_URL}/products?${params}`);
@@ -56,7 +111,63 @@ export const deleteProduct = async (productId) => {
   return response.json();
 };
 
-// Messages API
+export const addProductPhoto = async (productId, photoUrl) => {
+  const response = await fetch(`${API_URL}/products/${productId}/photos`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ photo_url: photoUrl }),
+  });
+  if (!response.ok) throw new Error("Failed to add photo");
+  return response.json();
+};
+
+export const saveProductAvailability = async (productId, availabilityList) => {
+  const response = await fetch(
+    `${API_URL}/products/${productId}/availability`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(availabilityList),
+    }
+  );
+
+  if (!response.ok) {
+    const errorBody = await response.json();
+    throw new Error(
+      errorBody.error ||
+        `Failed to save availability (Status: ${response.status})`
+    );
+  }
+  return response.json();
+};
+
+export const fetchProductDetails = async (productId) => {
+  try {
+    const response = await fetch(`${API_URL}/products/${productId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `API Error ${response.status}: ${
+          errorText || "Server returned an error."
+        }`
+      );
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error("Critical API Fetch Failure:", error.message);
+    throw new Error(
+      `Failed to load product details. Details: ${error.message}`
+    );
+  }
+};
+
 export const fetchUserThreads = async (userId) => {
   const response = await fetch(`${API_URL}/messages/threads/${userId}`);
   if (!response.ok) throw new Error("Failed to fetch threads");
@@ -79,7 +190,6 @@ export const sendMessage = async (messageData) => {
   return response.json();
 };
 
-// Rentals API
 export const createRentalRequest = async (rentalData) => {
   const response = await fetch(`${API_URL}/rentals/requests`, {
     method: "POST",
@@ -109,7 +219,6 @@ export const updateRentalStatus = async (requestId, status) => {
   return response.json();
 };
 
-// Swaps API
 export const createSwapRequest = async (swapData) => {
   const response = await fetch(`${API_URL}/swaps/requests`, {
     method: "POST",
@@ -136,107 +245,8 @@ export const updateSwapStatus = async (swapId, status) => {
   return response.json();
 };
 
-export const sendOTP = async (email) => {
-  const response = await fetch(`${API_URL}/users/send-otp`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email }),
-  });
-  if (!response.ok) throw new Error("Failed to send OTP");
-  return response.json();
-};
-
-export const verifyOTP = async (email, otp_code) => {
-  const response = await fetch(`${API_URL}/users/verify-otp`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, otp_code }),
-  });
-  if (!response.ok) throw new Error("Invalid OTP");
-  return response.json();
-};
-
-export const registerUser = async (userData) => {
-  const response = await fetch(`${API_URL}/users/register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(userData),
-  });
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error || "Registration failed");
-  }
-  return response.json();
-};
-
-export const addProductPhoto = async (productId, photoUrl) => {
-  const response = await fetch(`${API_URL}/products/${productId}/photos`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    //body: JSON.stringify({ product_id: productId, photo_url: photoUrl }),
-    body: JSON.stringify({ photo_url: photoUrl }),
-  });
-  if (!response.ok) throw new Error("Failed to add photo");
-  return response.json();
-};
-
-export const saveProductAvailability = async (productId, availabilityList) => {
-  const response = await fetch(
-    `${API_URL}/products/${productId}/availability`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      // CRITICAL: Send the list of days directly as the request body.
-      body: JSON.stringify(availabilityList),
-    }
-  );
-
-  if (!response.ok) {
-    // This will catch 400 or 500 errors from the server
-    const errorBody = await response.json();
-    throw new Error(
-      errorBody.error ||
-        `Failed to save availability (Status: ${response.status})`
-    );
-  }
-  return response.json();
-};
-
-export const fetchProductDetails = async (productId) => {
-  const API_URL = "http://127.0.0.1:5000/api/products"; // Confirm this base URL is correct
-
-  try {
-    const response = await fetch(`${API_URL}/${productId}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (!response.ok) {
-      // Try to read a specific error message from the backend response body
-      const errorText = await response.text();
-      // Throw a clear error message that the frontend can display
-      throw new Error(
-        `API Error ${response.status}: ${
-          errorText || "Server returned an error."
-        }`
-      );
-    }
-
-    return response.json();
-  } catch (error) {
-    // This catches network failures or the specific API error thrown above
-    console.error("Critical API Fetch Failure:", error.message);
-    throw new Error(
-      `Failed to load product details. Details: ${error.message}`
-    );
-  }
-};
-
 export const createTransaction = async (transactionPayload) => {
   const response = await fetch(`${API_URL}/transactions`, {
-    // <-- Updated URL
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -255,8 +265,6 @@ export const createTransaction = async (transactionPayload) => {
   return data;
 };
 
-// src/services/api.js
-
 export const fetchTransactionDetails = async (transactionId) => {
   const response = await fetch(`${API_URL}/transactions/${transactionId}`);
 
@@ -267,4 +275,27 @@ export const fetchTransactionDetails = async (transactionId) => {
   }
 
   return response.json();
+};
+
+// [NEW] Forgot Password APIs
+export const sendForgotPasswordOTP = async (email) => {
+  const response = await fetch(`${API_URL}/users/forgot-password-otp`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || "Failed to send code");
+  return data;
+};
+
+export const resetPasswordConfirm = async (email, otp, new_password) => {
+  const response = await fetch(`${API_URL}/users/reset-password-confirm`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, otp, new_password }),
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || "Failed to reset password");
+  return data;
 };
