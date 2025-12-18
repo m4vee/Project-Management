@@ -1,72 +1,107 @@
-video {
-    position: absolute;
-    object-fit: cover;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-}
-
 .hero-container {
-   /*background: url('images/bags.jpg') center center/cover no-repeat;*/
-    height: 100vh;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    box-shadow: inset 0 0 0 1000px rgba(0, 0, 0, 0.2);
-    object-fit: contain;
-    position: relative;
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  object-fit: contain;
+  background-color: rgba(0, 0, 0, 0.4);
 }
 
+video {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  left: 0;
+}
+
+/* DITO ANG PAGBABAGO SA TITLE */
 .hero-container > h1 {
-    color: #fff;
-    font-size: 80px;
-    margin-top: -100px;
-    padding: 120px;
+  color: #fff;
+  font-size: 80px;
+  text-align: center;
+  
+  /* Mas mataas na negative margin para umangat nang todo ang Title */
+  margin-top: -200px; 
+  
+  /* Malaking margin sa ilalim para 'iwanan' niya yung paragraph at buttons */
+  margin-bottom: 50px; 
+
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+  opacity: 0;
+  animation: fadeUp 1s ease-out forwards;
 }
 
 .hero-container > p {
-padding: 20px;
-margin-top: 8px;
-color: #ffffff;
-font-size: 32px;
-font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 
-'Lucida Sans', Arial, sans-serif;
+  margin-top: 0; /* Tinanggal ko na ang margin-top dito dahil yung H1 na ang magtutulak */
+  color: #fff;
+  font-size: 32px;
+  font-family: 'Poppins', sans-serif;
+  text-align: center;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+  opacity: 0;
+  animation: fadeUp 1s ease-out 0.5s forwards;
 }
 
 .hero-btns {
-    margin-top: 32px;
+  margin-top: 32px;
+  opacity: 0;
+  animation: fadeUp 1s ease-out 1s forwards;
 }
 
 .hero-btns .btn {
-    margin: 6px;
+  margin: 6px;
+  transition: all 0.3s ease;
+}
+
+.hero-btns .btn:hover {
+  transform: scale(1.05);
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media screen and (max-width: 960px) {
-    .hero-container > h1 {
-        font-size: 70px;
-        margin-top: -150px;
-    }
+  .hero-container > h1 {
+    font-size: 60px;
+    margin-top: -150px; /* Adjusted para sa tablet */
+    margin-bottom: 40px;
+  }
 }
 
-@media screen and (max-width: 760px) {
-    .hero-container > h1 {
-        text-align: center;
-        font-size: 50px;
-        margin-top: -100px;
-        margin-bottom: -50px;
-    }
+@media screen and (max-width: 768px) {
+  .hero-container > h1 {
+    font-size: 45px;
+    padding: 0 20px;
+    margin-top: -100px; 
+    margin-bottom: 30px;
+  }
 
-    .hero-container > p {
-        font-size: 30px;
-    }
+  .hero-container > p {
+    font-size: 24px;
+    padding: 0 20px;
+  }
 
-    .btn-mobile {
-        display: block;
-        text-decoration: none;
-    }
+  .btn-mobile {
+    display: block;
+    text-decoration: none;
+  }
 }
 
-
-
-
+/* Hide hero on auth pages (login / signup / forgot-password) */
+.auth-page .hero-container {
+  display: none !important;
+}

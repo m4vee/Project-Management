@@ -1,516 +1,402 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { fetchUserThreads, fetchThreadMessages, sendMessage } from "../../services/api";
 import "./Chat.css";
-import AppNavbar from "../AppNavbar";
 
-const CONTACTS = [
-  {
-    id: "m",
-    name: "Bini Mikha",
-    avatar: "/images/mikha.webp",
-    status: "online",
-  },
-  { id: "a", name: "Bini Aiah", avatar: "/images/aiah.webp", status: "online" },
-  {
-    id: "l",
-    name: "Bini Maloi",
-    avatar: "/images/maloi.webp",
-    status: "offline",
-  },
-  {
-    id: "c",
-    name: "Bini Colet",
-    avatar: "/images/colet.webp",
-    status: "online",
-  },
-  {
-    id: "j",
-    name: "Bini Jhoanna",
-    avatar: "/images/jhoanna.webp",
-    status: "online",
-  },
-  {
-    id: "g",
-    name: "Bini Gwen",
-    avatar: "/images/gwen.webp",
-    status: "offline",
-  },
-  {
-    id: "s",
-    name: "Bini Stacey",
-    avatar: "/images/stacey.webp",
-    status: "online",
-  },
-  {
-    id: "h",
-    name: "Bini Sheena",
-    avatar: "/images/sheena.webp",
-    status: "offline",
-  },
-];
+const BACKEND_URL = "http://127.0.0.1:5000";
 
-const PRODUCT_CATALOG = [
-  {
-    id: "p1",
-    title: "Laptop Bag",
-    price: 600,
-    img: "/images/bag.jpg",
-    type: "Sell",
-  },
-  {
-    id: "p2",
-    title: "Muji Notebook",
-    price: 100,
-    img: "/images/notebook.jpg",
-    type: "Sell",
-  },
-  {
-    id: "p3",
-    title: "Scientific Calculator",
-    price: 600,
-    img: "/images/calculator.jpg",
-    type: "Sell",
-  },
-  {
-    id: "p4",
-    title: "Pen Set",
-    price: 120,
-    img: "/images/pens.jpg",
-    type: "Sell",
-  },
-];
+export default function Chat() {
+    const navigate = useNavigate();
+    const location = useLocation();
+    const currentUserId = localStorage.getItem("user_id");
+    
+    const [threads, setThreads] = useState([]);
+    const [activeChat, setActiveChat] = useState(null);
+    const [messages, setMessages] = useState([]);
+    const [newMessage, setNewMessage] = useState("");
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [previewUrl, setPreviewUrl] = useState(null);
+    const [searchTerm, setSearchTerm] = useState(""); 
+    const [loading, setLoading] = useState(true);
+    const [isSending, setIsSending] = useState(false);
+    const [isSearching, setIsSearching] = useState(false); 
 
-const STORAGE_KEY = "tup_chats_v1";
+    const messagesEndRef = useRef(null);
+    const fileInputRef = useRef(null);
+    const searchTimeoutRef = useRef(null); 
 
-function timeNow() {
-  const d = new Date();
-  return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-}
+    const fetchThreadsSilently = async (query = "") => {
+        try {
+            const data = await fetchUserThreads(currentUserId, query); 
+            setThreads(data);
+        } catch (err) {
+            console.error("Error loading threads silently", err);
+        }
+    };
 
-export default function ChatPage() {
-  const [chats, setChats] = useState({});
-  // Start with no active conversation so user lands on a selection screen
-  const [activeContact, setActiveContact] = useState(null);
-  const [search, setSearch] = useState("");
-  const [composer, setComposer] = useState("");
-  const [showCatalog, setShowCatalog] = useState(false);
-  const [selectedCatalogContact, setSelectedCatalogContact] = useState(null);
-  const messagesEndRef = useRef(null);
+    const loadThreads = async (query = searchTerm, isInitialLoad = false) => {
+        try {
+            if (isInitialLoad || isSearching) setLoading(true); 
+            
+            const data = await fetchUserThreads(currentUserId, query); 
+            setThreads(data);
+        } catch (err) {
+            console.error("Error loading threads", err);
+        } finally {
+            setLoading(false);
+            setIsSearching(false);
+        }
+    };
 
-  useEffect(() => {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      try {
-        const parsed = JSON.parse(raw);
-        setChats(parsed);
-        // Do NOT auto-open a conversation: keep landing view and let user select
-        return;
-      } catch (e) {
-        console.error("Failed parse chat storage", e);
-      }
-    }
+    useEffect(() => {
+        if (!currentUserId) {
+            navigate("/login");
+            return;
+        }
 
-    const initial = {};
-    CONTACTS.forEach((c, idx) => {
-      initial[c.id] = {
-        unread: idx === 1 ? 2 : 0,
-        messages: [
-          {
-            id: `${c.id}-1`,
-            from: c.name,
-            text: `Hi, I'm ${c.name}. Ask me about ${
-              PRODUCT_CATALOG[idx % PRODUCT_CATALOG.length].title
-            }.`,
-            time: timeNow(),
-            meta: {
-              productId: PRODUCT_CATALOG[idx % PRODUCT_CATALOG.length].id,
-            },
-          },
-        ],
-      };
-    });
-    setChats(initial);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
-  }, []);
+        loadThreads(searchTerm, true);
+        
+        const params = new URLSearchParams(location.search);
+        const targetUserId = params.get('user');
+        
+        if (targetUserId) {
+            fetchUserThreads(currentUserId, targetUserId).then(allThreads => {
+                setThreads(allThreads);
+                const targetThread = allThreads.find(t => t.partner_id === parseInt(targetUserId));
+                
+                const placeholderThread = { 
+                    partner_id: parseInt(targetUserId), 
+                    partner_name: "New Chat User", 
+                    partner_image: null 
+                };
 
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(chats));
-    } catch (e) {
-      console.error("Failed saving chats", e);
-    }
-  }, [chats]);
+                handleSelectChat(targetThread || placeholderThread);
+            });
+            window.history.replaceState(null, '', '/chat');
+        }
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({
-      behavior: "smooth",
-      block: "end",
-    });
-  }, [activeContact, chats]);
+        const interval = setInterval(() => fetchThreadsSilently(searchTerm), 5000); 
+        return () => clearInterval(interval);
+    }, [currentUserId]); 
 
-  const contactObj = (id) => CONTACTS.find((c) => c.id === id) || {};
+    const handleSearchChange = (e) => {
+        const query = e.target.value;
+        setSearchTerm(query);
+        setIsSearching(true);
 
-  const sendMessage = (text, meta = null) => {
-    if (!text || !text.trim()) return;
-    setChats((prev) => {
-      const copy = { ...prev };
-      const chat = copy[activeContact] || { messages: [], unread: 0 };
-      const msg = {
-        id: `${activeContact}-${Date.now()}`,
-        from: "You",
-        text: text.trim(),
-        time: timeNow(),
-        meta,
-      };
-      chat.messages = [...chat.messages, msg];
-      chat.unread = 0;
-      copy[activeContact] = chat;
-      return copy;
-    });
-    setComposer("");
-    setTimeout(
-      () => simulateReply(activeContact, text),
-      800 + Math.random() * 1200
-    );
-  };
+        if (searchTimeoutRef.current) {
+            clearTimeout(searchTimeoutRef.current);
+        }
 
-  const simulateReply = (contactId, userText) => {
-    const contact = contactObj(contactId);
-    const replies = [
-      "Thanks — I'll check and get back to you.",
-      "Available. When do you want it?",
-      "Can we swap instead?",
-      "I'll reserve this for you.",
-      "Nice, how many do you need?",
-      "Confirming payment method.",
-    ];
-    const text = replies[Math.floor(Math.random() * replies.length)];
-    setChats((prev) => {
-      const copy = { ...prev };
-      const chat = copy[contactId] || { messages: [], unread: 0 };
-      const msg = {
-        id: `${contactId}-bot-${Date.now()}`,
-        from: contact.name,
-        text,
-        time: timeNow(),
-        meta: null,
-      };
-      chat.messages = [...chat.messages, msg];
-      if (activeContact !== contactId) chat.unread = (chat.unread || 0) + 1;
-      copy[contactId] = chat;
-      return copy;
-    });
-  };
+        searchTimeoutRef.current = setTimeout(() => {
+            loadThreads(query, false);
+        }, 300);
+    };
 
-  const sendProduct = (product) => {
-    const meta = { product };
-    const text = `${product.title} • ₱${product.price}`;
-    sendMessage(text, meta);
-    setShowCatalog(false);
-  };
+    const handleSelectChat = async (thread) => {
+        const partnerId = thread.partner_id;
+        
+        const existingThread = threads.find(t => t.partner_id === partnerId);
+        
+        setActiveChat({
+            ...thread,
+            partner_id: partnerId,
+            partner_name: existingThread?.partner_name || thread.partner_name, 
+            partner_image: existingThread?.partner_image || thread.partner_image
+        });
 
-  const openChat = (id) => {
-    setActiveContact(id);
-    setChats((prev) => {
-      const copy = { ...prev };
-      if (copy[id]) copy[id] = { ...copy[id], unread: 0 };
-      return copy;
-    });
-  };
+        setLoading(true);
+        await loadMessages(partnerId);
+        setLoading(false);
+    };
 
-  const deleteMessage = (msgId) => {
-    setChats((prev) => {
-      const copy = { ...prev };
-      const chat = copy[activeContact];
-      if (!chat) return prev;
-      copy[activeContact] = {
-        ...chat,
-        messages: chat.messages.filter((m) => m.id !== msgId),
-      };
-      return copy;
-    });
-  };
+    const loadMessages = async (partnerId) => {
+        try {
+            const msgs = await fetchThreadMessages(partnerId, currentUserId);
+            setMessages(msgs);
+            scrollToBottom();
+            fetchThreadsSilently();
+        } catch (err) {
+            console.error("Error loading messages", err);
+        }
+    };
 
-  const filteredContacts = CONTACTS.filter((c) =>
-    c.name.toLowerCase().includes(search.toLowerCase())
-  );
+    useEffect(() => {
+        let interval;
+        if (activeChat) {
+            interval = setInterval(() => {
+                fetchThreadMessages(activeChat.partner_id, currentUserId).then(msgs => {
+                    if(msgs.length !== messages.length) {
+                        setMessages(msgs);
+                        scrollToBottom();
+                    }
+                });
+            }, 3000);
+        }
+        return () => clearInterval(interval);
+    }, [activeChat, messages]);
 
-  const insertProductInComposer = (product) => {
-    setComposer(
-      (prev) => `${prev}${prev ? " " : ""}${product.title} ₱${product.price}`
-    );
-    setShowCatalog(false);
-  };
+    const handleSend = async (e) => {
+        e.preventDefault();
+        if ((!newMessage.trim() && !selectedFile) || isSending) return;
 
-  const handleExit = () => {
-    window.location.href = "/inside-app"; // ✅ Return to app homepage
-  };
+        setIsSending(true);
+        try {
+            const formData = new FormData();
+            formData.append("sender_id", currentUserId);
+            formData.append("receiver_id", activeChat.partner_id);
+            formData.append("message", newMessage.trim() || (selectedFile ? "Sent a file" : "")); 
 
-  return (
-    <>
-    <AppNavbar />
-    <div className="chat-root">
-      {/* LEFT SIDEBAR */}
-      <aside className="chat-sidebar">
-        <div className="sidebar-top">
-          <div className="sidebar-header">
-            <h3>Chats</h3>
-            <div className="sidebar-actions">
-              <button title="New message" className="icon-btn">
-                <i className="fa-solid fa-plus" aria-hidden="true"></i>
-              </button>
-            </div>
-          </div>
+            if (selectedFile) {
+                formData.append("image", selectedFile);
+            }
 
-          <div className="chat-search">
-            <input
-              placeholder="Search chats"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
-        </div>
+            const response = await sendMessage(formData);
+            
+            const newMsgObj = {
+                id: response.id, 
+                sender_id: parseInt(currentUserId),
+                message: newMessage,
+                image_url: response.image_url,
+                created_at: new Date().toISOString()
+            };
 
-        <div className="contact-list">
-          {filteredContacts.map((c) => {
-            const chat = chats[c.id] || { messages: [], unread: 0 };
-            const last = chat.messages[chat.messages.length - 1];
-            const preview = last
-              ? last.from === "You"
-                ? `You: ${last.text}`
-                : last.text
-              : "No messages";
-            return (
-              <div
-                key={c.id}
-                className={`contact-item ${
-                  activeContact === c.id ? "active" : ""
-                }`}
-                onClick={() => openChat(c.id)}
-                title={`${c.name} — ${preview}`}
-              >
-                <div className="contact-left">
-                  <img src={c.avatar} alt={c.name} className="contact-avatar" />
-                  <div className="contact-meta">
-                    <div className="contact-name">{c.name}</div>
-                    <div className="contact-preview">{preview}</div>
-                  </div>
+            setMessages(prev => [...prev, newMsgObj]);
+            setNewMessage("");
+            setSelectedFile(null);
+            setPreviewUrl(null);
+            scrollToBottom();
+            fetchThreadsSilently();
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setIsSending(false);
+        }
+    };
+
+    const handleViewProfile = (partnerId) => {
+        if (partnerId) {
+            navigate(`/user-profile/${partnerId}`);
+        }
+    };
+
+    const scrollToBottom = () => {
+        setTimeout(() => {
+            messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        }, 100);
+    };
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setSelectedFile(file);
+            setPreviewUrl(URL.createObjectURL(file));
+        }
+    };
+
+    const getProfileImg = (path) => {
+        if (!path) return "/images/default-profile.jpg";
+        return path.startsWith("http") ? path : `${BACKEND_URL}${path}`;
+    };
+
+
+    return (
+        <div className="chat-container fade-in">
+            
+            <div className={`chat-sidebar ${activeChat ? 'mobile-hidden' : ''}`}>
+                <div className="sidebar-header">
+                    <h2>Chats</h2>
+                    <div className="search-bar">
+                        <i className="fa-solid fa-magnifying-glass"></i>
+                        <input 
+                            type="text" 
+                            placeholder="Search users..." 
+                            value={searchTerm}
+                            onChange={handleSearchChange}
+                        />
+                    </div>
+                    {isSearching && <div className="search-status">Searching...</div>}
                 </div>
-                <div className="contact-right">
-                  {chat.unread > 0 && (
-                    <div className="unread-dot">{chat.unread}</div>
-                  )}
-                  <div className={`status ${c.status}`}></div>
+
+                <div className="threads-list">
+                    {loading ? (
+                        <div className="loading-chat">Loading chats...</div>
+                    ) : threads.length === 0 && !searchTerm ? (
+                        <div className="no-threads">No conversation history found. Search for a user above.</div>
+                    ) : threads.length === 0 && searchTerm ? (
+                        <div className="no-threads">No users match "{searchTerm}".</div>
+                    ) : (
+                        threads.map(thread => (
+                            <div 
+                                key={thread.partner_id} 
+                                className={`thread-item ${activeChat?.partner_id === thread.partner_id ? 'active' : ''} ${!thread.is_read && thread.last_sender_id !== parseInt(currentUserId) ? 'unread' : ''}`}
+                                onClick={() => handleSelectChat(thread)}
+                            >
+                                
+                                <div 
+                                    className="avatar-wrapper" 
+                                    onClick={(e) => { e.stopPropagation(); handleViewProfile(thread.partner_id); }}
+                                    style={{cursor: 'pointer'}} 
+                                >
+                                    <img src={getProfileImg(thread.partner_image)} alt={thread.partner_name} />
+                                    <span className="online-dot"></span>
+                                </div>
+                                <div className="thread-info">
+                                    <h4>{thread.partner_name}</h4>
+                                    <p className="last-msg">
+                                        {thread.last_message ? (
+                                            <>
+                                                {thread.last_sender_id === parseInt(currentUserId) ? "You: " : ""}
+                                                {thread.last_message.length > 30 ? thread.last_message.substring(0, 30) + "..." : thread.last_message}
+                                            </>
+                                        ) : thread.last_message === null && searchTerm ? (
+                                            "Click to start new chat" 
+                                        ) : (
+                                            "Sent a file" 
+                                        )}
+                                    </p>
+                                </div>
+                                {thread.last_message_time && (
+                                    <span className="msg-time">
+                                        {new Date(thread.last_message_time).toLocaleTimeString('en-US', {
+                                            hour: 'numeric',
+                                            minute: '2-digit',
+                                            hour12: true 
+                                        })}
+                                    </span>
+                                )}
+                            </div>
+                        ))
+                    )}
                 </div>
-              </div>
-            );
-          })}
-        </div>
-
-        <div className="sidebar-bottom">
-          <small className="muted">TUPulse • Student Marketplace</small>
-        </div>
-      </aside>
-
-      {/* MAIN CHAT PANEL: show landing when no convo selected */}
-      <main className="chat-main">
-        {!activeContact ? (
-          <div className="chat-landing">
-            <div className="landing-box">
-              <h2>Welcome to Chats</h2>
-              <p>Select a conversation from the left to start chatting.</p>
-              <p className="muted">Use the ✚ button to start a new message.</p>
-            </div>
-          </div>
-        ) : (
-          <>
-            <div className="chat-topbar">
-              <div className="top-left">
-                <img
-                  src={contactObj(activeContact).avatar}
-                  alt=""
-                  className="top-avatar"
-                />
-                <div className="top-meta">
-                  <div className="top-name">
-                    {contactObj(activeContact).name}
-                  </div>
-                  <div className="top-status">
-                    {contactObj(activeContact).status === "online"
-                      ? "Active now"
-                      : "Offline"}
-                  </div>
-                </div>
-              </div>
-
-              <div className="top-actions">
-                <button className="icon-btn small" title="Call">
-                  <i className="fa-solid fa-phone" aria-hidden="true"></i>
-                </button>
-                <button className="icon-btn small" title="Video">
-                  <i className="fa-solid fa-video" aria-hidden="true"></i>
-                </button>
-                <button
-                  className="icon-btn small"
-                  onClick={() => {
-                    setShowCatalog((s) => !s);
-                    setSelectedCatalogContact(activeContact);
-                  }}
-                  title="Products"
-                >
-                  <i className="fa-solid fa-box-open" aria-hidden="true"></i>
-                </button>
-
-                {/* Exit Button */}
-                <button
-                  className="icon-btn small exit-btn"
-                  onClick={handleExit}
-                  title="Exit Chat"
-                >
-                  <i
-                    className="fa-solid fa-arrow-right-from-bracket"
-                    aria-hidden="true"
-                  ></i>
-                </button>
-              </div>
             </div>
 
-            {/* Rest of chat remains unchanged */}
-            <div className="chat-body-area">
-              <div className="chat-wallpaper" />
-              <div className="messages-column">
-                {(!chats[activeContact] ||
-                  chats[activeContact].messages.length === 0) && (
-                  <div className="empty-chat">
-                    No messages yet. Say hello 👋
-                  </div>
+            <div className={`chat-main ${!activeChat ? 'mobile-hidden' : ''}`}>
+                
+                {activeChat ? (
+                    <>
+                        <div className="chat-header">
+                            <button className="back-btn mobile-only" onClick={() => setActiveChat(null)}>
+                                <i className="fa-solid fa-arrow-left"></i>
+                            </button>
+                            
+                            {/* 2. Chat Header Partner Info: Ginawa mo na ito sa parent div */}
+                            <div className="chat-partner-info" onClick={() => handleViewProfile(activeChat.partner_id)} style={{cursor: 'pointer'}}>
+                                <img src={getProfileImg(activeChat.partner_image)} alt="User" />
+                                <div>
+                                    <h3>{activeChat.partner_name}</h3>
+                                    <span className="status-text">View Profile</span> 
+                                </div>
+                            </div>
+                            
+                            <button className="info-btn" onClick={() => handleViewProfile(activeChat.partner_id)}>
+                                <i className="fa-solid fa-circle-info"></i>
+                            </button>
+                        </div>
+
+                        <div className="messages-area">
+                            {loading ? (
+                                <div className="loading-chat"><div className="spinner"></div></div>
+                            ) : messages.length === 0 ? (
+                                <div className="empty-chat-state">
+                                    <img src={getProfileImg(activeChat.partner_image)} className="big-avatar" alt="" />
+                                    <h3>{activeChat.partner_name}</h3>
+                                    <p>You are now connected on TUPulse.</p>
+                                    <p>Say hello! 👋</p>
+                                </div>
+                            ) : (
+                                messages.map((msg, index) => {
+                                    const isMe = msg.sender_id === parseInt(currentUserId);
+                                    return (
+                                        <div key={index} className={`message-row ${isMe ? 'me' : 'them'}`}>
+                                            
+                                            {!isMe && <img 
+                                                src={getProfileImg(msg.sender_image || activeChat.partner_image)} 
+                                                className="msg-avatar" 
+                                                alt="" 
+                                                onClick={() => handleViewProfile(msg.sender_id)} 
+                                                style={{cursor: 'pointer'}}
+                                            />}
+                                            
+                                            <div className="message-content">
+                                                {msg.image_url && (
+                                                    <img 
+                                                        src={msg.image_url.startsWith('http') ? msg.image_url : `${BACKEND_URL}${msg.image_url}`} 
+                                                        className="msg-attachment" 
+                                                        alt="Attachment" 
+                                                    />
+                                                )}
+                                                {msg.message && msg.message.trim() !== "Sent a file" && <div className="msg-bubble">{msg.message}</div>}
+                                                <span className="msg-timestamp">
+                                                    {new Date(msg.created_at).toLocaleTimeString('en-US', {
+                                                        hour: 'numeric',
+                                                        minute: '2-digit',
+                                                        hour12: true 
+                                                    })}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    );
+                                })
+                            )}
+                            <div ref={messagesEndRef} />
+                        </div>
+
+                        <form className="chat-input-area" onSubmit={handleSend}>
+                            
+                            {previewUrl && (
+                                <div className="image-preview-container">
+                                    <img src={previewUrl} alt="Preview" />
+                                    <button type="button" onClick={() => { setPreviewUrl(null); setSelectedFile(null); }}>
+                                        <i className="fa-solid fa-xmark"></i>
+                                    </button>
+                                </div>
+                            )}
+
+                            <div className="input-wrapper">
+                                <button type="button" className="attach-btn" onClick={() => fileInputRef.current.click()}>
+                                    <i className="fa-solid fa-image"></i>
+                                </button>
+                                <input 
+                                    type="file" 
+                                    ref={fileInputRef} 
+                                    hidden 
+                                    accept="image/*" 
+                                    onChange={handleFileChange}
+                                />
+                                
+                                <input 
+                                    type="text" 
+                                    placeholder="Type a message..." 
+                                    value={newMessage}
+                                    onChange={(e) => setNewMessage(e.target.value)}
+                                    onKeyDown={(e) => { 
+                                        if (e.key === 'Enter' && !e.shiftKey) {
+                                            e.preventDefault(); 
+                                            handleSend(e); 
+                                        }
+                                    }}
+                                />
+                                
+                                <button 
+                                    type="button" 
+                                    className="send-btn" 
+                                    onClick={handleSend} 
+                                    disabled={isSending || (!newMessage.trim() && !selectedFile)}
+                                >
+                                    <i className="fa-solid fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </>
+                ) : (
+                    <div className="no-chat-selected">
+                        <i className="fa-regular fa-comments"></i>
+                        <h2>Select a conversation</h2>
+                        <p>Choose a user from the left sidebar to start chatting.</p>
+                    </div>
                 )}
-
-                {(chats[activeContact]?.messages || []).map((m) => (
-                  <div
-                    key={m.id}
-                    className={`message-row ${
-                      m.from === "You" ? "sent" : "recv"
-                    }`}
-                  >
-                    <div className="message-bubble">
-                      <div className="message-text">{m.text}</div>
-                      {m.meta?.product && (
-                        <div className="message-product">
-                          <img
-                            src={m.meta.product.img}
-                            alt={m.meta.product.title}
-                          />
-                          <div>
-                            <div className="prod-title">
-                              {m.meta.product.title}
-                            </div>
-                            <div className="prod-price">
-                              ₱{m.meta.product.price}
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                      <div className="message-footer">
-                        <span className="time">{m.time}</span>
-                        {m.from === "You" && (
-                          <button
-                            className="msg-del"
-                            onClick={() => deleteMessage(m.id)}
-                            title="Delete message"
-                          >
-                            <i
-                              className="fa-solid fa-xmark"
-                              aria-hidden="true"
-                            ></i>
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-                <div ref={messagesEndRef} />
-              </div>
             </div>
-
-            <div className="chat-composer">
-              <div className="composer-left">
-                <button className="icon-btn" title="Emoji">
-                  <i className="fa-solid fa-smile" aria-hidden="true"></i>
-                </button>
-                <button
-                  className="icon-btn"
-                  onClick={() => {
-                    setShowCatalog((s) => !s);
-                    setSelectedCatalogContact(activeContact);
-                  }}
-                  title="Quick products"
-                >
-                  <i
-                    className="fa-solid fa-shopping-cart"
-                    aria-hidden="true"
-                  ></i>
-                </button>
-              </div>
-
-              <input
-                className="composer-input"
-                placeholder={`Message ${contactObj(activeContact).name}...`}
-                value={composer}
-                onChange={(e) => setComposer(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    sendMessage(composer);
-                  }
-                }}
-              />
-
-              <div className="composer-right">
-                <button
-                  className="send-btn"
-                  onClick={() => sendMessage(composer)}
-                  disabled={!composer.trim()}
-                >
-                  Send
-                </button>
-              </div>
-            </div>
-
-            {showCatalog && selectedCatalogContact === activeContact && (
-              <div className="product-panel">
-                <div className="product-panel-header">
-                  <strong>Products</strong>
-                  <button
-                    className="icon-btn"
-                    onClick={() => setShowCatalog(false)}
-                    title="Close"
-                  >
-                    <i className="fa-solid fa-xmark" aria-hidden="true"></i>
-                  </button>
-                </div>
-                <div className="product-list">
-                  {PRODUCT_CATALOG.map((p) => (
-                    <div key={p.id} className="product-card">
-                      <img src={p.img} alt={p.title} />
-                      <div className="product-info">
-                        <div className="product-title">{p.title}</div>
-                        <div className="product-price">₱{p.price}</div>
-                        <div className="product-actions">
-                          <button onClick={() => insertProductInComposer(p)}>
-                            Insert
-                          </button>
-                          <button onClick={() => sendProduct(p)}>Send</button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </>
-        )}
-      </main>
-    </div>
-    </>
-  );
+        </div>
+    );
 }

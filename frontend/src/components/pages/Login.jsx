@@ -1,13 +1,12 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { initiateLogin, verifyLoginOtp } from "../../services/api"; 
 import "./Login.css";
 
 const Login = () => {
   const navigate = useNavigate();
 
-  // STATES
-  const [step, setStep] = useState(1); // 1: Credentials, 2: OTP
+  const [step, setStep] = useState(1); 
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -21,7 +20,22 @@ const Login = () => {
     setError(""); 
   };
 
-  // STEP 1: VALIDATE PASSWORD & SEND OTP
+  // Persist or remove remembered email based on the checkbox state.
+  // Usage: call handleRememberMeChange(checked, optionalEmail)
+  const handleRememberMeChange = (checked, email = formData.email) => {
+    try {
+      if (checked && email) {
+        localStorage.setItem("remembered_email", email);
+        localStorage.setItem("remember_me", "true");
+      } else {
+        localStorage.removeItem("remembered_email");
+        localStorage.removeItem("remember_me");
+      }
+    } catch (err) {
+      console.warn("Remember Me error:", err);
+    }
+  };
+
   const handleCredentialsSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -37,7 +51,6 @@ const Login = () => {
     }
   };
 
-  // STEP 2: VERIFY OTP
   const handleOtpSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -46,19 +59,24 @@ const Login = () => {
     try {
       const userData = await verifyLoginOtp(formData.email, formData.otp);
       
-      // Save Token & User Info to LocalStorage
       localStorage.setItem("token", userData.token); 
       localStorage.setItem("username", userData.username);
       
-      // ✅ FIX: Save user_id so posting works!
       if (userData.user_id) {
           localStorage.setItem("user_id", userData.user_id);
       }
       
       localStorage.setItem("isLoggedIn", "true");
-      window.dispatchEvent(new Event("storage"));
       
-      navigate("/inside-app"); 
+      // Notify other components (like CartContext) that login occurred
+      window.dispatchEvent(new Event("storage"));
+      window.dispatchEvent(new Event("local-storage-update"));
+      
+      navigate("/inside-app");
+      
+      // Optional: Reload to ensure all contexts re-fetch data fresh from DB
+      // window.location.reload(); 
+      
     } catch (err) {
       setError(err.message || "Invalid OTP code.");
     } finally {
@@ -71,7 +89,6 @@ const Login = () => {
       <div className="login-wrapper">
         <div className="form-box-login">
           
-          {/* --- STEP 1 FORM --- */}
           {step === 1 && (
             <form onSubmit={handleCredentialsSubmit} className="fade-in">
               <h1>Login</h1>
@@ -87,6 +104,10 @@ const Login = () => {
                   onChange={handleInputChange}
                   disabled={loading}
                   required
+                  autoComplete="email"
+                  autoCorrect="off"
+                  spellCheck="false"
+                  autoCapitalize="none"
                 />
                 <i className="fa-solid fa-envelope"></i>
               </div>
@@ -100,6 +121,10 @@ const Login = () => {
                   onChange={handleInputChange}
                   disabled={loading}
                   required
+                  autoComplete="current-password"
+                  autoCorrect="off"
+                  spellCheck="false"
+                  autoCapitalize="none"
                 />
                 <i className="fa-solid fa-lock"></i>
               </div>
@@ -108,7 +133,13 @@ const Login = () => {
                  <label className="remember-me">
                    <input type="checkbox" /> Remember Me
                  </label>
-                 <span className="forgot-password">Forgot Password?</span>
+                 <span 
+                   className="forgot-password" 
+                   onClick={() => navigate("/forgot-password")} 
+                   style={{ cursor: "pointer" }} 
+                 >
+                   Forgot Password?
+                 </span>
               </div>
 
               <button type="submit" className="login-btn" disabled={loading}>
@@ -123,7 +154,6 @@ const Login = () => {
             </form>
           )}
 
-          {/* --- STEP 2 FORM: OTP --- */}
           {step === 2 && (
             <form onSubmit={handleOtpSubmit} className="fade-in">
               <h1>Verification</h1>

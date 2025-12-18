@@ -167,6 +167,9 @@ export default function SignUp() {
                   onChange={handleInputChange}
                   required
                   autoComplete="name"
+                  autoCorrect="off"
+                  spellCheck="false"
+                  autoCapitalize="none"
                 />
                 <i className="fa-solid fa-user"></i>
               </div>
@@ -180,6 +183,9 @@ export default function SignUp() {
                   onChange={handleInputChange}
                   required
                   autoComplete="email"
+                  autoCorrect="off"
+                  spellCheck="false"
+                  autoCapitalize="none"
                 />
                 <i className="fa-solid fa-envelope"></i>
               </div>
@@ -234,6 +240,10 @@ export default function SignUp() {
                   value={formData.password}
                   onChange={handleInputChange}
                   required
+                  autoComplete="new-password"
+                  autoCorrect="off"
+                  spellCheck="false"
+                  autoCapitalize="none"
                 />
                 <i 
                   className={`fa-solid ${showPassword ? "fa-eye-slash" : "fa-eye"}`}
@@ -267,6 +277,10 @@ export default function SignUp() {
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
                   required
+                  autoComplete="new-password"
+                  autoCorrect="off"
+                  spellCheck="false"
+                  autoCapitalize="none"
                 />
                 <i 
                   className={`fa-solid ${showConfirmPassword ? "fa-eye-slash" : "fa-eye"}`}

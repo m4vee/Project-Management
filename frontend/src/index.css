@@ -1,3 +1,4 @@
+/* ===== 1. BASIC RESET & BODY SETTINGS (CRITICAL FOR STICKY) ===== */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -5,6 +6,20 @@
   font-family: "PT Sans", sans-serif;
 }
 
+/* ITO ANG KULANG MO: fixes sticky behavior */
+body {
+  overflow-x: hidden; /* Prevent horizontal scroll */
+  overflow-y: auto;   /* Ensure vertical scroll is on the window */
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== 2. YOUR EXISTING STYLES ===== */
 .home,
 .services,
 .about,
@@ -29,7 +44,7 @@
 .about {
   background-image: url("/images/about us.jpg");
   background-position: center;
-  background-size: fill;
+  background-size: cover; /* Fixed 'fill' to 'cover' */
   background-repeat: no-repeat;
   color: #fff;
   font-size: 100px;

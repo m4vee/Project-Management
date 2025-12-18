@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from "react";
-// Import createProduct from api service
 import { createProduct } from "../../services/api"; 
 import "./PostItemModal.css";
 
 const PostItemModal = ({ isOpen, onClose, activeFilter }) => {
-  // Determine default listing type
   const defaultType = 
-    activeFilter === "buy/sell" ? "sell" :
     activeFilter === "rent" ? "rent" :
     activeFilter === "swap" ? "swap" : "sell";
 
@@ -25,7 +22,6 @@ const PostItemModal = ({ isOpen, onClose, activeFilter }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Sync listing type when modal opens
   useEffect(() => {
     if (isOpen) {
       setListingType(defaultType);
@@ -52,6 +48,7 @@ const PostItemModal = ({ isOpen, onClose, activeFilter }) => {
   const getTitle = () => {
     switch (listingType) {
       case "sell": return "Sell Your Item";
+      case "looking_for": return "Post a Request (Looking For)";
       case "rent": return "Rent Out Your Item";
       case "swap": return "Swap Your Item";
       default: return "Post Item";
@@ -83,7 +80,6 @@ const PostItemModal = ({ isOpen, onClose, activeFilter }) => {
         throw new Error("You must be logged in to post.");
       }
 
-      // Prepare FormData
       const formData = new FormData();
       formData.append("seller_id", userId);
       formData.append("name", itemName);
@@ -93,13 +89,15 @@ const PostItemModal = ({ isOpen, onClose, activeFilter }) => {
       formData.append("listing_type", listingType);
       formData.append("availability", availability.join(",")); 
 
-      // Handle Price logic
       if (listingType === "sell") {
         if (!price) throw new Error("Price is required for selling.");
         formData.append("price", price);
+      } else if (listingType === "looking_for") {
+        if (!price) throw new Error("Please enter your budget.");
+        formData.append("price", price); 
       } else if (listingType === "rent") {
         if (!price) throw new Error("Rental price is required.");
-        formData.append("price", price); // Backend maps to price/rental_price
+        formData.append("price", price); 
         formData.append("description", `${description} \n(Duration: ${rentDuration || "Not specified"})`); 
       } else if (listingType === "swap") {
         formData.append("price", 0);
@@ -108,15 +106,13 @@ const PostItemModal = ({ isOpen, onClose, activeFilter }) => {
 
       if (image) {
         formData.append("image", image);
-      } else {
-         // Optional: Throw error if image is mandatory
-         // throw new Error("Image is required.");
+      } else if (listingType === "sell") {
+         throw new Error("Image is required when selling an item.");
       }
 
-      // Use the API service function
       await createProduct(formData);
 
-      alert("Item posted successfully!");
+      alert("Post created successfully!");
       resetForm();
       onClose(); 
 
@@ -132,7 +128,7 @@ const PostItemModal = ({ isOpen, onClose, activeFilter }) => {
     if (listingType === "sell") {
       return (
         <div className="form-group">
-          <label htmlFor="price">Price (₱) *</label>
+          <label htmlFor="price">Selling Price (₱) *</label>
           <input
             type="number"
             id="price"
@@ -147,6 +143,24 @@ const PostItemModal = ({ isOpen, onClose, activeFilter }) => {
         </div>
       );
     }
+    if (listingType === "looking_for") {
+        return (
+          <div className="form-group">
+            <label htmlFor="price">My Budget (₱) *</label>
+            <input
+              type="number"
+              id="price"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              placeholder="e.g., 250"
+              min="0"
+              step="0.01"
+              required
+              disabled={loading}
+            />
+          </div>
+        );
+      }
     if (listingType === "rent") {
       return (
         <>
@@ -213,11 +227,26 @@ const PostItemModal = ({ isOpen, onClose, activeFilter }) => {
           </div>
         )}
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="modal-post-form">
           
-          {/* Image Upload Preview Section */}
+          <div className="form-group">
+            <label>Post Type</label>
+            <select 
+                value={listingType} 
+                onChange={(e) => setListingType(e.target.value)}
+                required
+                disabled={loading}
+                className="modal-select"
+            >
+                <option value="sell"> Selling </option>
+                <option value="looking_for">I am Looking/Buying For </option>
+                <option value="rent">For Rent </option>
+                <option value="swap">For Swap </option>
+            </select>
+          </div>
+
           <div className="form-group" style={{textAlign: 'center', marginBottom: '20px'}}>
-             <label htmlFor="imageUpload" style={{cursor: 'pointer'}}>
+             <label htmlFor="imageUpload" style={{cursor: 'pointer', display: 'block'}}>
                 {imagePreview ? (
                     <img 
                       src={imagePreview} 
@@ -236,7 +265,7 @@ const PostItemModal = ({ isOpen, onClose, activeFilter }) => {
                         gap: '10px'
                     }}>
                         <i className="fa-solid fa-cloud-arrow-up" style={{fontSize: '2rem'}}></i>
-                        <span>Click to Upload Image *</span>
+                        <span>{listingType === 'looking_for' ? "Upload Reference Photo (Optional)" : "Click to Upload Image *"}</span>
                     </div>
                 )}
              </label>
@@ -247,7 +276,7 @@ const PostItemModal = ({ isOpen, onClose, activeFilter }) => {
               onChange={handleImageChange}
               disabled={loading}
               style={{display: 'none'}} 
-              required={!image} // Make required only if no image selected yet
+              required={listingType !== 'looking_for' && !image} 
             />
           </div>
 
@@ -258,7 +287,7 @@ const PostItemModal = ({ isOpen, onClose, activeFilter }) => {
               id="itemName"
               value={itemName}
               onChange={(e) => setItemName(e.target.value)}
-              placeholder="e.g., iPhone 13 Pro Max"
+              placeholder={listingType === 'looking_for' ? "What are you looking for?" : "e.g., Books, Unifroms, Gadgets..."}
               required
               disabled={loading}
             />
@@ -270,7 +299,7 @@ const PostItemModal = ({ isOpen, onClose, activeFilter }) => {
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Describe your item..."
+              placeholder={listingType === 'looking_for' ? "Describe the item you need (size, color, etc.)..." : "Describe your item..."}
               rows="4"
               required
               disabled={loading}
@@ -286,12 +315,13 @@ const PostItemModal = ({ isOpen, onClose, activeFilter }) => {
                 onChange={(e) => setCategory(e.target.value)}
                 required
                 disabled={loading}
+                className="modal-select"
               >
                 <option value="">Select a category</option>
                 <option value="Electronics">Electronics</option>
                 <option value="Books">Books</option>
                 <option value="Clothing">Clothing/Uniform</option>
-                <option value="Furniture">Furniture</option>
+                <option value="School_Supplies">School Supplies</option>
                 <option value="Sports">Sports & Outdoors</option>
                 <option value="Gadgets">Gadgets</option>
                 <option value="Others">Others</option>
@@ -306,12 +336,14 @@ const PostItemModal = ({ isOpen, onClose, activeFilter }) => {
                 onChange={(e) => setCondition(e.target.value)}
                 required
                 disabled={loading}
+                className="modal-select"
               >
                 <option value="New">Brand New</option>
                 <option value="Like New">Like New</option>
                 <option value="Used">Used</option>
                 <option value="Fair">Fair</option>
                 <option value="Poor">Poor</option>
+                {listingType === 'looking_for' && <option value="Any">Any Condition</option>}
               </select>
             </div>
           </div>

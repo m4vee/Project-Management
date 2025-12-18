@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import "./CreatePostModal.css";
 
 export default function CreatePostModal({ onClose, onCreate }) {
@@ -13,6 +13,15 @@ export default function CreatePostModal({ onClose, onCreate }) {
   const [error, setError] = useState("");
 
   const fileRef = useRef(null);
+
+  useEffect(() => {
+    const handleKey = (e) => {
+      if (e.key === "Escape") onClose && onClose();
+    };
+
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [onClose]);
 
   function submit(e) {
   e.preventDefault();
@@ -54,12 +63,21 @@ export default function CreatePostModal({ onClose, onCreate }) {
   }
 
   return (
-    <div className="cp-backdrop" onClick={onClose}>
+    <div className="cp-backdrop" onClick={() => onClose && onClose()}>
       <form
         className="cp-modal-card"
         onClick={(e) => e.stopPropagation()}
         onSubmit={submit}
       >
+        <button
+          className="cp-close-btn"
+          type="button"
+          aria-label="Close"
+          title="Close"
+          onClick={() => onClose && onClose()}
+        >
+          <span aria-hidden>×</span>
+        </button>
         <h3 className="cp-title">Create New Post</h3>
 
         {error && <div className="cp-error">{error}</div>}
@@ -224,7 +242,7 @@ export default function CreatePostModal({ onClose, onCreate }) {
 
         {/* BUTTONS */}
         <div className="cp-actions">
-          <button type="button" className="cp-btn ghost" onClick={onClose}>
+          <button type="button" className="cp-btn ghost" onClick={() => onClose && onClose()}>
             Cancel
           </button>
           <button type="submit" className="cp-btn primary">

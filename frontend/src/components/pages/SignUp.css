@@ -67,27 +67,49 @@
   margin: 20px 0;
 }
 
-.input-box input {
+/* Make inputs pill-shaped and visually consistent with Login */
+.input-box input,
+.input-box input[type="text"],
+.input-box input[type="email"],
+.input-box input[type="password"] {
   width: 100%;
-  padding: 14px 50px 14px 20px;
-  border: 1.5px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.05);
-  color: #fff;
+  height: 50px;
+  background: transparent;
+  border: 1.5px solid rgba(255, 255, 255, 0.6);
+  border-radius: 100px;
+  padding: 0 45px 0 20px;
   font-size: 1rem;
+  color: #fff;
   outline: none;
-  transition: 0.3s;
+  transition: 0.3s ease;
 }
 
-.input-box input::placeholder {
-  color: rgba(255, 255, 255, 0.7);
+.input-box input::placeholder,
+.input-box input[type="text"]::placeholder,
+.input-box input[type="email"]::placeholder,
+.input-box input[type="password"]::placeholder {
+  color: rgba(255, 255, 255, 0.85);
 }
 
-.input-box input:focus {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: #00c3ff;
-  box-shadow: 0 0 15px rgba(0, 195, 255, 0.2);
+.input-box input:focus,
+.input-box input[type="text"]:focus,
+.input-box input[type="email"]:focus,
+.input-box input[type="password"]:focus {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #fff;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
 }
+
+/* Autofill normalization to keep colors consistent */
+.input-box input:-webkit-autofill,
+.input-box input:-webkit-autofill:focus,
+.input-box input:-webkit-autofill:hover {
+  -webkit-text-fill-color: #fff !important;
+  -webkit-box-shadow: 0 0 0px 1000px rgba(0,0,0,0.1) inset !important;
+  box-shadow: 0 0 0px 1000px rgba(0,0,0,0.1) inset !important;
+}
+
+
 
 /* ICONS */
 .input-box i {

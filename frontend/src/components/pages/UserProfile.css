@@ -1,0 +1,92 @@
+/* Add this block to your existing Profile.css file */
+
+/* ======================================================= */
+/* USER PROFILE VIEW SPECIFIC STYLES (for Message/Follow) */
+/* ======================================================= */
+
+.profile-page.user-view .profile-header-card {
+    position: relative;
+}
+
+.profile-page.user-view .profile-cover {
+    position: relative;
+}
+
+.profile-page.user-view .back-btn {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: rgba(0, 0, 0, 0.4);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    z-index: 10;
+    transition: background 0.2s;
+}
+
+.profile-page.user-view .back-btn:hover {
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.profile-actions-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px; /* Spacing below bio/stats */
+    width: 100%;
+}
+
+.btn-follow, .btn-message {
+    flex: 1;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* FOLLOW button (Primary Action) */
+.btn-follow {
+    background: var(--tup-red, #8B0000); /* Use your primary red */
+    color: white;
+    border: none;
+}
+
+.btn-follow:hover {
+    background: #6e0000;
+}
+
+/* FOLLOWING state (White/Outline) */
+.btn-follow.following {
+    background: white;
+    color: var(--text-dark, #333);
+    border: 1px solid var(--text-light, #ccc);
+}
+
+.btn-follow.following:hover {
+    background: var(--bg-gray, #f3f4f6);
+    color: var(--text-dark, #333);
+}
+
+/* MESSAGE button (Secondary Action) */
+.btn-message {
+    background: var(--bg-gray, #f3f4f6);
+    color: var(--text-dark, #333);
+    border: 1px solid var(--text-light, #ccc);
+}
+
+.btn-message:hover {
+    background: #e5e7eb;
+}
+
+/* Optional: Adjust stats spacing for user view */
+.profile-page.user-view .profile-stats {
+    margin-bottom: 15px;
+}

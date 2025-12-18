@@ -1,164 +1,156 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom"; // 👈 CRITICAL: Use useParams
-import { useCart } from "../../context/CartContext";
-import { fetchTransactionDetails } from "../../services/api"; // 👈 Must be imported
+import { useNavigate, useParams } from "react-router-dom";
+import { fetchTransactionDetails } from "../../services/api"; 
 import "./Receipt.css";
 
+const formatPrice = (amount) => {
+    return new Intl.NumberFormat('en-PH', {
+        style: 'currency',
+        currency: 'PHP',
+    }).format(amount);
+};
+
 export default function Receipt() {
-  const { clearCart } = useCart();
-  const navigate = useNavigate();
-  const { transactionId } = useParams(); // 🌟 Get the ID from the URL (e.g., '4')
+    const navigate = useNavigate();
+    const { transactionId } = useParams();
 
-  const [transactionData, setTransactionData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+    const [transactionData, setTransactionData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-  useEffect(() => {
-    if (transactionId) {
-      setLoading(true);
-      // Call the API function we added that hits the backend GET route
-      fetchTransactionDetails(transactionId)
-        .then((data) => {
-          setTransactionData(data);
-          setLoading(false);
-        })
-        .catch((err) => {
-          console.error("Error fetching transaction:", err);
-          setError("Failed to load order details. Check network.");
-          setLoading(false);
-        });
-    } else {
-      setError("No transaction ID provided in the URL.");
-      setLoading(false);
-    }
-  }, [transactionId]);
+    useEffect(() => {
+        if (transactionId) {
+            setLoading(true);
+            fetchTransactionDetails(transactionId)
+                .then((data) => {
+                    setTransactionData(data);
+                    setLoading(false);
+                })
+                .catch((err) => {
+                    console.error("Error fetching transaction:", err);
+                    setError("Failed to load receipt details.");
+                    setLoading(false);
+                });
+        } else {
+            setError("No transaction ID provided.");
+            setLoading(false);
+        }
+    }, [transactionId]);
 
-  // --- Handle Loading, Error, and Missing Data States ---
-  if (loading) {
-    return <div className="receipt-container loading">Loading receipt...</div>;
-  }
+    if (loading) return <div className="receipt-loading"><div className="spinner"></div>Loading Receipt...</div>;
+    if (error) return <div className="receipt-error">⚠️ {error}</div>;
+    if (!transactionData || !transactionData.items) return <div className="receipt-error">⚠️ Receipt data incomplete.</div>;
 
-  if (error) {
-    return <div className="receipt-container error">Error: {error}</div>;
-  }
+    const {
+        receipt_code,
+        created_at,
+        amount,
+        payment_method,
+        meetup_details,
+        buyer_name,
+        items, 
+    } = transactionData;
 
-  // If the API returned 404 or the data is null
-  if (!transactionData) {
+    const finalTotal = parseFloat(amount || 0);
+
+    const handlePrint = () => {
+        window.print();
+    };
+
     return (
-      <div className="receipt-container">
-        <div className="empty-receipt">
-          <p>Order details not found for transaction ID: {transactionId}.</p>
-        </div>
-      </div>
-    );
-  }
+        <div className="receipt-wrapper">
+            <button className="mobile-back-btn" onClick={() => navigate(-1)}>
+                <i className="fa-solid fa-arrow-left"></i>
+            </button>
 
-  // --- Data Mapping (Uses transactionData from the backend) ---
-  const {
-    price_paid,
-    listing_price,
-    meetup_details = {},
-    payment_method,
-    product_name,
-    status,
-  } = transactionData;
-
-  const subtotal = parseFloat(price_paid);
-  const grandTotal = subtotal;
-  const productPrice = parseFloat(listing_price);
-
-  const orderItems = [
-    {
-      id: transactionData.product_id,
-      name: product_name,
-      price: productPrice,
-      quantity: 1, // Assuming single item purchase flow
-    },
-  ];
-
-  // --- Handler Functions ---
-  const handleDone = () => {
-    clearCart(); // Clear cart when leaving receipt
-    navigate("/inside-app");
-  };
-
-  const handlePrint = () => {
-    window.print();
-  };
-
-  // --- JSX Rendering (Updated to use transactionData) ---
-  // You will need to restore the full JSX body using the variables defined above
-  // (e.g., transactionData, orderItems, meetup_details, etc.)
-  return (
-    <div className="receipt-container">
-      <div className="receipt-card">
-        <header className="receipt-header">
-          <div className="receipt-icon">🧾</div>
-          <h1 className="receipt-title">Order Receipt</h1>
-          <p className="receipt-subtitle">
-            Transaction ID: {transactionData.transaction_id}
-          </p>
-        </header>
-
-        <div className="receipt-content">
-          <section className="customer-info">
-            <h2 className="section-title">Meet-up Details</h2>
-            <p>
-              <strong>Customer:</strong>{" "}
-              {meetup_details.full_name || transactionData.buyer_username}
-            </p>
-            <p>
-              <strong>Location:</strong>{" "}
-              {meetup_details.location_type === "school-premises"
-                ? "School Premises"
-                : "Near Establishment"}
-            </p>
-            <p>
-              <strong>Specifics:</strong>{" "}
-              {meetup_details.specific_details || "N/A"}
-            </p>
-            <p>
-              <strong>Contact:</strong> {meetup_details.contact_number || "N/A"}
-            </p>
-            <p>
-              <strong>Payment Method:</strong> {payment_method || "N/A"}
-            </p>
-          </section>
-
-          <section className="receipt-items">
-            <h2 className="section-title">Order Details</h2>
-            {orderItems.map((item) => (
-              <div key={item.id} className="receipt-item">
-                <div className="item-details">
-                  <span className="item-name">{item.name}</span>
-                  <span className="item-quantity">
-                    Qty: {item.quantity || 1}
-                  </span>
+            <div className="receipt-paper">
+                
+                <div className="receipt-header-red">
+                    <div style={{marginBottom: '5px', opacity: 0.8}}>Ref: {receipt_code}</div>
+                    <h2>Order Receipt</h2>
+                    <p>{new Date(created_at).toLocaleDateString()} • {new Date(created_at).toLocaleTimeString()}</p>
                 </div>
-                <span className="item-price">
-                  ₱{(item.price * (item.quantity || 1)).toFixed(2)}
-                </span>
-              </div>
-            ))}
-          </section>
 
-          <section className="receipt-summary">
-            <div className="summary-row total">
-              <span>Total Amount Paid</span>
-              <span>₱{grandTotal.toFixed(2)}</span>
+                <div className="receipt-body">
+                    
+                    <div className="section-header">
+                        <i className="fa-solid fa-location-dot"></i> Meet-up Details
+                    </div>
+                    
+                    <div className="details-grid">
+                        <span className="detail-label">Customer</span>
+                        <span className="detail-value">{meetup_details?.full_name || buyer_name}</span>
+
+                        <span className="detail-label">Location</span>
+                        <span className="detail-value">
+                            {meetup_details?.location_type === "school-premises" ? "Inside TUP Campus" : "Near Establishment"}
+                        </span>
+
+                        <span className="detail-label">Specifics</span>
+                        <span className="detail-value">{meetup_details?.specific_details || "N/A"}</span>
+
+                        <span className="detail-label">Contact</span>
+                        <span className="detail-value">{meetup_details?.contact_number || "N/A"}</span>
+
+                        <span className="detail-label">Payment</span>
+                        <span className="detail-value">{payment_method}</span>
+                    </div>
+
+                    <div className="section-header" style={{marginTop: '25px'}}>
+                        <i className="fa-solid fa-bag-shopping"></i> Order Details ({items.length} Items)
+                    </div>
+
+                    {items.map((item, index) => (
+                        <div key={index} className="order-item-card">
+                            {item.image_url ? (
+                                <img src={item.image_url} alt="Item" className="item-thumb" onError={(e) => e.target.style.display='none'}/>
+                            ) : (
+                                <div className="item-thumb"><i className="fa-solid fa-box"></i></div>
+                            )}
+                            <div className="item-info">
+                                <h4>{item.product_name}</h4>
+                                <p className="seller-tag">Sold by: <strong>{item.seller_name}</strong></p>
+                            </div>
+                            <div className="item-pricing">
+                                <p className="qty">Qty: {item.quantity}</p>
+                                <p className="unit-price">@ {formatPrice(item.unit_price)}</p>
+                            </div>
+                        </div>
+                    ))}
+                    
+                    <div className="calc-table-wrapper">
+                        <div className="calculation-table">
+                            <div className="calc-row">
+                                <span>Subtotal ({items.length} Items)</span>
+                                <span>{formatPrice(finalTotal)}</span>
+                            </div>
+                            
+                            <div className="calc-divider"></div>
+                            
+                            <div className="calc-row total">
+                                <span>TOTAL AMOUNT</span>
+                                <span>{formatPrice(finalTotal)}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="receipt-barcode">
+                        <div className="barcode-lines"></div>
+                        <p>{receipt_code}</p>
+                    </div>
+
+                </div>
+
+                <div className="receipt-actions">
+                    <button className="btn-print" onClick={handlePrint}>
+                        <i className="fa-solid fa-print"></i> Print
+                    </button>
+                    
+                    <button className="btn-home" onClick={() => navigate('/transactions')}>
+                        <i className="fa-solid fa-receipt"></i> Transactions
+                    </button>
+                </div>
             </div>
-          </section>
         </div>
-
-        <footer className="receipt-footer">
-          <button className="btn btn-secondary" onClick={handlePrint}>
-            Print Receipt
-          </button>
-          <button className="btn btn-primary" onClick={handleDone}>
-            Continue Shopping
-          </button>
-        </footer>
-      </div>
-    </div>
-  );
+    );
 }

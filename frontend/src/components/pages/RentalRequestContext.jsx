@@ -1,91 +1,148 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { createRentalRequest, fetchRentalRequests, updateRentalStatus } from "../../services/api";
 
 const RentalRequestContext = createContext();
 
 export const RentalRequestProvider = ({ children }) => {
-  const [renterRequests, setRenterRequests] = useState([]);
-  const [renteeRequests, setRenteeRequests] = useState([]);
+    const [allRequests, setAllRequests] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-  // Load existing requests when the app starts
-  useEffect(() => {
-    const loadRequests = async () => {
-      try {
-        const userId = localStorage.getItem("user_id");
-        if (userId) {
-          const data = await fetchRentalRequests(userId);
-          // Assuming backend returns a list, you might need to split them based on role later
-          // For now, we just store them to avoid errors
-          setRenterRequests(data); 
+    const loadRequests = useCallback(async () => {
+        try {
+            setLoading(true);
+            const userId = localStorage.getItem("user_id"); 
+            if (userId && userId !== 'null' && userId !== 'undefined') {
+                const data = await fetchRentalRequests(userId);
+                if (Array.isArray(data)) {
+                    setAllRequests(data);
+                } else {
+                    setAllRequests([]);
+                }
+            } else {
+                 setAllRequests([]);
+            }
+        } catch (error) {
+            console.error("Failed to load rental requests:", error);
+            setAllRequests([]);
+        } finally {
+            setLoading(false);
         }
-      } catch (error) {
-        console.error("Failed to load rental requests", error);
-      }
+    }, []);
+
+    useEffect(() => {
+        loadRequests();
+    }, [loadRequests]);
+
+    const checkAvailability = (productId, startDate, endDate) => {
+        const userStart = new Date(startDate).getTime();
+        const userEnd = new Date(endDate).getTime();
+
+        const hasConflict = allRequests.some((req) => {
+            if (String(req.product_id) !== String(productId)) return false;
+            if (req.status === "declined" || req.status === "cancelled") return false;
+
+            const existingStart = new Date(req.rent_start).getTime();
+            const existingEnd = new Date(req.rent_end).getTime();
+
+            return userStart < existingEnd && userEnd > existingStart;
+        });
+
+        return !hasConflict;
     };
-    loadRequests();
-  }, []);
 
-  const addRentalRequest = async (requestDetails) => {
-    try {
-      const userId = localStorage.getItem("user_id");
-      if (!userId) {
-        alert("You must be logged in to rent an item.");
-        return;
-      }
+    const addRentalRequest = async (requestDetails) => {
+        try {
+            const userId = localStorage.getItem("user_id");
+            
+            if (!userId || userId === 'null' || userId === 'undefined') {
+                alert("Renter ID is missing. Please log in again.");
+                return false;
+            }
+            
+            const productId = requestDetails.product_id; 
+            const startDate = requestDetails.startDate;
+            const endDate = requestDetails.endDate;
+            
+            // CRITICAL CHECK: Ensure all required fields exist before API call
+            if (!productId || !startDate || !endDate) {
+                 alert("Missing product ID or rental dates. Cannot proceed."); // Match the error image
+                 return false;
+            }
 
-      // Prepare payload for Backend
-      // Note: HomePage passes confirmationItem details. We need product_id.
-      // Assuming requestDetails has 'product_id' or 'id'
-      const payload = {
-        product_id: requestDetails.product_id || requestDetails.id, 
-        renter_id: userId
-      };
+            const isAvailable = checkAvailability(
+                productId, 
+                startDate, 
+                endDate
+            );
 
-      const response = await createRentalRequest(payload);
-      
-      // Update local state to reflect change immediately
-      const newRequest = { ...requestDetails, status: 'pending', id: response.id };
-      setRenterRequests((prev) => [...prev, newRequest]);
-      
-      console.log("Rental request saved to DB:", response);
+            if (!isAvailable) {
+                alert("This item is already booked for these dates.");
+                return false;
+            }
 
-    } catch (error) {
-      console.error("Error creating rental request:", error);
-      alert("Failed to send rental request.");
-    }
-  };
+            // Final payload structure matching Flask requirements (product_id, renter_id, start_date, end_date)
+            const payload = {
+                product_id: productId,
+                renter_id: parseInt(userId), 
+                start_date: startDate,
+                end_date: endDate
+            };
+            
+            const response = await createRentalRequest(payload);
+            
+            await loadRequests();
+            
+            alert("Rental request sent successfully!");
+            return true;
 
-  const updateRequestAPI = async (requestId, newStatus) => {
-    try {
-      await updateRentalStatus(requestId, newStatus);
-      
-      setRenterRequests((prev) =>
-        prev.map((req) =>
-          req.id === requestId ? { ...req, status: newStatus } : req
-        )
-      );
-      setRenteeRequests((prev) =>
-        prev.map((req) =>
-          req.id === requestId ? { ...req, status: newStatus } : req
-        )
-      );
-    } catch (error) {
-      console.error("Error updating rental status:", error);
-    }
-  };
+        } catch (error) {
+            console.error("Error creating rental request:", error);
+            
+            let errorMessage = "Failed to send rental request.";
+            if (error.message) {
+                 // Check if the error is the exact one from Flask
+                errorMessage = error.message.includes("Missing required fields") 
+                                ? "Missing dates or product ID. Please check the form." 
+                                : error.message; 
+            } else if (error.response && error.response.status === 409) {
+                errorMessage = "Dates are not available (409 Conflict).";
+            }
 
-  return (
-    <RentalRequestContext.Provider
-      value={{
-        renterRequests,
-        renteeRequests,
-        addRentalRequest,
-        updateRequestAPI,
-      }}
-    >
-      {children}
-    </RentalRequestContext.Provider>
-  );
+            alert(errorMessage);
+            return false;
+        }
+    };
+
+    const updateRequestAPI = async (requestId, newStatus) => {
+        try {
+            await updateRentalStatus(requestId, newStatus);
+            setAllRequests((prevList) => 
+                prevList.map((req) => 
+                    req.id === requestId ? { ...req, status: newStatus } : req
+                )
+            );
+            return true;
+        } catch (error) {
+            console.error("Error updating rental status:", error);
+            alert("Failed to update status.");
+            return false;
+        }
+    };
+
+    return (
+        <RentalRequestContext.Provider
+            value={{
+                allRequests,
+                loading,
+                addRentalRequest,
+                updateRequestAPI,
+                checkAvailability,
+                refreshRequests: loadRequests
+            }}
+        >
+            {children}
+        </RentalRequestContext.Provider>
+    );
 };
 
 export const useRentalRequests = () => useContext(RentalRequestContext);

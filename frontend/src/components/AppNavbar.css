@@ -1,228 +1,328 @@
 .app-navbar {
-  background: linear-gradient(90deg, #7a0000 0%, #4b0000 100%);
-  color: #fff;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  height: 80px;
-  padding: 0 30px;
-  position: sticky;
-  top: 0;
-  z-index: 999;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    background: linear-gradient(90deg, #7a0000 0%, #4b0000 100%);
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 80px;
+    padding: 0 30px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
-/* ===== LEFT SIDE ===== */
-.app-navbar-left {
-  display: flex;
-  align-items: center;
-}
+.app-navbar-left { display: flex; align-items: center; }
+.app-logo { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.app-logo h2 { font-size: 1.8rem; margin: 0; font-weight: 700; letter-spacing: 0.5px; }
+.app-navbar-right { display: flex; align-items: center; gap: 20px; }
 
-.app-logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-}
-
-.app-logo h2 {
-  font-size: 1.8rem;
-  margin: 0;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-}
-
-/* ===== RIGHT SIDE ===== */
-.app-navbar-right {
-  display: flex;
-  align-items: center;
-  gap: 25px; /* Spacing between icons */
-}
-
-/* Top Nav Icons (Message & Bell) */
-.nav-icon-container {
-  position: relative;
-  cursor: pointer;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: background 0.3s ease;
-}
-
-.nav-icon-container:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.nav-icon {
-  font-size: 1.4rem;
-  color: rgba(255, 255, 255, 0.9);
-  transition: transform 0.2s, color 0.2s;
-}
-
-.nav-icon-container:hover .nav-icon {
-  color: #FFD700; /* Gold highlight */
-  transform: scale(1.1);
-}
-
-/* Red Notification Dot */
+/* Notification Bell Styles */
 .nav-badge-dot {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 10px;
-  height: 10px;
-  background-color: #ff4d4d;
-  border-radius: 50%;
-  border: 2px solid #4b0000;
+    position: absolute;
+    top: 0px; 
+    right: 0px; 
+    background: #d32f2f;
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 800;
+    min-width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    padding: 1px 4px;
+    border: 2px solid #4b0000;
+    z-index: 3000;
 }
 
-/* Profile Icon */
-.profile-menu-container {
-  margin-left: 10px;
+/* Profile Icon & Dropdown */
+.profile-menu-container { margin-left: 10px; position: relative; }
+.profile-icon { position: relative; cursor: pointer; }
+.profile-icon img { width: 45px; height: 45px; border-radius: 50%; cursor: pointer; border: 2px solid rgba(255,255,255,0.7); transition: all 0.3s ease; object-fit: cover; }
+.profile-icon img:hover { border-color: #FFD700; box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+.dropdown-menu { position: absolute; top: 60px; right: 0; width: 220px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; animation: slideIn 0.2s ease-out forwards; z-index: 1500; border: 1px solid #eee; }
+.dropdown-item { padding: 14px 20px; font-size: 0.95rem; color: #333; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: background 0.2s; font-weight: 500; }
+.dropdown-item:hover { background: #f5f5f5; color: #8B0000; }
+.dropdown-divider { height: 1px; background: #eee; margin: 4px 0; }
+.dropdown-item.logout { color: #d32f2f; }
+.dropdown-item.logout:hover { background: #ffebee; }
+@keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ========================================= */
+/* 🔥 GLOBAL SPEED DIAL (FAB) CSS 🔥 */
+/* ========================================= */
+
+.fab-container {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
 }
 
-.profile-icon img {
-  width: 45px;
-  height: 45px;
-  border-radius: 50%;
-  cursor: pointer;
-  border: 2px solid rgba(255,255,255,0.7);
-  transition: all 0.3s ease;
-  object-fit: cover;
+.fab-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.5);
+    z-index: 1999;
+    backdrop-filter: blur(2px);
+    animation: fadeIn 0.2s ease-out;
 }
 
-.profile-icon img:hover {
-  border-color: #FFD700;
-  box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+.fab-trigger-wrapper {
+    position: relative;
+    z-index: 2001;
 }
 
-/* ===== DROPDOWN MENU ===== */
-.dropdown-menu {
-  position: absolute;
-  top: 60px;
-  right: 0;
-  width: 220px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-  overflow: hidden;
-  animation: slideIn 0.2s ease-out forwards;
-  z-index: 1000;
-  border: 1px solid #eee;
+/* Main (+) Button */
+.fab-main-trigger {
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    background: #8B0000;
+    color: white;
+    border: none;
+    font-size: 1.8rem;
+    box-shadow: 0 6px 20px rgba(139, 0, 0, 0.4);
+    cursor: pointer;
+    transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55), background 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.dropdown-item {
-  padding: 14px 20px;
-  font-size: 0.95rem;
-  color: #333;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  transition: background 0.2s;
-  font-weight: 500;
+.fab-main-trigger:hover { transform: scale(1.1); }
+.fab-main-trigger.active { transform: rotate(45deg); background: #333; }
+
+/* 🌟 MAIN BADGE (Yellow Gold on +) 🌟 */
+.main-fab-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #FFC107;
+    color: #8B0000;
+    font-size: 0.85rem;
+    font-weight: 800;
+    min-width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.dropdown-item:hover {
-  background: #f5f5f5;
-  color: #8B0000;
+.fab-menu {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+    margin-bottom: 32px;
+    z-index: 2001;
 }
 
-.dropdown-item i {
-  width: 20px;
-  text-align: center;
-  font-size: 1.1rem;
+.fab-item {
+    position: right;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(20px) scale(0.92);
+    pointer-events: none;
+    transition: all 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    padding-right: 64px;
+    min-height: 56px;
 }
 
-.dropdown-divider {
-  height: 1px;
-  background: #eee;
-  margin: 4px 0;
+.fab-btn-mini.fab-chat, .fab-btn-mini.fab-cart-mini, .fab-btn-mini.fab-post {
+    background: transparent;
+    box-shadow: none;
+}
+.fab-btn-mini.fab-chat i, .fab-btn-mini.fab-cart-mini i, .fab-btn-mini.fab-post i { display: none; } 
+
+.fab-container.open .fab-item {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
 }
 
-.dropdown-item.logout {
-  color: #d32f2f;
+.fab-container.open .fab-item:nth-child(3) { transition-delay: 0.05s; }
+.fab-container.open .fab-item:nth-child(2) { transition-delay: 0.1s; } 
+.fab-container.open .fab-item:nth-child(1) { transition-delay: 0.15s; }
+
+.fab-btn-wrapper {
+    position: relative;
 }
 
-.dropdown-item.logout:hover {
-  background: #ffebee;
+/* Mini Buttons Style (Circles) */
+.fab-btn-mini {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: none;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    cursor: pointer;
+    transition: transform 0.2s;
 }
 
-@keyframes slideIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+.fab-btn-mini:hover { transform: scale(1.15); }
+
+/* 🔴 MINI BADGES (Red on Cart/Chat) 🔴 */
+.mini-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #d32f2f;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
-/* ===== 🛒 FLOATING CART BUTTON (Bottom Right) ===== */
-.floating-cart-btn {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  width: 65px;
-  height: 65px;
-  /* Gold/Orange Gradient to stand out from Red */
-  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); 
-  color: #8B0000; /* Maroon Icon */
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 1.8rem;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-  cursor: pointer;
-  z-index: 2000; /* Top of everything */
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Bouncy effect */
+/* Specific Colors for Icons */
+.fab-post { background: #1f2937; }
+.fab-cart-mini { background: #FFC107; color: #8B0000; }
+.fab-chat { background: #007bff; }
+
+/* Create Post floating icon (right side of label) */
+.fab-post-floating-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #1f2937;
+    color: #fff;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    z-index: 2002;
 }
 
-.floating-cart-btn:hover {
-  transform: scale(1.1) rotate(-5deg);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+/* Floating icons for Chat & Cart — align to the right like Create Post */
+.fab-chat-floating-icon, .fab-cart-floating-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    z-index: 2002;
 }
 
-.floating-cart-btn:active {
-  transform: scale(0.95);
+.fab-chat-floating-icon { background: #007bff; }
+.fab-cart-floating-icon { background: #FFC107; color: #8B0000; }
+
+.fab-item:hover .fab-post-floating-icon,
+.fab-item:hover .fab-chat-floating-icon,
+.fab-item:hover .fab-cart-floating-icon {
+    transform: translateY(-50%) scale(1.12);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.32);
 }
 
-/* Cart Badge Number */
-.floating-cart-badge {
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  background-color: #d32f2f;
-  color: white;
-  font-size: 0.85rem;
-  font-weight: 800;
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  border: 3px solid #f5f5f5; /* White border to make it pop */
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+.fab-post-floating-icon .mini-badge,
+.fab-chat-floating-icon .mini-badge,
+.fab-cart-floating-icon .mini-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    z-index: 2003;
 }
 
-/* ===== RESPONSIVE ===== */
-@media (max-width: 768px) {
-  .app-navbar {
-    padding: 0 20px;
-    height: 70px;
+@media (max-width: 480px) {
+  .fab-post-floating-icon, .fab-chat-floating-icon, .fab-cart-floating-icon {
+    right: 12px;
+    width: 40px;
+    height: 40px;
   }
-  
-  .app-logo h2 {
-    font-size: 1.5rem;
+  .fab-label {
+    display: inline-flex;
+    right: 48px;
+    width: 80px;
+    font-size: 0.82rem;
+    padding: 4px 8px;
+    text-align: right;
+    color: #fff;
   }
-
-  /* Move FAB higher on mobile if needed */
-  .floating-cart-btn {
-    bottom: 80px; 
+  .fab-item {
+    padding-right: 56px;
+    gap: 8px;
+    min-height: 48px;
+  }
+  .fab-menu {
+    margin-bottom: 120px;
+    gap: 10px;
+  }
+  .fab-container {
+    bottom: 20px;
     right: 20px;
-    width: 55px;
-    height: 55px;
-    font-size: 1.5rem;
   }
+}  
+
+.fab-label {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 64px;
+    width: 110px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    background: transparent;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    box-shadow: none;
+    white-space: nowrap;
+    text-align: right;
+    z-index: 2001;
+} 
+
+@keyframes popIn { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+@media (max-width: 768px) {
+    .app-navbar { padding: 0 20px; height: 70px; }
+    .app-logo h2 { font-size: 1.5rem; }
+    .fab-container { bottom: 20px; right: 20px; }
+    .fab-main-trigger { width: 60px; height: 60px; font-size: 1.5rem; }
+    .fab-btn-mini { width: 45px; height: 45px; font-size: 1.1rem; }
+    .fab-label { font-size: 0.8rem; padding: 4px 10px; }
+    .fab-menu { gap: 10px; margin-bottom: 10px; }
 }
+

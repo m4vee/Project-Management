@@ -2,35 +2,45 @@ import React, { useState, useRef, useEffect } from "react";
 import "./PostActionModal.css";
 
 const PostActionModal = ({ post, onClose, onDelete, onEdit }) => {
-  const [title, setTitle] = useState(post.title || "");
-  const [description, setDescription] = useState(post.desc || "");
-  const [category, setCategory] = useState(post.category || "Buy/Sell");
-  const [itemCategory, setItemCategory] = useState(post.itemCategory || "");
+  const [title, setTitle] = useState(post.name || ""); 
+  const [description, setDescription] = useState(post.description || "");
+  const [category, setCategory] = useState(post.listing_type || "sell");
+  const [itemCategory, setItemCategory] = useState(post.category || "");
   const [condition, setCondition] = useState(post.condition || "Good");
   const [price, setPrice] = useState(post.price || "");
-  const [rentDuration, setRentDuration] = useState(post.rentDuration || "");
-  const [itemWanted, setItemWanted] = useState(post.itemWanted || "");
-  const [availability, setAvailability] = useState(post.meetup || []);
-  // Initialize images safely as an array
-  const [images, setImages] = useState(Array.isArray(post.img) ? post.img : post.img ? [post.img] : []);
+  
+  const [rentDuration, setRentDuration] = useState(""); 
+  const [itemWanted, setItemWanted] = useState("");
+
+  const [availability, setAvailability] = useState([]);
+  const [images, setImages] = useState([]);
 
   const [errorMessage, setErrorMessage] = useState("");
-
   const fileInputRef = useRef(null);
 
   useEffect(() => {
-  setTitle(post.title || "");
-  setDescription(post.desc || "");
-  setCategory(post.category || "Buy/Sell");
-  setItemCategory(post.itemCategory || "");
-  setCondition(post.condition || "Good");
-  setPrice(post.price || "");
-  setRentDuration(post.rentDuration || "");
-  setItemWanted(post.itemWanted || "");
-  setAvailability(post.meetup || []);
-  setImages(Array.isArray(post.img) ? post.img : post.img ? [post.img] : []);
-  }, [post]);
+    if (post) {
+        setTitle(post.name || "");
+        setDescription(post.description || "");
+        setCategory(post.listing_type || "sell");
+        setItemCategory(post.category || "");
+        setCondition(post.condition || "Good");
+        setPrice(post.price || "");
+        
+        if (post.availability) {
+            const availArray = post.availability.split(',').map(day => day.trim().toLowerCase());
+            setAvailability(availArray);
+        } else {
+            setAvailability([]);
+        }
 
+        if (post.image_url) {
+            setImages([post.image_url]);
+        } else {
+            setImages([]);
+        }
+    }
+  }, [post]);
 
   const handleAvailabilityChange = (day) => {
     setAvailability(prev =>
@@ -39,11 +49,10 @@ const PostActionModal = ({ post, onClose, onDelete, onEdit }) => {
   };
 
   const handleImageChange = (e) => {
-  const files = Array.from(e.target.files);
-  const previewURLs = files.map(f => URL.createObjectURL(f));
-  setImages(previewURLs);
-};
-
+    const files = Array.from(e.target.files);
+    const previewURLs = files.map(f => URL.createObjectURL(f));
+    setImages(previewURLs);
+  };
 
   const handleSave = () => {
     if (!title || !description || !category) {
@@ -52,17 +61,25 @@ const PostActionModal = ({ post, onClose, onDelete, onEdit }) => {
     }
 
     const updatedPost = {
-      ...post,
-      title,
-      desc: description,
-      category,
-      itemCategory,
-      condition,
-      price,
-      rentDuration,
-      itemWanted,
-      meetup: availability,
-      img: images
+      id: post.id,
+      seller_id: post.seller_id,
+      
+      // We map these to match what Profile.jsx expects or the DB columns directly
+      title: title, 
+      name: title,
+      
+      description: description,
+      
+      type: category,
+      listing_type: category,
+      
+      category: itemCategory,
+      condition: condition,
+      price: price,
+      
+      availability: availability.map(d => d.charAt(0).toUpperCase() + d.slice(1)).join(', '),
+      
+      image_url: images.length > 0 ? images[0] : "",
     };
 
     onEdit(updatedPost);
@@ -74,11 +91,10 @@ const PostActionModal = ({ post, onClose, onDelete, onEdit }) => {
     <div className="edit-modal-backdrop" onClick={onClose}>
       <div className="edit-modal-container" onClick={e => e.stopPropagation()}>
         <button className="edit-close-btn" onClick={onClose}>×</button>
-        <h2>Edit Post</h2><br></br>
+        <h2>Edit Post</h2>
         {errorMessage && <div className="edit-error-message">{errorMessage}</div>}
 
         <div className="edit-scroll-area">
-          {/* ITEM NAME */}
           <div className="edit-form-group">
             <label>Item Name</label>
             <input
@@ -89,7 +105,6 @@ const PostActionModal = ({ post, onClose, onDelete, onEdit }) => {
             />
           </div>
 
-          {/* DESCRIPTION */}
           <div className="edit-form-group">
             <label>Description</label>
             <textarea
@@ -99,22 +114,19 @@ const PostActionModal = ({ post, onClose, onDelete, onEdit }) => {
             />
           </div>
 
-          {/* MAIN CATEGORY */}
           <div className="edit-form-group">
-            <label>Category</label>
+            <label>Listing Type</label>
             <select value={category} onChange={e => setCategory(e.target.value)} required>
-              <option value="">Select a category</option>
-              <option value="Buy/Sell">Buy/Sell</option>
-              <option value="Rent">Rent</option>
-              <option value="Swap">Swap</option>
+              <option value="sell">Buy/Sell</option>
+              <option value="rent">Rent</option>
+              <option value="swap">Swap</option>
             </select>
           </div>
 
-          {/* ITEM CATEGORY */}
           <div className="edit-form-group">
             <label>Item Category</label>
             <select value={itemCategory} onChange={e => setItemCategory(e.target.value)}>
-              <option value="" disabled hidden>Select Category</option>
+              <option value="" disabled>Select Category</option>
               <option value="arts">Arts and Crafts</option>
               <option value="electronics">Electronics</option>
               <option value="books">Books</option>
@@ -124,43 +136,36 @@ const PostActionModal = ({ post, onClose, onDelete, onEdit }) => {
             </select>
           </div>
 
-          {/* CONDITION (Buy/Sell only) */}
-          
-            <div className="edit-form-group">
-              <label>Condition</label>
-              <select value={condition} onChange={e => setCondition(e.target.value)}>
-                <option>New</option>
-                <option>Good</option>
-                <option>Used</option>
-              </select>
-            </div>
-          
+          <div className="edit-form-group">
+            <label>Condition</label>
+            <select value={condition} onChange={e => setCondition(e.target.value)}>
+              <option value="New">New</option>
+              <option value="Good">Good</option>
+              <option value="Used">Used</option>
+            </select>
+          </div>
 
-          {/* PRICE */}
-          {(category === "Buy/Sell" || category === "Rent") && (
+          {(category === "sell" || category === "rent") && (
             <div className="edit-form-group">
               <label>Price (₱)</label>
               <input type="number" value={price} onChange={e => setPrice(e.target.value)} />
             </div>
           )}
 
-          {/* RENT DURATION */}
-          {category === "Rent" && (
+          {category === "rent" && (
             <div className="edit-form-group">
               <label>Rent Duration (days)</label>
               <input type="number" value={rentDuration} onChange={e => setRentDuration(e.target.value)} />
             </div>
           )}
 
-          {/* SWAP ITEM */}
-          {category === "Swap" && (
+          {category === "swap" && (
             <div className="edit-form-group">
               <label>Looking to Swap For</label>
               <input type="text" value={itemWanted} onChange={e => setItemWanted(e.target.value)} />
             </div>
           )}
 
-          {/* Meetup Availability */}
           <div className="edit-form-group">
             <label>Meetup Availability</label>
             <div className="edit-availability-grid">
@@ -177,26 +182,25 @@ const PostActionModal = ({ post, onClose, onDelete, onEdit }) => {
             </div>
           </div>
 
-          {/* IMAGE UPLOAD */}
           <div className="edit-form-group">
-            <label>Upload Images</label>
-            <input type="file" ref={fileInputRef} onChange={handleImageChange} accept="image/*" multiple />
+            <label>Update Image</label>
+            <input type="file" ref={fileInputRef} onChange={handleImageChange} accept="image/*" />
+            
             {images.length > 0 && (
               <div className="edit-image-preview-row">
-                {images.map((src, i) => (
-                  <img key={i} src={src} alt="Preview" className="edit-image-preview" />
-                ))}
+                <img src={images[0]} alt="Preview" className="edit-image-preview" />
               </div>
             )}
           </div>
         </div>
 
-        {/* ACTION BUTTONS */}
         <div className="edit-action-buttons">
           <button className="edit-btn cancel" onClick={onClose}>Cancel</button>
+          
           <button className="edit-btn primary" onClick={() => {
             if (window.confirm("Do you want to save the changes?")) handleSave();
           }}>Save Changes</button>
+          
           <button className="edit-btn danger" onClick={() => {
             if (window.confirm("Are you sure you want to delete this post?")) onDelete(post.id);
           }}>Delete</button>

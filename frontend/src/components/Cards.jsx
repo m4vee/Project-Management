@@ -1,3 +1,4 @@
+import React from 'react';
 import CardItem from "./CardItem";
 import './Cards.css';
 
@@ -13,7 +14,7 @@ function Cards() {
               src="images/buy.jpg"
               text="Buy items easily from trusted schoolmates."
               label="Buying"
-              path="/services"
+              path="/services" 
             />
             <CardItem
               src="images/unif.jpg"

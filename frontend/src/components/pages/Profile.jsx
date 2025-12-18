@@ -1,18 +1,19 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchProducts, deleteProduct, updateUserProfile } from "../../services/api";
+// FIX 1: Import updateProduct here
+import { fetchProducts, deleteProduct, updateProduct, uploadProfileImage } from "../../services/api";
 import PostItemModal from "./PostItemModal";
 import PostActionModal from "./PostActionModal";
 import "./Profile.css";
 
 const DEFAULT_COVER = "https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2000&auto=format&fit=crop";
-const DEFAULT_AVATAR = "/images/no_profile.jpg";
+const DEFAULT_AVATAR = "/images/default-profile.jpg";
 const BACKEND_URL = "http://127.0.0.1:5000";
 
 export default function Profile() {
   const navigate = useNavigate();
   const userId = localStorage.getItem("user_id");
-  const storedName = localStorage.getItem("username"); // Fallback name
+  const storedName = localStorage.getItem("username");
 
   const [profileData, setProfileData] = useState({
     name: storedName || "User",
@@ -51,17 +52,28 @@ export default function Profile() {
           const response = await fetch(`${BACKEND_URL}/api/users/profile/${userId}`);
           if(response.ok) {
               const data = await response.json();
+              
+              let avatarUrl = DEFAULT_AVATAR;
+              if (data.profile_image) {
+                  avatarUrl = data.profile_image.startsWith("http") 
+                      ? data.profile_image 
+                      : `${BACKEND_URL}${data.profile_image}`;
+              }
+
               setProfileData(prev => ({
                   ...prev,
                   name: data.username || storedName,
                   bio: data.bio || "No bio yet.",
                   course: data.course || "TUP Student",
                   year: data.year_level || "",
-                  avatar: data.profile_image ? `${BACKEND_URL}${data.profile_image}` : DEFAULT_AVATAR,
+                  avatar: avatarUrl,
               }));
+
+              localStorage.setItem("profile_image", data.profile_image);
+              window.dispatchEvent(new Event("profile-updated"));
           }
       } catch (err) {
-          console.error("Failed to load profile", err);
+          console.error(err);
       }
   };
 
@@ -75,15 +87,19 @@ export default function Profile() {
         id: p.id,
         title: p.name,
         price: p.price || 0,
-        image: p.image_url ? `${BACKEND_URL}${p.image_url}` : "/images/placeholder.jpg",
+        image: p.image_url ? (p.image_url.startsWith("http") ? p.image_url : `${BACKEND_URL}${p.image_url}`) : "/images/placeholder.jpg",
         type: p.listing_type || 'sell',
         status: p.status || 'available',
-        date: new Date(p.created_at).toLocaleDateString()
+        date: new Date(p.created_at).toLocaleDateString(),
+        // Make sure description/category are passed if needed for editing
+        description: p.description,
+        category: p.category,
+        condition: p.condition
       }));
 
       setPosts(transformed);
     } catch (err) {
-      console.error("Error loading posts:", err);
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -93,6 +109,30 @@ export default function Profile() {
     if (activeFilter === "All") return true;
     return post.type.toLowerCase() === activeFilter.toLowerCase();
   });
+
+  // --- FIX 2: CREATE THE HANDLE EDIT FUNCTION ---
+  const handleEditPost = async (updatedData) => {
+    try {
+        // updatedData should contain { id, name, price, description, etc. }
+        await updateProduct(updatedData.id, {
+            name: updatedData.title, // Backend expects 'name', make sure keys match
+            price: updatedData.price,
+            description: updatedData.description,
+            category: updatedData.category,
+            condition: updatedData.condition,
+            listing_type: updatedData.type
+        });
+
+        alert("Post updated successfully!");
+        
+        // Refresh posts to show changes
+        loadUserPosts();
+        setActionModalOpen(false);
+    } catch (error) {
+        console.error("Update failed:", error);
+        alert("Failed to update post.");
+    }
+  };
 
   const handleDeletePost = async (id) => {
     if(!window.confirm("Delete this item permanently?")) return;
@@ -109,33 +149,34 @@ export default function Profile() {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Optimistic Update
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-        setProfileData(prev => ({ ...prev, [type]: ev.target.result }));
-    };
-    reader.readAsDataURL(file);
+    if (type === 'avatar') {
+        const formData = new FormData();
+        formData.append("image", file);
+        formData.append("user_id", userId);
 
-    const formData = new FormData();
-    formData.append("user_id", userId);
-    formData.append("image", file);
-    formData.append("bio", profileData.bio || ""); 
-    formData.append("course", profileData.course || "");
-
-    try {
-      await updateUserProfile(formData);
-    } catch(err) {
-      alert("Failed to save image. Is the database updated?");
-      loadProfile(); 
+        try {
+            const data = await uploadProfileImage(formData); 
+            const fullUrl = `${BACKEND_URL}${data.image_url}`;
+            setProfileData(prev => ({ ...prev, avatar: fullUrl }));
+            localStorage.setItem("profile_image", data.image_url);
+            window.dispatchEvent(new Event("profile-updated"));
+            alert("Profile picture updated!");
+        } catch (err) {
+            console.error(err);
+            alert("Error uploading image.");
+        }
+    } else {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            setProfileData(prev => ({ ...prev, [type]: ev.target.result }));
+        };
+        reader.readAsDataURL(file);
     }
   };
 
   return (
     <div className="profile-page fade-in">
-      {/* HEADER CARD */}
       <div className="profile-header-card">
-        {/* Removed Settings Icon as requested */}
-
         <div 
           className="profile-cover" 
           style={{ backgroundImage: `url(${profileData.cover})` }}
@@ -177,11 +218,22 @@ export default function Profile() {
                     <span className="stat-label">Following</span>
                 </div>
              </div>
+
+             <div className="profile-action-buttons">
+                <button className="action-btn-outline" onClick={() => navigate('/swaprequests')}>
+                  <i className="fa-solid fa-right-left"></i> Swap Requests
+                </button>
+                <button className="action-btn-outline" onClick={() => navigate('/rentalrequests')}>
+                  <i className="fa-solid fa-clock-rotate-left"></i> Rental Requests
+                </button>
+                <button className="action-btn-outline" onClick={() => navigate('/transactions')}>
+                  <i className="fa-solid fa-receipt"></i> Transactions
+                </button>
+             </div>
           </div>
         </div>
       </div>
 
-      {/* BODY CONTENT */}
       <div className="profile-content">
         <div className="profile-tabs-wrapper">
              <div className="tabs-list">
@@ -195,11 +247,6 @@ export default function Profile() {
                     </button>
                 ))}
              </div>
-             
-             {/* Styled "Post Item" Button */}
-             <button className="btn-post-new desktop-only" onClick={() => setShowCreateModal(true)}>
-                <i className="fa-solid fa-plus"></i> Post Item
-             </button>
         </div>
 
         <div className="profile-grid">
@@ -212,7 +259,7 @@ export default function Profile() {
                 </div>
             ) : (
                 filteredPosts.map(post => (
-                    <div key={post.id} className="pro-card" onClick={() => setSelectedPost(post)}>
+                    <div key={post.id} className="pro-card">
                         <div className="pro-card-img">
                             <img src={post.image} alt={post.title} onError={(e) => e.target.src="/images/placeholder.jpg"} />
                             <span className={`pro-badge ${post.type}`}>{post.type}</span>
@@ -224,7 +271,11 @@ export default function Profile() {
                                 <span className="date">{post.date}</span>
                             </div>
                         </div>
-                        <button className="pro-card-opt" onClick={(e) => { e.stopPropagation(); setSelectedPost(post); setActionModalOpen(true); }}>
+                        <button className="pro-card-opt" onClick={(e) => { 
+                            e.stopPropagation(); 
+                            setSelectedPost(post); 
+                            setActionModalOpen(true); 
+                        }}>
                             <i className="fa-solid fa-ellipsis-vertical"></i>
                         </button>
                     </div>
@@ -233,12 +284,7 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* Floating Action Button (Mobile Only) */}
-      <button className="fab-add mobile-only" onClick={() => setShowCreateModal(true)}>
-        <i className="fa-solid fa-plus"></i>
-      </button>
 
-      {/* Modals */}
       <PostItemModal 
         isOpen={showCreateModal} 
         onClose={() => { setShowCreateModal(false); loadUserPosts(); }} 
@@ -250,6 +296,7 @@ export default function Profile() {
           post={selectedPost} 
           onClose={() => setActionModalOpen(false)}
           onDelete={handleDeletePost}
+          onEdit={handleEditPost} 
         />
       )}
     </div>

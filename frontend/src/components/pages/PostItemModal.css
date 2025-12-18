@@ -1,176 +1,230 @@
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  padding: 20px;
+}
+
 .modal-content-post {
-  background: white;
-  padding: 25px;
-  border-radius: 8px;
-  width: 90%;
-  max-width: 500px;
-  position: relative;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 18px;
+  width: 100%;
+  max-width: 560px;
   max-height: 90vh;
   overflow-y: auto;
-  z-index: 1001;
+  position: relative;
+  box-shadow: 0 24px 55px rgba(0,0,0,0.3);
+  font-family: "Poppins", sans-serif;
+  border: 2px solid #800000;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  background-color: #800000;
+  margin-bottom: 20px;
+  padding: 15px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border-radius: 14px;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: clamp(1.2rem, 4vw, 1.5rem);
+  font-weight: 700;
+  color: #ffffff;
+  text-align: center;
 }
 
 .modal-close-btn {
   position: absolute;
-  top: 10px;
   right: 15px;
-  background: transparent;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
   border: none;
-  font-size: 28px;
-  color: #888;
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 700;
   cursor: pointer;
-  z-index: 1002;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
 }
 
-.modal-content-post h2 {
-  margin-top: 0;
-  margin-bottom: 20px;
-  color: #333;
-  text-align: center;
+.modal-close-btn:hover {
+  background: #ffffff;
+  color: #800000;
+}
+
+.modal-post-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .form-group {
-  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .form-group label {
-  display: block;
-  margin-bottom: 5px;
   font-weight: 600;
-  color: #555;
+  color: #333;
+  font-size: 0.9rem;
 }
 
-.form-group input[type="text"],
-.form-group input[type="number"],
+.form-group input,
 .form-group textarea,
-.form-group input[type="file"],
-.form-group select {
+.modal-select {
   width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
+  padding: 12px;
+  border: 1.5px solid #cfcfcf;
+  border-radius: 12px;
+  font-size: 0.9rem;
   font-family: inherit;
-  font-size: 15px;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.modal-select:focus {
+  outline: none;
+  border-color: #800000;
+  box-shadow: 0 0 0 3px rgba(128,0,0,0.1);
 }
 
 .form-group textarea {
   resize: vertical;
-  min-height: 80px;
+  min-height: 100px;
 }
 
-.submit-post-btn {
-  width: 100%;
-  padding: 12px;
-  background-color: #800000;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: bold;
-  transition: background-color 0.3s ease;
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
 }
 
-.submit-post-btn:hover {
-  background-color: #600000;
-}
-
-/* --- Styles for Availability Checkboxes --- */
 .availability-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
+  gap: 8px;
   margin-top: 5px;
 }
 
 .day-checkbox {
+  border: 1.5px solid #cfcfcf;
+  border-radius: 20px;
+  padding: 8px 5px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #fafafa;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid #ccc;
-  border-radius: 20px;
-  padding: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  text-align: center;
   user-select: none;
 }
 
-.day-checkbox input[type="checkbox"] {
+.day-checkbox input {
   display: none;
 }
 
 .day-checkbox span {
+  font-size: 0.8rem;
   font-weight: 500;
   color: #555;
 }
 
-.day-checkbox input[type="checkbox"]:checked + span {
-  color: white;
+.day-checkbox:hover {
+  border-color: #800000;
+  color: #800000;
 }
 
 .day-checkbox:has(input:checked) {
-  background-color: #800000;
+  background: #800000;
   border-color: #800000;
 }
 
-/* Error banner */
+.day-checkbox:has(input:checked) span {
+  color: #ffffff;
+}
+
 .error-banner {
-  background: #ffebee;
-  color: #c62828;
-  padding: 12px 15px;
-  border-radius: 6px;
-  margin-bottom: 20px;
+  background: #ffe8e8;
+  color: #9b0000;
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  font-size: 0.9rem;
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 14px;
+  font-weight: 500;
 }
 
-.error-banner i {
-  font-size: 18px;
-}
-
-/* Form row for side-by-side fields */
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
-}
-
-/* Small helper text */
-.form-group small {
-  display: block;
-  margin-top: 5px;
-  color: #666;
-  font-size: 12px;
-}
-
-/* Disabled state */
-button:disabled,
-input:disabled,
-select:disabled,
-textarea:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* Submit button with icon */
 .submit-post-btn {
+  width: 100%;
+  padding: 14px;
+  margin-top: 10px;
+  background: linear-gradient(135deg, #800000, #5a0000);
+  color: #ffffff;
+  border: none;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 8px 20px rgba(128,0,0,0.3);
 }
 
-.submit-post-btn i {
-  font-size: 16px;
+.submit-post-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 25px rgba(128,0,0,0.4);
 }
 
-@media (max-width: 768px) {
+.submit-post-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
   .form-row {
     grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .modal-content-post {
+    padding: 20px 16px;
+    max-height: 95vh;
+    border-radius: 12px;
+  }
+
+  .modal-header {
+    margin-bottom: 20px;
+    border-radius: 12px;
+  }
+
+  .availability-grid {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
